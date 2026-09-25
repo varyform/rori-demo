@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** optional wallpapers (`Desk.wallpapers`): a random landscape photo from Unsplash on each launch, tinted toward the current theme and credited in the status bar.
 - **Users:** the macOS app zooms like a browser: View → Zoom In / Zoom Out / Actual Size (`⌘=`, `⌘-`, `⌘0`), in steps from 50% to 300%.
 - **Users:** the window whose text field has focus wears a green `<input>` tag on its left edge (right edge when there's no room; inside the bottom-left corner of full-width windows), so it's clear keys will type rather than drive the desk.
 - **Users:** a native macOS app (`src-tauri`, `cargo tauri dev`) wrapping the desk, where ⌘ is the shortcut modifier (⌘←→ focus, ⌘1–9 workspaces, ⌘W close…; centre column is ⌘⇧C since ⌘C copies).

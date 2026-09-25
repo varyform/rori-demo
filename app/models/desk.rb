@@ -16,6 +16,10 @@ module Desk
   mattr_accessor :themes_stylesheet, default: Rails.root.join("app/assets/stylesheets/desk/themes.css")
   mattr_accessor :theme_cookie, default: "theme"
 
+  # Optional background photos (off by default): a random one per page load.
+  mattr_accessor :wallpapers, default: false
+  mattr_accessor :wallpapers_file, default: Rails.root.join("vendor/wallpapers/unsplash.yml")
+
   # Keyboard: desk action (desk_controller.js#perform) → key chords, written as
   # `KeyboardEvent#code` names joined with modifiers. `Mod` stands for
   # `Desk.modifier` — Alt in the browser, where ⌘ combos belong to the browser;

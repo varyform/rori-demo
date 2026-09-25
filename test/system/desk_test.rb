@@ -29,6 +29,18 @@ class DeskTest < ApplicationSystemTestCase
     assert_no_text "couldn't be shown"
   end
 
+  test "an optional wallpaper sits behind the strips, tinted toward the theme" do
+    Desk.wallpapers = true
+    visit root_path
+
+    background = evaluate_script("getComputedStyle(document.querySelector('.viewport')).backgroundImage")
+    assert_match %r{image-set\(url\("https://images\.unsplash\.com/photo-}, background
+    assert_not_equal "none", evaluate_script("getComputedStyle(document.querySelector('.viewport'), '::before').backgroundColor")
+    assert_text "Nothing open"
+  ensure
+    Desk.wallpapers = false
+  end
+
   test "invalid modal submissions keep the modal up with field errors" do
     visit root_path
     run_command "new user"

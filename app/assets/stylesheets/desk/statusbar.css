@@ -15,6 +15,17 @@
     text-overflow: ellipsis;
   }
 
+  .statusbar__credit {
+    flex: none;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+  }
+
+  .statusbar__credit:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+  }
+
   .minimap {
     display: flex;
     align-items: center;

@@ -1,0 +1,25 @@
+/* Optional photo behind the strips (Desk.wallpapers). Windows are opaque, so
+   it shows through the gutters and on an empty desk. */
+@layer layout {
+  .viewport.has-wallpaper {
+    background: var(--desk-wallpaper) center / cover no-repeat;
+  }
+
+  /* Tinted toward the theme's canvas so light and dark themes both stay calm
+     and the empty-desk hint stays readable. */
+  .viewport.has-wallpaper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--color-canvas) 35%, transparent);
+    pointer-events: none;
+  }
+
+  .viewport.has-wallpaper .wallpaper {
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    padding: 14px 20px;
+    border-radius: var(--radius);
+    background: color-mix(in oklch, var(--color-surface) 88%, transparent);
+  }
+}

@@ -46,7 +46,9 @@
       "desk-palette:preview->desk-theme#preview",
       "desk-palette:closed->desk-theme#revert"].join(" ") } }
     = render "desk/menubar"
-    %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
+    %main.viewport{ class: class_names("has-wallpaper" => desk_wallpaper),
+      style: ("--desk-wallpaper: #{desk_wallpaper.css_image}" if desk_wallpaper),
+      data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
       = render "desk/wallpaper"
       .stack{ data: { desk_target: "stack" } }
       -# Windows wait here until their page says where they go; modals stay here.

@@ -14,6 +14,19 @@ class Desk::DesktopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "dialog.palette turbo-frame#commands:not([src])"
   end
 
+  test "wallpapers are optional: none by default, a random photo with credit when on" do
+    get root_path
+    assert_select "main.viewport.has-wallpaper", count: 0
+    assert_select ".statusbar__credit", count: 0
+
+    Desk.wallpapers = true
+    get root_path
+    assert_select "main.viewport.has-wallpaper[style*=?]", "--desk-wallpaper: image-set(url(\"https://images.unsplash.com/photo-"
+    assert_select "a.statusbar__credit[target=_blank][href^=?]", "https://images.unsplash.com/photo-", text: "Photo · Unsplash"
+  ensure
+    Desk.wallpapers = false
+  end
+
   test "the native shell gets the ⌘ keymap and hint" do
     get root_path, headers: { "User-Agent" => "Mozilla/5.0 (Macintosh) AppleWebKit/605.1.15 (KHTML, like Gecko) DeskApp/0.1" }
 
