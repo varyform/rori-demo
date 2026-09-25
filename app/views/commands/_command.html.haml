@@ -1,6 +1,13 @@
 -# locals: (command:)
 %li.palette__item{ role: "option",
-  data: { palette_target: "item", url: command.url, desk_action: command.action, search: "#{command.label} #{command.group}",
+  data: { palette_target: "item", url: command.url, desk_action: command.action, param: command.param, children: command.children,
+    current: command.current || nil, search: "#{command.label} #{command.group}",
     action: "click->palette#pick mousemove->palette#hover" } }
-  %span.palette__label= command.label
-  %span.palette__group= command.group
+  %span.palette__label
+    = command.label
+    - if command.children
+      %span.palette__more ›
+  %span.palette__group
+    - if command.current
+      %span.palette__check ✓
+    = command.group

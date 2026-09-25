@@ -153,6 +153,43 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "Desk UI"
   end
 
+  test "nested theme picker previews on the way, reverts on close and persists a pick" do
+    visit root_path
+    find("body").send_keys [ :meta, "k" ]
+    within "dialog.palette" do
+      find(".palette__input").set("theme")
+      assert_selector ".palette__item[aria-selected=true]", text: "Pick theme"
+      find(".palette__input").send_keys :enter
+
+      assert_selector ".palette__crumbs", text: "Pick theme… ›"
+      assert_selector ".palette__item[aria-selected=true][data-current]", text: "Default"
+      find(".palette__input").send_keys :down
+    end
+    assert_selector "html[data-theme=catppuccin-latte]", visible: :all
+
+    within("dialog.palette") { find(".palette__input").send_keys :escape }
+    assert_selector "dialog.palette .palette__item", text: "Pick theme"
+    assert_no_selector "dialog.palette .palette__crumbs"
+    within("dialog.palette") { find(".palette__input").send_keys :escape }
+    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "html[data-theme]", visible: :all
+
+    find("body").send_keys [ :meta, "k" ]
+    within "dialog.palette" do
+      find(".palette__input").set("theme")
+      assert_selector ".palette__item[aria-selected=true]", text: "Pick theme"
+      find(".palette__input").send_keys :enter
+      assert_selector ".palette__crumbs"
+      find(".palette__input").set("nord")
+      assert_selector ".palette__item[aria-selected=true]", text: "Nord"
+      find(".palette__input").send_keys :enter
+    end
+    assert_selector "html[data-theme=nord]", visible: :all
+
+    refresh
+    assert_selector "html[data-theme=nord]", visible: :all
+  end
+
   test "Esc closes a modal window" do
     visit new_project_path
     assert_selector "dialog.win:modal"

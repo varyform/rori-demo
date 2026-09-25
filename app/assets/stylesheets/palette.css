@@ -13,12 +13,29 @@
     background: var(--color-backdrop);
   }
 
-  .palette__input {
-    width: 100%;
-    padding: 14px 16px;
+  .palette__field {
+    display: flex;
+    align-items: center;
     border-bottom: 1px solid var(--color-line);
+  }
+
+  .palette__crumbs {
+    padding-left: 16px;
+    font: 12px var(--font-mono);
+    color: var(--color-ink-muted);
+    white-space: nowrap;
+  }
+
+  .palette__input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px;
     font-size: 15px;
     outline: none;
+  }
+
+  .palette__crumbs:not([hidden])+.palette__input {
+    padding-left: 8px;
   }
 
   .palette__input::-webkit-search-cancel-button {
@@ -52,6 +69,11 @@
   .palette__group {
     font-size: 12px;
     opacity: 0.6;
+  }
+
+  .palette__more,
+  .palette__check {
+    margin: 0 4px;
   }
 
   .palette__empty {

@@ -1,5 +1,5 @@
 !!!
-%html{ lang: I18n.locale }
+%html{ lang: I18n.locale, data: { theme: current_theme&.slug } }
   %head
     %title= windowed? ? window_title : t("app_name")
     %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }
@@ -20,7 +20,8 @@
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_importmap_tags
 
-  %body{ data: { controller: "desk palette",
+  %body{ data: { controller: "desk palette theme",
+    theme_cookie_value: ThemeHelper::THEME_COOKIE,
     desk_root_url_value: root_path,
     desk_load_error_value: t("desk.window.load_error"),
     action: ["keydown@window->desk#keydown",
@@ -30,7 +31,10 @@
       "message->desk#streamMessage:capture",
       "turbo:before-stream-render@document->desk#streamRender",
       "turbo:before-visit@document->desk#interceptVisit",
-      "palette:run->desk#command"].join(" ") } }
+      "palette:run->desk#command",
+      "palette:run->theme#run",
+      "palette:preview->theme#preview",
+      "palette:closed->theme#revert"].join(" ") } }
     = render "desk/menubar"
     %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive" } }
       = render "desk/wallpaper"

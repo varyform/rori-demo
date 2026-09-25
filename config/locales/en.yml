@@ -82,6 +82,12 @@ en:
       full_width: Toggle full-width column
       center_column: Center column
       close_window: Close window
+    themes:
+      pick: Pick theme…
+      default: Default
+      auto: Follows system
+      dark: Dark
+      light: Light
 
   desk:
     menubar:
@@ -97,7 +103,7 @@ en:
       label: Command palette
       placeholder: Type a command or search…
       empty: Nothing matches.
-      hint_html: "<kbd>↵</kbd> open · <kbd>⇧↵</kbd> in a new window · <kbd>esc</kbd> close"
+      hint_html: "<kbd>↵</kbd> open · <kbd>⇧↵</kbd> in a new window · <kbd>⌫</kbd> back · <kbd>esc</kbd> close"
     window:
       back: Back
       detach: Open in a new tab
