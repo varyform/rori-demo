@@ -109,6 +109,35 @@ class DeskTest < ApplicationSystemTestCase
     assert_focused "Dashboard"
   end
 
+  test "alt+shift+digit and ⌘K move the focused column between workspaces" do
+    visit users_path
+    run_command "oleh", new_window: true
+    window_titled "Oleh"
+
+    press :shift, "2"
+    assert_workspace "2"
+    assert_focused "Oleh"
+    assert_selector ".workspace[data-name='2'] .col", count: 1, visible: :all
+
+    find("body").send_keys [ :meta, "k" ]
+    within "dialog.palette" do
+      find(".palette__input").set("move")
+      assert_selector ".palette__item[aria-selected=true]", text: "Move column to workspace"
+      find(".palette__input").send_keys :enter
+
+      assert_selector ".palette__crumbs", text: "Move column to workspace… ›"
+      assert_selector ".palette__item", count: 2
+      find(".palette__input").set("1")
+      assert_selector ".palette__item[aria-selected=true]", text: "1"
+      find(".palette__input").send_keys :enter
+    end
+
+    assert_workspace "1"
+    assert_focused "Oleh"
+    assert_selector ".workspace-button", count: 1
+    assert_selector ".col", count: 2
+  end
+
   test "overview zooms out; clicking a window focuses it" do
     visit users_path
     run_command "dashboard"
@@ -184,6 +213,8 @@ class DeskTest < ApplicationSystemTestCase
       assert_selector ".palette__item[aria-selected=true]", text: "Nord"
       find(".palette__input").send_keys :enter
     end
+    # The selection already previews Nord; the closed palette means the pick itself ran and was saved.
+    assert_no_selector "dialog.palette[open]"
     assert_selector "html[data-theme=nord]", visible: :all
 
     refresh

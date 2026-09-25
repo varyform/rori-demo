@@ -1,12 +1,13 @@
 # A command-palette entry. Running it either opens `url` in a desk window,
 # fires a client-side `action` (with an optional `param`) that the desk or
-# theme controller picks up, or — when it has `children` — drills into the
-# nested command list served at that URL.
-class Desk::Command < Data.define(:label, :group, :url, :action, :param, :children, :current)
+# theme controller picks up, or drills into a nested list: served at the
+# `children` URL, or built in the browser from a named `source` for state the
+# server can't see (see desk-palette's `source` event).
+class Desk::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current)
   ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window ].freeze
 
   class << self
-    def all = routes + records + actions + [ theme_picker ] + app_commands
+    def all = routes + records + actions + [ workspace_mover, theme_picker ] + app_commands
 
     # Every parameterless GET route becomes a command once it has a label under
     # `desk.commands.routes.<controller>.<action>` — adding the locale key opts it in.
@@ -33,6 +34,10 @@ class Desk::Command < Data.define(:label, :group, :url, :action, :param, :childr
       ACTIONS.map { new(label: I18n.t(it, scope: "desk.commands.actions"), group: group(:desk), action: it) }
     end
 
+    def workspace_mover
+      new(label: I18n.t("desk.commands.workspaces.move"), group: group(:desk), source: "workspaces")
+    end
+
     def theme_picker
       new(label: I18n.t("desk.commands.themes.pick"), group: group(:desk), children: url_helpers.desk_commands_themes_path)
     end
@@ -56,7 +61,7 @@ class Desk::Command < Data.define(:label, :group, :url, :action, :param, :childr
       def url_helpers = Rails.application.routes.url_helpers
   end
 
-  def initialize(label:, group:, url: nil, action: nil, param: nil, children: nil, current: false) = super
+  def initialize(label:, group:, url: nil, action: nil, param: nil, children: nil, source: nil, current: false) = super
 
   def to_partial_path = "desk/commands/command"
 end

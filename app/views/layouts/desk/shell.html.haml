@@ -24,8 +24,11 @@
 
   %body{ data: { controller: "desk desk-palette desk-theme",
     desk_theme_cookie_value: Desk.theme_cookie,
+    desk_palette_root_value: desk_commands_path,
     desk_root_url_value: root_path,
     desk_load_error_value: t("desk.window.load_error"),
+    desk_workspace_group_value: t("desk.commands.workspaces.group"),
+    desk_new_workspace_label_value: t("desk.commands.workspaces.new"),
     action: ["keydown@window->desk#keydown",
       "keydown@window->desk-palette#keydown",
       "resize@window->desk#layout",
@@ -34,6 +37,7 @@
       "turbo:before-stream-render@document->desk#streamRender",
       "turbo:before-visit@document->desk#interceptVisit",
       "desk-palette:run->desk#command",
+      "desk-palette:source->desk#paletteSource",
       "desk-palette:run->desk-theme#run",
       "desk-palette:preview->desk-theme#preview",
       "desk-palette:closed->desk-theme#revert"].join(" ") } }

@@ -25,9 +25,10 @@ function score(text, query) {
   return total - text.length / 100
 }
 
-// ⌘K command palette. Command lists are server-rendered into a lazy
-// turbo-frame (reloaded on every open so new records show up) and ranked
-// client-side, with a bonus for commands you run often.
+// ⌘K command palette. Command lists are server-rendered into a turbo-frame
+// (the root list is fetched on every open so new records show up) and ranked
+// client-side, with a bonus for commands you run often. Enter pressed while a
+// list is still arriving runs once it lands.
 //
 // Commands with `data-children` are nested lists: picking one swaps the frame
 // to that URL and pushes a breadcrumb; Backspace on an empty query or Esc goes
@@ -35,10 +36,10 @@ function score(text, query) {
 // `desk-palette:preview` (e.g. live theme preview), and `desk-palette:closed`
 // on close.
 export default class extends Controller {
-  static targets = ["dialog", "input", "frame", "list", "item", "empty", "crumbs"]
+  static targets = ["dialog", "input", "frame", "list", "item", "itemTemplate", "empty", "crumbs"]
+  static values = { root: String }
 
   connect() {
-    this.root = this.frameTarget.getAttribute("src")
     this.stack = []
   }
 
@@ -51,13 +52,12 @@ export default class extends Controller {
   open() {
     this.inputTarget.value = ""
     this.dialogTarget.showModal()
-    this.inputTarget.focus()
-    if (this.stack.length) this.#go([])
-    else if (this.frameTarget.hasAttribute("complete")) this.frameTarget.reload()
+    this.#go([])
     this.filter()
   }
 
   close() {
+    this.pendingRun = null
     this.dialogTarget.close()
   }
 
@@ -67,6 +67,25 @@ export default class extends Controller {
 
   backdrop(event) {
     if (event.target === this.dialogTarget) this.close()
+  }
+
+  // The new list is in: rank it, then run an Enter that was waiting for it.
+  loaded() {
+    // A response that had already arrived still renders after its request was
+    // cancelled, so a stale list can land after drilling in; put the right one back.
+    const top = this.stack.at(-1)
+    if (top?.source) return this.#showSourceList(top.source)
+    const expected = top?.src || this.rootValue
+    if (this.#path(this.frameTarget.getAttribute("src")) !== this.#path(expected)) {
+      return this.frameTarget.setAttribute("src", expected)
+    }
+
+    this.navigating = false
+    this.filter()
+
+    const pending = this.pendingRun
+    this.pendingRun = null
+    if (pending && this.selected) this.#run(this.selected, pending.newWindow)
   }
 
   filter() {
@@ -84,7 +103,7 @@ export default class extends Controller {
 
     // Nested lists keep their server order, so a browsed list reads the same every time.
     if (this.hasListTarget && (query.trim() || !this.stack.length)) this.listTarget.append(...visible.map(({ item }) => item))
-    this.emptyTarget.hidden = visible.length > 0 || !this.frameTarget.hasAttribute("complete")
+    this.emptyTarget.hidden = visible.length > 0 || this.#loading()
 
     const current = !query.trim() && visible.find(({ item }) => "current" in item.dataset)
     this.#select((current || visible[0])?.item)
@@ -98,9 +117,11 @@ export default class extends Controller {
       event.preventDefault()
       const next = event.key === "ArrowDown" ? index + 1 : index - 1
       this.#select(items[(next + items.length) % items.length])
-    } else if (event.key === "Enter" && this.selected && !this.frameTarget.hasAttribute("busy")) {
+    } else if (event.key === "Enter") {
       event.preventDefault()
-      this.#run(this.selected, event.shiftKey || event.metaKey || event.ctrlKey)
+      const newWindow = event.shiftKey || event.metaKey || event.ctrlKey
+      if (this.navigating) this.pendingRun = { newWindow }
+      else if (this.selected) this.#run(this.selected, newWindow)
     } else if (this.stack.length && (event.key === "Escape" || (event.key === "Backspace" && !this.inputTarget.value))) {
       event.preventDefault()
       this.#go(this.stack.slice(0, -1))
@@ -111,8 +132,13 @@ export default class extends Controller {
     this.#run(event.currentTarget, event.shiftKey || event.metaKey || event.ctrlKey)
   }
 
+  // Browsers fire mousemove when a list re-renders under a resting pointer; only
+  // a real move may take the selection from the keyboard.
   hover(event) {
-    if (this.selected !== event.currentTarget) this.#select(event.currentTarget)
+    const pointer = `${event.screenX},${event.screenY}`
+    const moved = this.pointer !== undefined && this.pointer !== pointer
+    this.pointer = pointer
+    if (moved && this.selected !== event.currentTarget) this.#select(event.currentTarget)
   }
 
   #run(item, newWindow) {
@@ -121,8 +147,9 @@ export default class extends Controller {
     usage[id] = (usage[id] || 0) + 1
     localStorage.setItem(USAGE_KEY, JSON.stringify(usage))
 
-    if (item.dataset.children) {
-      return this.#go([...this.stack, { label: item.querySelector(".palette__label").firstChild.textContent.trim(), src: item.dataset.children }])
+    const { children: src, source } = item.dataset
+    if (src || source) {
+      return this.#go([...this.stack, { label: item.querySelector(".palette__label").firstChild.textContent.trim(), src, source }])
     }
     this.close()
     this.dispatch("run", { detail: this.#detail(item, { newWindow }) })
@@ -134,15 +161,59 @@ export default class extends Controller {
     this.inputTarget.value = ""
     this.crumbsTarget.hidden = !stack.length
     this.crumbsTarget.textContent = stack.map(({ label }) => `${label} ›`).join(" ")
-    this.frameTarget.setAttribute("src", stack.at(-1)?.src || this.root)
+    const top = stack.at(-1)
+    if (top?.source) return this.#showSourceList(top.source)
+
+    // Until the new list arrives the old one is still showing; don't run it.
+    this.navigating = true
+    this.pendingRun = null
+    this.frameTarget.setAttribute("src", top?.src || this.rootValue)
     this.inputTarget.focus()
+  }
+
+  // A nested list another controller provides at runtime, for state that only
+  // exists in the browser: `desk-palette:source` asks, the listener fills
+  // `detail.items` with { label, group, action, param }.
+  #showSourceList(source) {
+    const { detail } = this.dispatch("source", { detail: { source, items: [] } })
+    const list = document.createElement("ul")
+    list.className = "palette__list"
+    list.setAttribute("role", "listbox")
+    list.dataset.deskPaletteTarget = "list"
+    list.append(...detail.items.map((attributes) => this.#buildItem(attributes)))
+
+    this.navigating = false
+    this.frameTarget.removeAttribute("src")
+    this.frameTarget.replaceChildren(list)
+    this.filter()
+    this.inputTarget.focus()
+  }
+
+  #buildItem({ label, group, action, param }) {
+    const item = this.itemTemplateTarget.content.firstElementChild.cloneNode(true)
+    Object.assign(item.dataset, { deskAction: action, param: param ?? "", search: `${label} ${group}` })
+    item.querySelector(".palette__label").textContent = label
+    item.querySelector(".palette__group").textContent = group
+    return item
+  }
+
+  #path(url) {
+    if (!url) return null
+    const { pathname, search } = new URL(url, location.href)
+    return pathname + search
+  }
+
+  #loading() {
+    const frame = this.frameTarget
+    return frame.hasAttribute("busy") || (frame.hasAttribute("src") && !frame.hasAttribute("complete"))
   }
 
   #select(item) {
     this.itemTargets.forEach((other) => other.setAttribute("aria-selected", other === item))
     this.selected = item
     item?.scrollIntoView({ block: "nearest" })
-    if (item) this.dispatch("preview", { detail: this.#detail(item) })
+    // A list can finish loading after the palette closed; previewing then would undo the pick.
+    if (item && this.dialogTarget.open) this.dispatch("preview", { detail: this.#detail(item) })
   }
 
   #detail(item, extra = {}) {
@@ -151,8 +222,8 @@ export default class extends Controller {
   }
 
   #id(item) {
-    const { url, deskAction, param, children } = item.dataset
-    return url || children || [deskAction, param].filter((part) => part !== undefined).join(":")
+    const { url, deskAction, param, children, source } = item.dataset
+    return url || children || source || [deskAction, param].filter((part) => part !== undefined).join(":")
   }
 
   #usage() {

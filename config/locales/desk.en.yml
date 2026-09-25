@@ -13,6 +13,10 @@ en:
         full_width: Toggle full-width column
         center_column: Center column
         close_window: Close window
+      workspaces:
+        move: Move column to workspace…
+        group: Workspace
+        new: New workspace
       themes:
         pick: Pick theme…
         default: Default
@@ -24,7 +28,7 @@ en:
       search: Search or run a command…
     statusbar:
       columns: Columns
-      hint_html: "<kbd>⌘K</kbd> commands · <kbd>⌥←→↑↓</kbd> focus · <kbd>⌥⇧</kbd> + arrows move · <kbd>⌥[</kbd> <kbd>⌥]</kbd> stack / unstack · <kbd>⌥R</kbd> width · <kbd>⌥F</kbd> full · <kbd>⌥O</kbd> overview · <kbd>⌥W</kbd> close"
+      hint_html: "<kbd>⌘K</kbd> commands · <kbd>⌥←→↑↓</kbd> focus · <kbd>⌥1–9</kbd> workspace · <kbd>⌥⇧</kbd> + arrows / 1–9 move · <kbd>⌥[</kbd> <kbd>⌥]</kbd> stack / unstack · <kbd>⌥R</kbd> width · <kbd>⌥F</kbd> full · <kbd>⌥O</kbd> overview · <kbd>⌥W</kbd> close"
     wallpaper:
       title: Nothing open
       hint_html: "Press <kbd>⌘K</kbd> to open a page or run a command."

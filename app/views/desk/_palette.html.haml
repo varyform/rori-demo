@@ -3,7 +3,11 @@
     %span.palette__crumbs{ hidden: true, data: { desk_palette_target: "crumbs" } }
     %input.palette__input{ type: "search", placeholder: t(".placeholder"), autocomplete: "off", spellcheck: "false",
       data: { "1p-ignore": true, desk_palette_target: "input", action: "input->desk-palette#filter keydown->desk-palette#navigate" } }
-  = turbo_frame_tag "commands", src: desk_commands_path, loading: :lazy, class: "palette__results",
-    data: { desk_palette_target: "frame", action: "turbo:frame-load->desk-palette#filter" }
+  -# No src until the palette opens: it loads the root list (desk-palette's rootValue) on every open.
+  = turbo_frame_tag "commands", class: "palette__results",
+    data: { desk_palette_target: "frame", action: "turbo:frame-load->desk-palette#loaded" }
   %p.palette__empty{ hidden: true, data: { desk_palette_target: "empty" } }= t(".empty")
   %footer.palette__hint= t(".hint_html")
+  -# Prototype for items of browser-provided lists (Desk::Command `source:`).
+  %template{ data: { desk_palette_target: "itemTemplate" } }
+    = render "desk/commands/command", command: Desk::Command.new(label: "", group: "")

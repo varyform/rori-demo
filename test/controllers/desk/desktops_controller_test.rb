@@ -8,6 +8,7 @@ class Desk::DesktopsControllerTest < ActionDispatch::IntegrationTest
     assert_select "main.viewport .wallpaper"
     assert_select "main.viewport dialog.win", count: 0
     assert_select "template[data-desk-target=template] dialog.win"
-    assert_select "dialog.palette turbo-frame#commands[src=?][loading=lazy]", desk_commands_path
+    assert_select "body[data-desk-palette-root-value=?]", desk_commands_path
+    assert_select "dialog.palette turbo-frame#commands:not([src])"
   end
 end

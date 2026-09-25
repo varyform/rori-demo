@@ -22,7 +22,7 @@ const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 // says where they belong; modals stay there, shown with showModal().
 export default class extends Controller {
   static targets = ["viewport", "stack", "floating", "window", "template", "workspaces", "minimap"]
-  static values = { rootUrl: String, loadError: String }
+  static values = { rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String }
 
   initialize() {
     this.offsets = new WeakMap()      // workspace → strip scroll offset
@@ -42,18 +42,30 @@ export default class extends Controller {
 
   // Entry points ---------------------------------------------------------------
 
-  command({ detail: { url, action, newWindow } }) {
+  command({ detail: { url, action, param, newWindow } }) {
     if (url) return this.#spawn(url, { reuse: !newWindow })
 
     const actions = {
       overview: () => this.toggleOverview(),
       new_workspace: () => this.#switchTo(this.#newWorkspace()),
+      move_to_workspace: () => this.#moveToWorkspace(param ? this.#workspace(param) : null),
       close_window: () => this.#remove(this.focused),
       cycle_width: () => this.#cycleWidth(),
       full_width: () => this.#toggleFullWidth(),
       center_column: () => this.#center(),
     }
     actions[action]?.()
+  }
+
+  // Client-side palette lists (Desk::Command `source:`): workspaces only exist in the browser.
+  paletteSource({ detail }) {
+    if (detail.source !== "workspaces" || !this.#focusIn(this.current)) return
+
+    const item = (label, param) => ({ label, group: this.workspaceGroupValue, action: "move_to_workspace", param })
+    detail.items = [
+      ...this.#workspaces().filter((ws) => ws !== this.current).map((ws) => item(this.#workspaceLabel(ws), ws.dataset.name)),
+      item(this.newWorkspaceLabelValue, ""),
+    ]
   }
 
   // desk_link_to (data-turbo-frame="_top") and any other top-level visit open a window instead.
@@ -87,7 +99,8 @@ export default class extends Controller {
     const direction = DIRECTIONS[event.code]
     const digit = event.code.match(/^Digit([1-9])$/)?.[1]
 
-    if (digit) this.#switchTo(this.#workspaces()[digit - 1] || this.#newWorkspace())
+    if (digit && event.shiftKey) this.#moveToWorkspace(this.#workspaces()[digit - 1])
+    else if (digit) this.#switchTo(this.#workspaces()[digit - 1] || this.#newWorkspace())
     else if (direction && event.shiftKey) this.#move(direction)
     else if (direction) this.#focusDirection(direction)
     else if (event.code === "BracketLeft") this.#consumeOrExpel(-1)
@@ -425,16 +438,25 @@ export default class extends Controller {
     if (!win) return
     const col = win.closest(".col")
 
+    const workspaces = this.#workspaces()
+    const i = workspaces.indexOf(this.current)
+    if (direction === "up") return i > 0 && this.#moveToWorkspace(workspaces[i - 1])
+    if (direction === "down") return this.#moveToWorkspace(workspaces[i + 1])
+
     if (direction === "left") col.previousElementSibling?.before(col)
-    else if (direction === "right") col.nextElementSibling?.after(col)
-    else {
-      const workspaces = this.#workspaces()
-      const i = workspaces.indexOf(this.current)
-      const target = direction === "up" ? workspaces[i - 1] : workspaces[i + 1] || this.#newWorkspace()
-      if (!target) return
-      const anchor = this.#focusIn(target)?.closest(".col")
-      anchor ? anchor.after(col) : this.#strip(target).append(col)
-    }
+    else col.nextElementSibling?.after(col)
+    this.focus(win)
+  }
+
+  // Moves the focused column to `target` — a new workspace when missing — and follows it.
+  #moveToWorkspace(target) {
+    const win = this.#focusIn(this.current)
+    if (!win || target === this.current) return
+
+    target ||= this.#newWorkspace()
+    const col = win.closest(".col")
+    const anchor = this.#focusIn(target)?.closest(".col")
+    anchor ? anchor.after(col) : this.#strip(target).append(col)
     this.#windowsIn(col).forEach((other) => this.#open(other))
     this.focus(win)
   }
@@ -583,11 +605,10 @@ export default class extends Controller {
 
   #renderWorkspaces() {
     this.workspacesTarget.replaceChildren(...this.#workspaces().map((ws, i) => {
-      const name = ws.dataset.name
       const button = document.createElement("button")
       button.type = "button"
       button.className = "workspace-button"
-      button.textContent = /^\d+$/.test(name) ? i + 1 : `${i + 1} ${name}`
+      button.textContent = this.#workspaceLabel(ws, i)
       if (ws === this.current) button.setAttribute("aria-current", "true")
       button.addEventListener("click", () => {
         this.overview = false
@@ -625,6 +646,12 @@ export default class extends Controller {
 
   #workspaces() {
     return [...this.stackTarget.children]
+  }
+
+  // Position, plus the name when a page gave the workspace one ("2 projects").
+  #workspaceLabel(ws, i = this.#workspaces().indexOf(ws)) {
+    const name = ws.dataset.name
+    return /^\d+$/.test(name) ? String(i + 1) : `${i + 1} ${name}`
   }
 
   #workspace(name) {
