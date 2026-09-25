@@ -1,8 +1,8 @@
 require "test_helper"
 
-class CommandsControllerTest < ActionDispatch::IntegrationTest
+class Desk::CommandsControllerTest < ActionDispatch::IntegrationTest
   test "lists route, record and desk commands in the palette frame" do
-    get commands_path, headers: { "Turbo-Frame" => "commands" }
+    get desk_commands_path, headers: { "Turbo-Frame" => "commands" }
 
     assert_response :success
     assert_select "turbo-frame#commands li.palette__item[data-url=?]", new_user_path, text: /New user/

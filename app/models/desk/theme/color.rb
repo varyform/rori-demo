@@ -1,5 +1,5 @@
 # An OKLCH color. Theme files are sRGB hex; the app's CSS speaks oklch().
-class Theme::Color < Data.define(:lightness, :chroma, :hue)
+class Desk::Theme::Color < Data.define(:lightness, :chroma, :hue)
   class << self
     # sRGB hex → linear RGB → OKLab → OKLCH (https://bottosson.github.io/posts/oklab/).
     def from_hex(hex)

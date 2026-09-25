@@ -1,3 +1,5 @@
+-# The desk shell: full page loads render the requested page as the first
+-# window. Apps add to <head> with `content_for :head`.
 !!!
 %html{ lang: I18n.locale, data: { theme: current_theme&.slug } }
   %head
@@ -20,21 +22,21 @@
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_importmap_tags
 
-  %body{ data: { controller: "desk palette theme",
-    theme_cookie_value: ThemeHelper::THEME_COOKIE,
+  %body{ data: { controller: "desk desk-palette desk-theme",
+    desk_theme_cookie_value: Desk.theme_cookie,
     desk_root_url_value: root_path,
     desk_load_error_value: t("desk.window.load_error"),
     action: ["keydown@window->desk#keydown",
-      "keydown@window->palette#keydown",
+      "keydown@window->desk-palette#keydown",
       "resize@window->desk#layout",
       "pagehide@window->desk#save",
       "message->desk#streamMessage:capture",
       "turbo:before-stream-render@document->desk#streamRender",
       "turbo:before-visit@document->desk#interceptVisit",
-      "palette:run->desk#command",
-      "palette:run->theme#run",
-      "palette:preview->theme#preview",
-      "palette:closed->theme#revert"].join(" ") } }
+      "desk-palette:run->desk#command",
+      "desk-palette:run->desk-theme#run",
+      "desk-palette:preview->desk-theme#preview",
+      "desk-palette:closed->desk-theme#revert"].join(" ") } }
     = render "desk/menubar"
     %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive" } }
       = render "desk/wallpaper"

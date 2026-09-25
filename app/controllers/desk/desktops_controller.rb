@@ -1,4 +1,4 @@
-class DesktopsController < ApplicationController
+class Desk::DesktopsController < ApplicationController
   def show
   end
 

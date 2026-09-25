@@ -17,7 +17,7 @@ const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 //
 // Every window is a <dialog> around a <turbo-frame refresh="morph">, so links and
 // forms inside it navigate just that window. Pages describe how they want to be
-// shown with a <template data-window-meta> (WindowHelper#window), re-read on every
+// shown with a <template data-window-meta> (Desk::WindowHelper#window), re-read on every
 // frame load. New windows load hidden in `floating` and are placed once their page
 // says where they belong; modals stay there, shown with showModal().
 export default class extends Controller {

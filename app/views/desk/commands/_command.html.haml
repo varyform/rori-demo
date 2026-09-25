@@ -1,8 +1,8 @@
 -# locals: (command:)
 %li.palette__item{ role: "option",
-  data: { palette_target: "item", url: command.url, desk_action: command.action, param: command.param, children: command.children,
+  data: { desk_palette_target: "item", url: command.url, desk_action: command.action, param: command.param, children: command.children,
     current: command.current || nil, search: "#{command.label} #{command.group}",
-    action: "click->palette#pick mousemove->palette#hover" } }
+    action: "click->desk-palette#pick mousemove->desk-palette#hover" } }
   %span.palette__label
     = command.label
     - if command.children

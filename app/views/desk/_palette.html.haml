@@ -1,9 +1,9 @@
-%dialog.palette{ "aria-label": t(".label"), data: { palette_target: "dialog", action: "click->palette#backdrop close->palette#closed" } }
+%dialog.palette{ "aria-label": t(".label"), data: { desk_palette_target: "dialog", action: "click->desk-palette#backdrop close->desk-palette#closed" } }
   .palette__field
-    %span.palette__crumbs{ hidden: true, data: { palette_target: "crumbs" } }
+    %span.palette__crumbs{ hidden: true, data: { desk_palette_target: "crumbs" } }
     %input.palette__input{ type: "search", placeholder: t(".placeholder"), autocomplete: "off", spellcheck: "false",
-      data: { "1p-ignore": true, palette_target: "input", action: "input->palette#filter keydown->palette#navigate" } }
-  = turbo_frame_tag "commands", src: commands_path, loading: :lazy, class: "palette__results",
-    data: { palette_target: "frame", action: "turbo:frame-load->palette#filter" }
-  %p.palette__empty{ hidden: true, data: { palette_target: "empty" } }= t(".empty")
+      data: { "1p-ignore": true, desk_palette_target: "input", action: "input->desk-palette#filter keydown->desk-palette#navigate" } }
+  = turbo_frame_tag "commands", src: desk_commands_path, loading: :lazy, class: "palette__results",
+    data: { desk_palette_target: "frame", action: "turbo:frame-load->desk-palette#filter" }
+  %p.palette__empty{ hidden: true, data: { desk_palette_target: "empty" } }= t(".empty")
   %footer.palette__hint= t(".hint_html")

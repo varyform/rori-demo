@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const USAGE_KEY = "palette:usage"
+const USAGE_KEY = "desk:palette:usage"
 
 // Subsequence match: every query character must appear in order. Consecutive
 // runs and word starts score higher; shorter labels win ties.
@@ -31,8 +31,9 @@ function score(text, query) {
 //
 // Commands with `data-children` are nested lists: picking one swaps the frame
 // to that URL and pushes a breadcrumb; Backspace on an empty query or Esc goes
-// back up. Runs are handed out as `palette:run`, the selection as
-// `palette:preview` (e.g. live theme preview), and `palette:closed` on close.
+// back up. Runs are handed out as `desk-palette:run`, the selection as
+// `desk-palette:preview` (e.g. live theme preview), and `desk-palette:closed`
+// on close.
 export default class extends Controller {
   static targets = ["dialog", "input", "frame", "list", "item", "empty", "crumbs"]
 

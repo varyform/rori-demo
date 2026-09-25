@@ -1,7 +1,7 @@
-module WindowHelper
+module Desk::WindowHelper
   # Declares how the current page wants to be shown on the desk. The window
   # layout serializes it into a <template data-window-meta>, which the desk
-  # reads on every frame load:
+  # (desk_controller.js) reads on every frame load:
   #
   #   size:      column width :sm ⅓ | :md ½ | :lg ⅔ | :xl full (default :md);
   #              for modals, the dialog width
