@@ -16,13 +16,24 @@ class Desk::DesktopsControllerTest < ActionDispatch::IntegrationTest
 
   test "wallpapers are optional: none by default, a random photo with credit when on" do
     get root_path
-    assert_select "main.viewport.has-wallpaper", count: 0
+    assert_select "body.has-wallpaper", count: 0
     assert_select ".statusbar__credit", count: 0
 
     Desk.wallpapers = true
     get root_path
-    assert_select "main.viewport.has-wallpaper[style*=?]", "--desk-wallpaper: image-set(url(\"https://images.unsplash.com/photo-"
+    assert_select "body.has-wallpaper:not(.wallpaper-cover)[style*=?]", "--desk-wallpaper: image-set(url(\"https://images.unsplash.com/photo-"
     assert_select "a.statusbar__credit[target=_blank][href^=?]", "https://images.unsplash.com/photo-", text: "Photo · Unsplash"
+  ensure
+    Desk.wallpapers = false
+  end
+
+  test "the wallpaper mode cookie picks safe, cover or off; unknown values fall back to safe" do
+    Desk.wallpapers = true
+    { "cover" => "body.has-wallpaper.wallpaper-cover", "off" => "body:not(.has-wallpaper)", "bogus" => "body.has-wallpaper:not(.wallpaper-cover)" }.each do |mode, selector|
+      cookies[Desk.wallpaper_cookie] = mode
+      get root_path
+      assert_select selector
+    end
   ensure
     Desk.wallpapers = false
   end

@@ -6,6 +6,9 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** a drop-down terminal on `` ` `` (outside text fields; `Desk.terminal_key`, or `⌥``/`⌘`` and ⌘K "Toggle terminal"). It runs every ⌘K command with the same matching: words walk the nested lists (`ui wallpaper cover`, `new user`, `oleh`), Tab completes one level at a time, ↑↓ recall history, `help` lists the top level, `clear` wipes the scrollback.
+- **Users:** ⌘K / terminal → UI › Theme and UI › Wallpaper › Safe (inside the desk) | Cover bars (behind the menu and status bars too) | Off, remembered across launches.
+- **Developers:** ⌘K and the terminal share one command bus (`desk-command:run|preview|closed|source`, was `desk-palette:*`) and one fuzzy matcher (`desk/fuzzy.js`).
 - **Users:** optional wallpapers (`Desk.wallpapers`): a random landscape photo from Unsplash on each launch, tinted toward the current theme and credited in the status bar.
 - **Users:** the macOS app zooms like a browser: View → Zoom In / Zoom Out / Actual Size (`⌘=`, `⌘-`, `⌘0`), in steps from 50% to 300%.
 - **Users:** the window whose text field has focus wears a green `<input>` tag on its left edge (right edge when there's no room; inside the bottom-left corner of full-width windows), so it's clear keys will type rather than drive the desk.

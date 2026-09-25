@@ -4,12 +4,17 @@
 class Desk::Wallpaper < Data.define(:id)
   CDN = "https://images.unsplash.com"
 
+  # safe: inside the desk only; cover: behind the menu and status bars too.
+  MODES = %w[ safe cover off ].freeze
+
   class << self
     def all = YAML.load_file(Desk.wallpapers_file).map { new(id: it.to_s) }
 
     def random
       all.sample if Desk.wallpapers
     end
+
+    def mode(value) = MODES.include?(value) ? value : MODES.first
   end
 
   # imgix resizes on the fly; image-set lets hi-dpi screens take the sharper one.

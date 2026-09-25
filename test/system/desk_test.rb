@@ -41,6 +41,72 @@ class DeskTest < ApplicationSystemTestCase
     Desk.wallpapers = false
   end
 
+  test "` opens the terminal; words walk the ⌘K tree and runs go through the same commands" do
+    Desk.wallpapers = true
+    visit root_path
+
+    type_into_focus "`"
+    assert_selector ".terminal"
+    assert_equal "terminal__input", evaluate_script("document.activeElement.className")
+
+    terminal_run "ui wallpaper cover"
+    assert_selector ".terminal__entry--ok", text: "✓ UI › Wallpaper › Cover bars"
+    assert_selector "body.wallpaper-cover", visible: :all
+
+    terminal_run "new user"
+    assert_selector "dialog.win:modal", text: "Name"
+
+    refresh
+    assert_selector "body.wallpaper-cover", visible: :all
+  ensure
+    Desk.wallpapers = false
+  end
+
+  test "terminal: Tab completes a level at a time, nested items list their children, ↑ recalls" do
+    visit root_path
+    type_into_focus "`"
+    input = find(".terminal__input")
+
+    input.send_keys "u"
+    assert_selector ".terminal__suggestion[aria-selected]", text: "ui ›"
+    input.send_keys :tab
+    assert_equal "ui ", input.value
+    input.send_keys "th"
+    assert_selector ".terminal__suggestion[aria-selected]", text: "theme ›"
+    input.send_keys :tab, :enter
+
+    assert_selector ".terminal__entry", text: "UI › Theme ›"
+    assert_selector ".terminal__entry--item", text: "nord"
+
+    terminal_run "nothing-like-this"
+    assert_selector ".terminal__entry--error", text: "No match for “nothing-like-this” in commands."
+
+    input.send_keys :up
+    assert_equal "nothing-like-this", input.value
+    input.send_keys :up
+    assert_equal "ui theme", input.value
+  end
+
+  test "terminal: Esc or ` closes it; ` inside a window's field just types" do
+    visit new_service_path
+    window_titled "New service"
+    find("#service_name").click
+    assert_selector "#service_name:focus"
+    type_into_focus "`"
+    assert_equal "`", find("#service_name").value
+    assert_no_selector ".terminal"
+
+    type_into_focus :escape
+    type_into_focus "`"
+    assert_selector ".terminal"
+    type_into_focus "`"
+    assert_no_selector ".terminal"
+
+    type_into_focus "`"
+    find(".terminal__input").send_keys :escape
+    assert_no_selector ".terminal"
+  end
+
   test "invalid modal submissions keep the modal up with field errors" do
     visit root_path
     run_command "new user"
@@ -458,6 +524,13 @@ class DeskTest < ApplicationSystemTestCase
       find("#service_name").click
       assert_focused "Edit api-gateway"
       execute_script("document.activeElement.setSelectionRange(99, 99)")
+    end
+
+    def terminal_run(line)
+      input = find(".terminal__input")
+      input.set(line)
+      input.send_keys :enter
+      assert_selector ".terminal__entry--echo", text: line
     end
 
     def boxes(*elements)

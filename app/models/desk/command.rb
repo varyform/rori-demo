@@ -4,10 +4,10 @@
 # `children` URL, or built in the browser from a named `source` for state the
 # server can't see (see desk-palette's `source` event).
 class Desk::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current)
-  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window ].freeze
+  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window toggle_terminal ].freeze
 
   class << self
-    def all = routes + records + actions + [ workspace_mover, theme_picker ] + app_commands
+    def all = routes + records + actions + [ workspace_mover, theme_picker, ui_menu ] + app_commands
 
     # Every parameterless GET route becomes a command once it has a label under
     # `desk.commands.routes.<controller>.<action>` — adding the locale key opts it in.
@@ -40,6 +40,24 @@ class Desk::Command < Data.define(:label, :group, :url, :action, :param, :childr
 
     def theme_picker
       new(label: I18n.t("desk.commands.themes.pick"), group: group(:desk), children: url_helpers.desk_commands_themes_path)
+    end
+
+    def ui_menu
+      new(label: I18n.t("desk.commands.ui.label"), group: group(:desk), children: url_helpers.desk_commands_ui_path)
+    end
+
+    # "UI ›": one nested list per appearance setting.
+    def ui
+      theme = new(label: I18n.t("desk.commands.ui.theme"), group: group(:ui), children: url_helpers.desk_commands_themes_path)
+      wallpaper = new(label: I18n.t("desk.commands.ui.wallpaper"), group: group(:ui), children: url_helpers.desk_commands_wallpapers_path)
+      Desk.wallpapers ? [ theme, wallpaper ] : [ theme ]
+    end
+
+    def wallpapers(current:)
+      Desk::Wallpaper::MODES.map do |mode|
+        new(label: I18n.t(mode, scope: "desk.commands.wallpapers"), group: I18n.t("desk.commands.ui.wallpaper"),
+          action: "wallpaper", param: mode, current: mode == current)
+      end
     end
 
     # `param: ""` is the built-in theme (no data-theme attribute).

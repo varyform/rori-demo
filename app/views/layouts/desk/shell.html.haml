@@ -22,8 +22,16 @@
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_importmap_tags
 
-  %body{ data: { controller: "desk desk-palette desk-theme",
+  %body{ class: desk_wallpaper_classes,
+    style: ("--desk-wallpaper: #{desk_wallpaper.css_image}" if desk_wallpaper),
+    data: { controller: "desk desk-palette desk-theme desk-wallpaper desk-terminal",
     desk_theme_cookie_value: Desk.theme_cookie,
+    desk_wallpaper_cookie_value: Desk.wallpaper_cookie,
+    desk_wallpaper_mode_value: desk_wallpaper_mode,
+    desk_terminal_root_value: desk_commands_path,
+    desk_terminal_key_value: Desk.terminal_key,
+    desk_terminal_prompt_value: t("desk.terminal.prompt"),
+    desk_terminal_messages_value: t("desk.terminal.messages").to_json,
     desk_palette_root_value: desk_commands_path,
     desk_root_url_value: root_path,
     desk_load_error_value: t("desk.window.load_error"),
@@ -40,15 +48,18 @@
       "message->desk#streamMessage:capture",
       "turbo:before-stream-render@document->desk#streamRender",
       "turbo:before-visit@document->desk#interceptVisit",
-      "desk-palette:run->desk#command",
-      "desk-palette:source->desk#paletteSource",
-      "desk-palette:run->desk-theme#run",
-      "desk-palette:preview->desk-theme#preview",
-      "desk-palette:closed->desk-theme#revert"].join(" ") } }
+      "keydown@window->desk-terminal#keydown",
+      "desk-command:run->desk#command",
+      "desk-command:source->desk#commandSource",
+      "desk-command:run->desk-theme#run",
+      "desk-command:preview->desk-theme#preview",
+      "desk-command:closed->desk-theme#revert",
+      "desk-command:run->desk-wallpaper#run",
+      "desk-command:preview->desk-wallpaper#preview",
+      "desk-command:closed->desk-wallpaper#revert",
+      "desk:toggle-terminal->desk-terminal#toggle"].join(" ") } }
     = render "desk/menubar"
-    %main.viewport{ class: class_names("has-wallpaper" => desk_wallpaper),
-      style: ("--desk-wallpaper: #{desk_wallpaper.css_image}" if desk_wallpaper),
-      data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
+    %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
       = render "desk/wallpaper"
       .stack{ data: { desk_target: "stack" } }
       -# Windows wait here until their page says where they go; modals stay here.
@@ -61,6 +72,7 @@
       %span.typing-badge.typing-badge--side{ "aria-hidden": "true" }= t("desk.window.typing")
       %span.typing-badge.typing-badge--inside{ "aria-hidden": "true" }= t("desk.window.typing")
     = render "desk/statusbar"
+    = render "desk/terminal"
     = render "desk/palette"
     %template{ data: { desk_target: "template" } }
       = render "desk/window"

@@ -1,29 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
+import { score } from "desk/fuzzy"
 
 const USAGE_KEY = "desk:palette:usage"
-
-// Subsequence match: every query character must appear in order. Consecutive
-// runs and word starts score higher; shorter labels win ties.
-function score(text, query) {
-  query = query.trim().toLowerCase()
-  if (!query) return 1
-  text = text.toLowerCase()
-
-  let total = 0
-  let from = 0
-  let previous = -2
-  for (const char of query) {
-    if (char === " ") continue
-    const at = text.indexOf(char, from)
-    if (at < 0) return 0
-    total += 1
-    if (at === previous + 1) total += 3
-    if (at === 0 || " /-_".includes(text[at - 1])) total += 2
-    previous = at
-    from = at + 1
-  }
-  return total - text.length / 100
-}
+// Shared with the terminal: whoever runs commands listens on desk-command:*.
+const BUS = "desk-command"
 
 // ⌘K command palette. Command lists are server-rendered into a turbo-frame
 // (the root list is fetched on every open so new records show up) and ranked
@@ -32,8 +12,8 @@ function score(text, query) {
 //
 // Commands with `data-children` are nested lists: picking one swaps the frame
 // to that URL and pushes a breadcrumb; Backspace on an empty query or Esc goes
-// back up. Runs are handed out as `desk-palette:run`, the selection as
-// `desk-palette:preview` (e.g. live theme preview), and `desk-palette:closed`
+// back up. Runs are handed out as `desk-command:run`, the selection as
+// `desk-command:preview` (e.g. live theme preview), and `desk-command:closed`
 // on close.
 export default class extends Controller {
   static targets = ["dialog", "input", "frame", "list", "item", "itemTemplate", "empty", "crumbs"]
@@ -62,7 +42,7 @@ export default class extends Controller {
   }
 
   closed() {
-    this.dispatch("closed")
+    this.dispatch("closed", { prefix: BUS })
   }
 
   backdrop(event) {
@@ -152,7 +132,7 @@ export default class extends Controller {
       return this.#go([...this.stack, { label: item.querySelector(".palette__label").firstChild.textContent.trim(), src, source }])
     }
     this.close()
-    this.dispatch("run", { detail: this.#detail(item, { newWindow }) })
+    this.dispatch("run", { prefix: BUS, detail: this.#detail(item, { newWindow }) })
   }
 
   // Shows the list at the end of `stack` (the root list when empty).
@@ -172,10 +152,10 @@ export default class extends Controller {
   }
 
   // A nested list another controller provides at runtime, for state that only
-  // exists in the browser: `desk-palette:source` asks, the listener fills
+  // exists in the browser: `desk-command:source` asks, the listener fills
   // `detail.items` with { label, group, action, param }.
   #showSourceList(source) {
-    const { detail } = this.dispatch("source", { detail: { source, items: [] } })
+    const { detail } = this.dispatch("source", { prefix: BUS, detail: { source, items: [] } })
     const list = document.createElement("ul")
     list.className = "palette__list"
     list.setAttribute("role", "listbox")
@@ -213,7 +193,7 @@ export default class extends Controller {
     this.selected = item
     item?.scrollIntoView({ block: "nearest" })
     // A list can finish loading after the palette closed; previewing then would undo the pick.
-    if (item && this.dialogTarget.open) this.dispatch("preview", { detail: this.#detail(item) })
+    if (item && this.dialogTarget.open) this.dispatch("preview", { prefix: BUS, detail: this.#detail(item) })
   }
 
   #detail(item, extra = {}) {

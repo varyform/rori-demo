@@ -62,8 +62,9 @@ export default class extends Controller {
     this.#perform(action, { workspace: param })
   }
 
-  // Client-side palette lists (Desk::Command `source:`): workspaces only exist in the browser.
-  paletteSource({ detail }) {
+  // Client-side command lists (Desk::Command `source:`), for ⌘K and the terminal:
+  // workspaces only exist in the browser.
+  commandSource({ detail }) {
     if (detail.source !== "workspaces" || !this.#focusIn(this.current)) return
 
     const item = (label, param) => ({ label, group: this.workspaceGroupValue, action: "move_to_workspace", param })
@@ -96,6 +97,8 @@ export default class extends Controller {
   }
 
   keydown(event) {
+    // Surfaces that own the keyboard (the terminal) opt out of every desk key.
+    if (event.target.closest?.("[data-desk-keys=off]")) return
     if (this.#bareKey(event)) return
     if (event.key === "Escape") return this.#escape(event)
 
@@ -205,6 +208,7 @@ export default class extends Controller {
       overview: () => this.toggleOverview(),
       close_window: () => this.#remove(win || this.focused),
       reopen_window: () => this.#reopen(),
+      toggle_terminal: () => this.dispatch("toggle-terminal"),
     }
     actions[action]?.()
   }

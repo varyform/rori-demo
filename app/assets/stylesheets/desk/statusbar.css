@@ -21,6 +21,10 @@
     text-decoration: none;
   }
 
+  body:not(.has-wallpaper) .statusbar__credit {
+    display: none;
+  }
+
   .statusbar__credit:hover {
     color: var(--color-ink);
     text-decoration: underline;

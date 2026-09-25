@@ -1,13 +1,16 @@
-/* Optional photo behind the strips (Desk.wallpapers). Windows are opaque, so
-   it shows through the gutters and on an empty desk. */
+/* Optional photo (Desk.wallpapers; UI › Wallpaper picks the mode). Windows are
+   opaque, so it shows through the gutters and on an empty desk. `safe` keeps it
+   inside the desk; `wallpaper-cover` runs it behind the menu and status bars. */
 @layer layout {
-  .viewport.has-wallpaper {
+
+  body.has-wallpaper:not(.wallpaper-cover) .viewport,
+  body.has-wallpaper.wallpaper-cover {
     background: var(--desk-wallpaper) center / cover no-repeat;
   }
 
   /* Tinted toward the theme's canvas so light and dark themes both stay calm
      and the empty-desk hint stays readable. */
-  .viewport.has-wallpaper::before {
+  body.has-wallpaper .viewport::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -15,7 +18,11 @@
     pointer-events: none;
   }
 
-  .viewport.has-wallpaper .wallpaper {
+  body.has-wallpaper.wallpaper-cover :is(.menubar, .statusbar) {
+    background: color-mix(in oklch, var(--color-canvas) 72%, transparent);
+  }
+
+  body.has-wallpaper .wallpaper {
     inset: 50% auto auto 50%;
     translate: -50% -50%;
     padding: 14px 20px;

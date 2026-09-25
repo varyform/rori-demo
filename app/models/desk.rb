@@ -19,6 +19,11 @@ module Desk
   # Optional background photos (off by default): a random one per page load.
   mattr_accessor :wallpapers, default: false
   mattr_accessor :wallpapers_file, default: Rails.root.join("vendor/wallpapers/unsplash.yml")
+  mattr_accessor :wallpaper_cookie, default: "wallpaper"
+
+  # The terminal (⌘K as a command line) opens with this bare key outside text
+  # fields — KeyboardEvent#code, like the keymap — and with `toggle_terminal`.
+  mattr_accessor :terminal_key, default: "Backquote"
 
   # Keyboard: desk action (desk_controller.js#perform) → key chords, written as
   # `KeyboardEvent#code` names joined with modifiers. `Mod` stands for
@@ -56,7 +61,8 @@ module Desk
     center_column: %w[ Mod+KeyC ],
     overview: %w[ Mod+KeyO ],
     close_window: %w[ Mod+KeyW ],
-    reopen_window: %w[ Mod+Shift+KeyT ]
+    reopen_window: %w[ Mod+Shift+KeyT ],
+    toggle_terminal: %w[ Mod+Backquote ]
   }.freeze
 
   # Bare keys (opt-in). Blender-style: once the pointer deliberately moves onto
