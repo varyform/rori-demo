@@ -50,14 +50,13 @@ en:
       prompt: "desk ›"
       # Passed to desk-terminal as one JSON value; %{…} are filled in there.
       messages:
-        welcome: "Same commands as ⌘K. Words walk nested lists (ui wallpaper cover) · Tab completes · ↑↓ history · help · clear · esc or ` closes."
-        root: commands
-        help: "Top level (use any of these, then Tab or a space to go deeper):"
+        welcome: "Same commands as ⌘K, matched as whole paths: ui wallpaper cover, or just uthen (UI › Theme › Nord) · Tab completes · ↑↓ history · help · clear · esc or ` closes."
+        help: "Top level (anything nested is reachable by typing its path, even abbreviated):"
         list: "%{path} ›"
         empty: "  (nothing here)"
         opened: "→ %{path}"
         ran: "✓ %{path}"
-        no_match: "No match for “%{word}” in %{list}."
+        no_match: "No match for “%{query}”."
     palette:
       label: Command palette
       placeholder: Type a command or search…

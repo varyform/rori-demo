@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { score } from "desk/fuzzy"
+import { CommandIndex, isNested } from "desk/command_index"
 
 const BUS = "desk-command"
 const HISTORY_KEY = "desk:terminal:history"
@@ -8,20 +8,20 @@ const SUGGESTIONS = 8
 const FIELDS = "input, textarea, select, [contenteditable]"
 
 const format = (template, values) => template.replace(/%\{(\w+)\}/g, (_, key) => values[key] ?? "")
-// "Pick theme…" → "pick-theme": one word per label, so completions stay single tokens.
+// "Pick theme…" → "pick-theme": one word per label, so a trail reads as words.
 const token = (label) => label.toLowerCase().replace(/[…›✓]/g, "").trim().replace(/\s+/g, "-")
+const words = (trail) => trail.map(({ label }) => token(label)).join(" ")
 
 // A drop-down command line over the same command tree as ⌘K: the same
-// server-rendered lists (fetched and parsed), the same client-side sources,
-// the same fuzzy matcher. Words walk the nesting — `ui wallpaper cover` is
-// UI › Wallpaper › Cover bars — and runs go out on desk-command:run like
-// the palette's. Opens with Desk.terminal_key outside text fields.
+// server-rendered lists, client-side sources, fuzzy matcher and command bus.
+// Input matches whole paths through the tree, so `ui wallpaper cover` and
+// just `uthen` (UI › Theme › Nord) both work; a path ending on a nested item
+// lists it. Opens with Desk.terminal_key outside text fields.
 export default class extends Controller {
   static targets = ["panel", "output", "input", "suggestions"]
   static values = { root: String, key: String, prompt: String, messages: Object }
 
   connect() {
-    this.lists = new Map()
     this.history = this.#loadHistory()
     this.cursor = this.history.length
   }
@@ -41,7 +41,7 @@ export default class extends Controller {
 
   open() {
     this.returnFocus = document.activeElement
-    this.lists.clear()
+    this.#reindex()
     this.panelTarget.hidden = false
     if (!this.outputTarget.childElementCount) this.#print(this.messagesValue.welcome, "muted")
     this.inputTarget.focus()
@@ -70,20 +70,21 @@ export default class extends Controller {
     }
   }
 
-  // Candidates for the word being typed, at the level the earlier words reached.
   async suggest() {
-    const { words, partial } = this.#split(this.inputTarget.value)
+    const query = this.inputTarget.value.trim()
     const ticket = (this.ticket = (this.ticket || 0) + 1)
-    const { list, error } = await this.#resolve(words)
+    const suggested = query
+      ? await this.index.search(query, { limit: SUGGESTIONS })
+      : (await this.index.list({ children: this.rootValue })).map((item) => ({ item, trail: [item] }))
     if (ticket !== this.ticket) return
 
-    this.suggested = error || !list ? [] : partial ? this.#rank(list, partial) : list
-    this.suggestionsTarget.replaceChildren(...this.suggested.slice(0, SUGGESTIONS).map((item, i) => {
+    this.suggested = suggested
+    this.suggestionsTarget.replaceChildren(...suggested.slice(0, SUGGESTIONS).map(({ item, trail }, i) => {
       const li = document.createElement("li")
       li.className = "terminal__suggestion"
       li.toggleAttribute("aria-selected", i === 0)
       const label = document.createElement("span")
-      label.textContent = token(item.label) + (item.children || item.source ? " ›" : "")
+      label.textContent = words(trail) + (isNested(item) ? " ›" : "")
       const group = document.createElement("span")
       group.className = "terminal__group"
       group.textContent = (item.current ? "✓ " : "") + item.group
@@ -92,13 +93,11 @@ export default class extends Controller {
     }))
   }
 
-  // Tab: replace the word being typed with the best candidate.
+  // Tab: spell out the best match's whole path.
   #complete() {
     const best = this.suggested?.[0]
     if (!best) return
-    const { words } = this.#split(this.inputTarget.value)
-    const nested = best.children || best.source
-    this.inputTarget.value = [...words, token(best.label)].join(" ") + (nested ? " " : "")
+    this.inputTarget.value = words(best.trail) + (isNested(best.item) ? " " : "")
     this.suggest()
   }
 
@@ -109,100 +108,33 @@ export default class extends Controller {
     if (!line) return this.suggest()
     this.#remember(line)
 
-    const words = line.split(/\s+/)
-    if (words[0] === "clear") {
+    if (line === "clear") {
       this.outputTarget.replaceChildren()
-      return this.suggest()
-    }
-    if (words[0] === "help") {
-      this.#printList(this.messagesValue.help, await this.#list({ children: this.rootValue }))
-      return this.suggest()
-    }
-
-    const { path, list, error } = await this.#resolve(words)
-    if (error) {
-      this.#print(format(this.messagesValue.no_match, error), "error")
+    } else if (line === "help") {
+      this.#printList(this.messagesValue.help, await this.index.list({ children: this.rootValue }))
     } else {
-      const item = path.at(-1)
-      const trail = path.map(({ label }) => label).join(" › ")
-      if (list) {
-        this.#printList(format(this.messagesValue.list, { path: trail }), list)
-      } else {
-        this.dispatch("run", { prefix: BUS, detail: { url: item.url, action: item.action, param: item.param, newWindow: false } })
-        this.#print(format(item.url ? this.messagesValue.opened : this.messagesValue.ran, { path: trail }), "ok")
-        this.lists.clear() // runs change state (current theme, workspaces, records)
-      }
+      await this.#run(line)
     }
     this.suggest()
   }
 
-  // Walks the words through nested lists. Labels contain spaces ("New user"),
-  // so each step takes the most words that still match something at that
-  // level. Returns the path and, when it ends on a nested item, that item's list.
-  async #resolve(words) {
-    let list = await this.#list({ children: this.rootValue })
-    const path = []
-    let rest = words
-    while (rest.length) {
-      const step = this.#step(list, rest)
-      const level = path.at(-1)?.label || this.messagesValue.root
-      if (!step) return { path, error: { word: rest[0], list: level } }
+  async #run(query) {
+    const [best] = await this.index.search(query, { limit: 1 })
+    if (!best) return this.#print(format(this.messagesValue.no_match, { query }), "error")
 
-      path.push(step.item)
-      rest = rest.slice(step.used)
-      const nested = step.item.children || step.item.source
-      if (!nested) return rest.length ? { path, error: { word: rest[0], list: step.item.label } } : { path, list: null }
-      list = await this.#list(step.item)
-    }
-    return { path, list }
+    const { item, trail } = best
+    const path = trail.map(({ label }) => label).join(" › ")
+    if (isNested(item)) return this.#printList(format(this.messagesValue.list, { path }), await this.index.list(item))
+
+    this.dispatch("run", { prefix: BUS, detail: { url: item.url, action: item.action, param: item.param, newWindow: false } })
+    this.#print(format(item.url ? this.messagesValue.opened : this.messagesValue.ran, { path }), "ok")
+    this.#reindex() // runs change state: the current theme, workspaces, records
   }
 
-  #step(list, words) {
-    for (let used = words.length; used > 0; used--) {
-      const best = this.#rank(list, words.slice(0, used).join(" "))[0]
-      if (best) return { item: best, used }
-    }
-    return null
-  }
-
-  #rank(list, query) {
-    return list
-      .map((item, index) => ({ item, index, score: score(item.label, query) }))
-      .filter(({ score }) => score > 0)
-      .sort((a, b) => b.score - a.score || a.index - b.index)
-      .map(({ item }) => item)
-  }
-
-  // Server lists are the palette's own HTML (desk/commands/index), parsed once
-  // per open; client sources are asked on the command bus, like the palette does.
-  async #list({ children, source }) {
-    if (source) {
-      const { detail } = this.dispatch("source", { prefix: BUS, detail: { source, items: [] } })
-      return detail.items
-    }
-    if (!this.lists.has(children)) this.lists.set(children, this.#fetchList(children))
-    return this.lists.get(children)
-  }
-
-  async #fetchList(url) {
-    const response = await fetch(url, { headers: { Accept: "text/html", "Turbo-Frame": "commands" } })
-    const html = new DOMParser().parseFromString(await response.text(), "text/html")
-    return [...html.querySelectorAll(".palette__item")].map((item) => ({
-      label: item.querySelector(".palette__label").firstChild.textContent.trim(),
-      group: item.querySelector(".palette__group").lastChild.textContent.trim(),
-      url: item.dataset.url,
-      action: item.dataset.deskAction,
-      param: item.dataset.param,
-      children: item.dataset.children,
-      source: item.dataset.source,
-      current: "current" in item.dataset,
-    }))
-  }
-
-  #split(value) {
-    const words = value.trimStart().split(/\s+/)
-    const partial = words.pop() ?? ""
-    return { words: words.filter(Boolean), partial }
+  #reindex() {
+    this.index = new CommandIndex(this.rootValue, {
+      source: (source) => this.dispatch("source", { prefix: BUS, detail: { source, items: [] } }).detail.items,
+    })
   }
 
   #print(text, kind) {
@@ -217,7 +149,7 @@ export default class extends Controller {
     this.#print(heading, "muted")
     if (!items.length) return this.#print(this.messagesValue.empty, "muted")
     for (const item of items) {
-      const nested = item.children || item.source ? " ›" : ""
+      const nested = isNested(item) ? " ›" : ""
       this.#print(`  ${token(item.label)}${nested}  ${item.current ? "✓ " : ""}${item.group}`, "item")
     }
   }

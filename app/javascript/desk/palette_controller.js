@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { score } from "desk/fuzzy"
+import { CommandIndex } from "desk/command_index"
 
 const USAGE_KEY = "desk:palette:usage"
 // Shared with the terminal: whoever runs commands listens on desk-command:*.
@@ -32,6 +33,11 @@ export default class extends Controller {
   open() {
     this.inputTarget.value = ""
     this.dialogTarget.showModal()
+    // Flattened tree for top-level queries, crawled in the background.
+    this.index = new CommandIndex(this.rootValue, {
+      source: (source) => this.dispatch("source", { prefix: BUS, detail: { source, items: [] } }).detail.items,
+    })
+    this.index.entries()
     this.#go([])
     this.filter()
   }
@@ -62,14 +68,14 @@ export default class extends Controller {
 
     this.navigating = false
     this.filter()
-
-    const pending = this.pendingRun
-    this.pendingRun = null
-    if (pending && this.selected) this.#run(this.selected, pending.newWindow)
+    this.#runPending()
   }
 
   filter() {
     const query = this.inputTarget.value
+    // At the top, queries match whole paths through the tree ("uthen" → UI › Theme › Nord).
+    if (!this.stack.length && query.trim()) return this.#searchPaths(query)
+    this.#clearPathResults()
     const usage = this.#usage()
     const ranked = this.itemTargets.map((item, i) => {
       item.dataset.index ||= i
@@ -100,7 +106,7 @@ export default class extends Controller {
     } else if (event.key === "Enter") {
       event.preventDefault()
       const newWindow = event.shiftKey || event.metaKey || event.ctrlKey
-      if (this.navigating) this.pendingRun = { newWindow }
+      if (this.navigating || this.searching) this.pendingRun = { newWindow }
       else if (this.selected) this.#run(this.selected, newWindow)
     } else if (this.stack.length && (event.key === "Escape" || (event.key === "Backspace" && !this.inputTarget.value))) {
       event.preventDefault()
@@ -127,7 +133,10 @@ export default class extends Controller {
     usage[id] = (usage[id] || 0) + 1
     localStorage.setItem(USAGE_KEY, JSON.stringify(usage))
 
-    const { children: src, source } = item.dataset
+    const { children: src, source, trail } = item.dataset
+    if (trail && (src || source)) {
+      return this.#go([...this.stack, ...JSON.parse(trail).map(({ label, children, source }) => ({ label, src: children, source }))])
+    }
     if (src || source) {
       return this.#go([...this.stack, { label: item.querySelector(".palette__label").firstChild.textContent.trim(), src, source }])
     }
@@ -135,8 +144,46 @@ export default class extends Controller {
     this.dispatch("run", { prefix: BUS, detail: this.#detail(item, { newWindow }) })
   }
 
+  async #searchPaths(query) {
+    const ticket = (this.ticket = (this.ticket || 0) + 1)
+    this.searching = true
+    const usage = this.#usage()
+    const results = await this.index.search(query, { limit: 30, bonus: (item) => Math.log2(1 + (usage[this.#idOf(item)] || 0)) })
+    if (ticket !== this.ticket || !this.dialogTarget.open) return
+
+    this.searching = false
+    // Until the root list has loaded there's nowhere to put results; loaded() refilters.
+    if (!this.hasListTarget) return
+    this.itemTargets.forEach((item) => { item.hidden = true })
+    this.#clearPathResults()
+    const items = results.map(({ item, trail, text }) => {
+      const trailData = trail.map(({ label, children, source }) => ({ label, children, source }))
+      const built = this.#buildItem({ ...item, label: text, trail: JSON.stringify(trailData) })
+      built.dataset.pathResult = ""
+      return built
+    })
+    this.listTarget.prepend(...items)
+    this.emptyTarget.hidden = items.length > 0
+    this.#select(items[0])
+    this.#runPending()
+  }
+
+  #clearPathResults() {
+    this.ticket = (this.ticket || 0) + 1
+    this.searching = false
+    this.itemTargets.filter((item) => "pathResult" in item.dataset).forEach((item) => item.remove())
+  }
+
+  #runPending() {
+    if (this.navigating || this.searching) return
+    const pending = this.pendingRun
+    this.pendingRun = null
+    if (pending && this.selected) this.#run(this.selected, pending.newWindow)
+  }
+
   // Shows the list at the end of `stack` (the root list when empty).
   #go(stack) {
+    this.#clearPathResults()
     this.stack = stack
     this.inputTarget.value = ""
     this.crumbsTarget.hidden = !stack.length
@@ -169,11 +216,13 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  #buildItem({ label, group, action, param }) {
+  #buildItem({ label, group, action, param, url, children, source, trail, current }) {
     const item = this.itemTemplateTarget.content.firstElementChild.cloneNode(true)
-    Object.assign(item.dataset, { deskAction: action, param: param ?? "", search: `${label} ${group}` })
-    item.querySelector(".palette__label").textContent = label
-    item.querySelector(".palette__group").textContent = group
+    const data = { deskAction: action, param: param ?? "", url, children, source, trail, search: `${label} ${group}` }
+    for (const [key, value] of Object.entries(data)) if (value !== undefined) item.dataset[key] = value
+    if (current) item.dataset.current = ""
+    item.querySelector(".palette__label").textContent = label + (children || source ? " ›" : "")
+    item.querySelector(".palette__group").textContent = (current ? "✓ " : "") + group
     return item
   }
 
@@ -202,8 +251,12 @@ export default class extends Controller {
   }
 
   #id(item) {
-    const { url, deskAction, param, children, source } = item.dataset
-    return url || children || source || [deskAction, param].filter((part) => part !== undefined).join(":")
+    const { url, deskAction: action, param, children, source } = item.dataset
+    return this.#idOf({ url, action, param, children, source })
+  }
+
+  #idOf({ url, action, param, children, source }) {
+    return url || children || source || [action, param].filter((part) => part !== undefined).join(":")
   }
 
   #usage() {

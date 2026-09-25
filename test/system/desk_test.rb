@@ -79,12 +79,43 @@ class DeskTest < ApplicationSystemTestCase
     assert_selector ".terminal__entry--item", text: "nord"
 
     terminal_run "nothing-like-this"
-    assert_selector ".terminal__entry--error", text: "No match for “nothing-like-this” in commands."
+    assert_selector ".terminal__entry--error", text: "No match for “nothing-like-this”."
 
     input.send_keys :up
     assert_equal "nothing-like-this", input.value
     input.send_keys :up
     assert_equal "ui theme", input.value
+  end
+
+  test "fuzzy matching spans nesting: uthen is UI › Theme › Nord, in ⌘K and the terminal" do
+    visit root_path
+    find("body").send_keys [ :meta, "k" ]
+    within "dialog.palette" do
+      find(".palette__input").set("uthen")
+      assert_selector ".palette__item[aria-selected=true]", text: "UI › Theme › Nord"
+      find(".palette__input").send_keys :enter
+    end
+    # Selecting already previews Nord; a closed palette means the pick itself ran.
+    assert_no_selector "dialog.palette[open]"
+    assert_selector "html[data-theme=nord]", visible: :all
+
+    type_into_focus "`"
+    terminal_run "uthed"
+    assert_selector ".terminal__entry--ok", text: "✓ UI › Theme › Default"
+    assert_no_selector "html[data-theme]", visible: :all
+  end
+
+  test "a top-level ranking still prefers shallow matches, and nested picks drill in" do
+    visit root_path
+    find("body").send_keys [ :meta, "k" ]
+    within "dialog.palette" do
+      find(".palette__input").set("ui th")
+      assert_selector ".palette__item[aria-selected=true]", text: "UI › Theme ›"
+      find(".palette__input").send_keys :enter
+
+      assert_selector ".palette__crumbs", text: "UI › Theme ›"
+      assert_selector ".palette__item[aria-selected=true][data-current]", text: "Default"
+    end
   end
 
   test "terminal: Esc or ` closes it; ` inside a window's field just types" do
