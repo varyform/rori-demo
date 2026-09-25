@@ -96,7 +96,7 @@ export default class extends Controller {
   }
 
   keydown(event) {
-    if (this.#hoverKey(event)) return
+    if (this.#bareKey(event)) return
     if (event.key === "Escape") return this.#escape(event)
 
     const binding = this.bindings.get(this.#chord(event))
@@ -139,20 +139,26 @@ export default class extends Controller {
     }
   }
 
-  #hoverKey(event) {
-    if (!this.armed || MODIFIERS.includes(event.key)) return false
+  // Bare keys (Desk.hover_keymap) act on the armed hovered window — even while a
+  // field elsewhere has focus — or, when no field has focus, on the focused
+  // window (vim-style normal mode). Held-down repeats never count.
+  #bareKey(event) {
+    if (!this.hoverBindings?.size || MODIFIERS.includes(event.key)) return false
 
+    const armed = this.armed?.isConnected ? this.armed : null
     const binding = this.hoverBindings.get(this.#chord(event))
-    const blocked = event.isComposing || this.overview || !this.armed.isConnected || document.querySelector("dialog:modal")
+    const blocked = event.repeat || event.isComposing || this.overview || document.querySelector("dialog:modal")
     if (!binding || blocked) {
-      this.#disarm()
+      if (this.armed) this.#disarm()
       return false
     }
+    if (!armed && event.target.closest?.(FIELDS)) return false
 
     event.preventDefault()
-    const win = this.armed
-    this.#perform(binding.action, { win, workspace: this.#workspaceAt(binding.digit) })
-    win.isConnected && win.closest(".workspace") === this.current ? this.#arm(win) : this.#disarm()
+    this.#perform(binding.action, { win: armed || undefined, workspace: this.#workspaceAt(binding.digit) })
+
+    if (armed) armed.isConnected && armed.closest(".workspace") === this.current ? this.#arm(armed) : this.#disarm()
+    else if (this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
     return true
   }
 

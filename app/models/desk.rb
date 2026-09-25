@@ -55,10 +55,11 @@ module Desk
     reopen_window: %w[ Mod+Shift+KeyT ]
   }.freeze
 
-  # Blender-style hover keys (opt-in): once the pointer deliberately moves onto
-  # an inactive window, these bare keys act on that window without taking focus
-  # — even while you're typing in a field elsewhere. They stay armed until the
-  # pointer rests for `hover_timeout` seconds, leaves, or another key is typed.
+  # Bare keys (opt-in). Blender-style: once the pointer deliberately moves onto
+  # an inactive window, they act on that window without taking focus — even
+  # while you're typing in a field elsewhere — until the pointer rests for
+  # `hover_timeout` seconds, leaves, or another key is typed. Otherwise, when
+  # no field has focus, they act on the focused window.
   # No hjkl/arrows here: they'd shadow text entry and page scrolling.
   mattr_accessor :hover_keys, default: false
   mattr_accessor :hover_timeout, default: 1.5

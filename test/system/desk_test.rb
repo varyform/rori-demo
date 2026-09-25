@@ -249,6 +249,23 @@ class DeskTest < ApplicationSystemTestCase
     end
   end
 
+  test "outside fields, bare keys act on the focused window; in a field they type" do
+    visit projects_path
+    window_titled "Projects"
+
+    type_into_focus "w"
+    assert_no_selector "dialog.win[open]"
+
+    type_into_focus "u"
+    window_titled "Projects"
+
+    run_command "new project"
+    assert_selector "dialog.win:modal #project_name:focus"
+    type_into_focus "w"
+    assert_equal "w", find("#project_name").value
+    window_titled "Projects"
+  end
+
   test "closing a window with unsaved edits asks first" do
     visit new_service_path
     fill_in "Name", with: "draft"
