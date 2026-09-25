@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** the window whose text field has focus wears a green `<input>` tag on its left edge (right edge when there's no room; inside the bottom-left corner of full-width windows), so it's clear keys will type rather than drive the desk.
 - **Users:** a native macOS app (`src-tauri`, `cargo tauri dev`) wrapping the desk, where ⌘ is the shortcut modifier (⌘←→ focus, ⌘1–9 workspaces, ⌘W close…; centre column is ⌘⇧C since ⌘C copies).
 - **Developers:** development runs on exactly one origin, `http://desk.localhost:3030`; other hosts get 403. Pages served to the app's user agent (`Desk.native_user_agent`) use `Desk.native_modifier`, with `Desk.keymap_overrides` for chords the platform owns.
 - **Users:** Blender-style hover keys (opt-in, `Desk.hover_keys`): move the pointer onto an inactive window and bare keys act on it — `W` close, `U` reopen, `R` width, `F` full, `C` centre, `[` `]` stack, `⇧H`/`⇧L` move, `1–9` send to workspace — while the cursor stays in your field. The target shows "keys → here"; it disarms when the pointer rests (`Desk.hover_timeout`, 1.5 s), leaves, or you type any other key.

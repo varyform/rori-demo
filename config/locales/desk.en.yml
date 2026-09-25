@@ -44,5 +44,6 @@ en:
       detach: Open in a new tab
       close: Close
       armed: keys → here
+      typing: "<input>"
       discard: This window has unsaved changes. Close it anyway?
       load_error: This page couldn't be shown in a window. Open it in a new tab (↗) to see what went wrong.

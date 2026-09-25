@@ -55,6 +55,9 @@
           = render "desk/window", frame_id: "win_main", src: (request.fullpath if request.get?), body: safe_join([yield, window_meta_tag])
         - else
           = yield
+      -# Tags the window whose field has focus (desk/typing_badge.css, anchor positioning).
+      %span.typing-badge.typing-badge--side{ "aria-hidden": "true" }= t("desk.window.typing")
+      %span.typing-badge.typing-badge--inside{ "aria-hidden": "true" }= t("desk.window.typing")
     = render "desk/statusbar"
     = render "desk/palette"
     %template{ data: { desk_target: "template" } }

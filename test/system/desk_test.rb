@@ -266,6 +266,41 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "Projects"
   end
 
+  test "a window with a focused field wears an <input> badge: outside its edge, or inside when full width" do
+    visit users_path
+    run_command "new service"
+    form = window_titled("New service")
+    assert_equal "service_name", evaluate_script("document.activeElement.id")
+
+    side = find(".typing-badge--side", text: "<input>")
+    assert_no_selector ".typing-badge--inside"
+    window_box, badge_box = boxes(form, side)
+    assert_in_delta window_box["left"], badge_box["right"], 1, "hangs off the left edge"
+    assert_operator badge_box["top"], :>, window_box["top"]
+
+    type_into_focus :escape
+    assert_no_selector ".typing-badge"
+
+    find("#service_name").click
+    type_into_focus :escape
+    type_into_focus [ :alt, "f" ]
+    find("#service_name").click
+    inside = find(".typing-badge--inside", text: "<input>")
+    assert_no_selector ".typing-badge--side"
+    window_box, badge_box = boxes(form, inside)
+    assert_operator badge_box["left"], :>, window_box["left"]
+    assert_operator badge_box["bottom"], :<, window_box["bottom"]
+  end
+
+  test "the side badge flips to the right edge when the window touches the viewport's left" do
+    visit new_service_path
+    form = window_titled("New service")
+    find("#service_name").click
+
+    window_box, badge_box = boxes(form, find(".typing-badge--side"))
+    assert_in_delta window_box["right"], badge_box["left"], 1
+  end
+
   test "closing a window with unsaved edits asks first" do
     visit new_service_path
     fill_in "Name", with: "draft"
@@ -394,6 +429,11 @@ class DeskTest < ApplicationSystemTestCase
       find("#service_name").click
       assert_focused "Edit api-gateway"
       execute_script("document.activeElement.setSelectionRange(99, 99)")
+    end
+
+    def boxes(*elements)
+      sleep 0.4 # strip and width transitions
+      elements.map { |element| evaluate_script("arguments[0].getBoundingClientRect().toJSON()", element) }
     end
 
     # The page reads the timeout on load, so this wraps the visit.
