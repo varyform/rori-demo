@@ -1,0 +1,21 @@
+- content_for :title, @user.name
+= turbo_stream_from :users
+= turbo_stream_from :projects
+.toolbar
+  %dl.props
+    %dt= User.human_attribute_name(:email)
+    %dd= mail_to @user.email
+    %dt= User.human_attribute_name(:created_at)
+    %dd= l(@user.created_at, format: :short)
+  .actions
+    = desk_link_to t(".edit"), edit_user_path(@user), class: "btn"
+    = button_to t(".destroy"), @user, method: :delete, class: "btn btn--danger",
+      form: { data: { turbo_confirm: t(".confirm") } }
+%section.section
+  .section__head
+    %h2= Project.model_name.human(count: 2)
+    = desk_link_to t(".new_project"), new_project_path(user_id: @user), class: "btn"
+  - if @projects.any?
+    %ul.list= render partial: "projects/item", collection: @projects, as: :project
+  - else
+    %p.empty= t(".empty")

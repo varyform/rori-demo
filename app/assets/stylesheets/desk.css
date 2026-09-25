@@ -1,0 +1,100 @@
+@layer layout {
+  body {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 32px 1fr 36px;
+    overflow: hidden;
+  }
+
+  /* Workspaces stack vertically; each is an endless horizontal strip of columns.
+     desk_controller.js sets column widths and the strip/stack transforms. */
+  /* clip, not hidden: dialog.show() focuses the window and would scroll a
+     hidden-overflow box behind the transforms' back. */
+  .viewport {
+    position: relative;
+    overflow: clip;
+  }
+
+  .stack {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    transition: transform var(--motion) var(--ease);
+  }
+
+  .workspace {
+    height: 100%;
+    overflow: clip;
+  }
+
+  .is-overview .workspace {
+    overflow: visible;
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--gap);
+    width: max-content;
+    height: 100%;
+    padding: 0 var(--gap) var(--gap);
+    transition: transform var(--motion) var(--ease);
+  }
+
+  .col {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    min-width: 0;
+    transition: width var(--motion) var(--ease);
+  }
+
+  /* Loading windows wait here unseen; modals live here in the top layer. */
+  .floating {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .floating>.win:not(:modal) {
+    display: none;
+  }
+
+  .is-booting :is(.stack, .strip, .col),
+  .is-scrolling .strip {
+    transition: none;
+  }
+
+  .is-overview .workspace {
+    outline: 1px dashed var(--color-line);
+    outline-offset: -1px;
+  }
+
+  .is-overview .win {
+    cursor: pointer;
+  }
+
+  .is-overview .win__body {
+    pointer-events: none;
+  }
+
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    text-align: center;
+    color: var(--color-ink-muted);
+    pointer-events: none;
+  }
+
+  .viewport:not(.is-empty) .wallpaper {
+    display: none;
+  }
+
+  .wallpaper__title {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+}

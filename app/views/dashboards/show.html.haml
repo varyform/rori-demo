@@ -1,0 +1,22 @@
+- window mode: :fullscreen, workspace: "overview"
+= turbo_stream_from :users
+= turbo_stream_from :projects
+%dl.stats
+  .stats__item
+    %dt= User.model_name.human(count: 2)
+    %dd= @user_count
+  - Project::STATUSES.each do |status|
+    .stats__item
+      %dt= Project.human_status(status)
+      %dd= @status_counts.fetch(status, 0)
+%section.section
+  .section__head
+    %h2= t(".recent")
+  %table.table
+    %thead
+      %tr
+        %th= Project.human_attribute_name(:name)
+        %th= Project.human_attribute_name(:status)
+        %th= Project.human_attribute_name(:user)
+        %th= Project.human_attribute_name(:updated_at)
+    %tbody= render partial: "projects/project", collection: @recent_projects

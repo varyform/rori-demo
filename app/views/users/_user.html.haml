@@ -1,0 +1,6 @@
+-# locals: (user:)
+%tr
+  %td= link_to user.name, user
+  %td= user.email
+  %td.table__num= user.projects.size
+  %td= l(user.updated_at, format: :short)

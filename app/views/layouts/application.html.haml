@@ -1,0 +1,42 @@
+!!!
+%html{ lang: I18n.locale }
+  %head
+    %title= windowed? ? window_title : t("app_name")
+    %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }
+    %meta{ name: "apple-mobile-web-app-capable", content: "yes" }
+    %meta{ name: "application-name", content: t("app_name") }
+    %meta{ name: "mobile-web-app-capable", content: "yes" }
+    = csrf_meta_tags
+    = csp_meta_tag
+    = yield :head
+    %link{ rel: "icon", href: "/icon.png", type: "image/png" }
+    %link{ rel: "icon", href: "/icon.svg", type: "image/svg+xml" }
+    %link{ rel: "apple-touch-icon", href: "/icon.png" }
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  %body{ data: { controller: "desk palette",
+    desk_root_url_value: root_path,
+    desk_load_error_value: t("desk.window.load_error"),
+    action: ["keydown@window->desk#keydown",
+      "keydown@window->palette#keydown",
+      "resize@window->desk#layout",
+      "pagehide@window->desk#save",
+      "message->desk#streamMessage:capture",
+      "turbo:before-stream-render@document->desk#streamRender",
+      "turbo:before-visit@document->desk#interceptVisit",
+      "palette:run->desk#command"].join(" ") } }
+    = render "desk/menubar"
+    %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive" } }
+      = render "desk/wallpaper"
+      .stack{ data: { desk_target: "stack" } }
+      -# Windows wait here until their page says where they go; modals stay here.
+      .floating{ data: { desk_target: "floating" } }
+        - if windowed?
+          = render "desk/window", frame_id: "win_main", src: (request.fullpath if request.get?), body: safe_join([yield, window_meta_tag])
+        - else
+          = yield
+    = render "desk/statusbar"
+    = render "desk/palette"
+    %template{ data: { desk_target: "template" } }
+      = render "desk/window"

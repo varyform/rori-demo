@@ -1,0 +1,16 @@
+- window size: :lg, workspace: "projects"
+= turbo_stream_from :projects
+.toolbar
+  %p.toolbar__meta= t(".count", count: @projects.size)
+  = desk_link_to t(".new"), new_project_path, class: "btn btn--primary"
+- if @projects.any?
+  %table.table
+    %thead
+      %tr
+        %th= Project.human_attribute_name(:name)
+        %th= Project.human_attribute_name(:status)
+        %th= Project.human_attribute_name(:user)
+        %th= Project.human_attribute_name(:updated_at)
+    %tbody= render @projects
+- else
+  %p.empty= t(".empty")

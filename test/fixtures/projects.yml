@@ -1,0 +1,10 @@
+desk:
+  name: Desk UI
+  status: active
+  description: Window manager on top of Turbo frames.
+  user: oleh
+
+engine:
+  name: Analytical Engine
+  status: idea
+  user: ada

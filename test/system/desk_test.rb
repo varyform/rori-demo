@@ -1,0 +1,152 @@
+require "application_system_test_case"
+
+class DeskTest < ApplicationSystemTestCase
+  test "blank desk; a ⌘K modal form becomes the new user's column" do
+    visit root_path
+    assert_text "Nothing open"
+
+    run_command "new user"
+    within "dialog.win:modal" do
+      fill_in "Name", with: "Grace"
+      fill_in "Email", with: "grace@example.com"
+      click_on "Create User"
+    end
+
+    assert_no_selector "dialog.win:modal"
+    assert_selector ".col dialog.win", text: "Grace"
+    assert_current_path user_path(User.find_by!(email: "grace@example.com"))
+  end
+
+  test "invalid modal submissions keep the modal up with field errors" do
+    visit root_path
+    run_command "new user"
+    within "dialog.win:modal" do
+      fill_in "Email", with: users(:oleh).email
+      click_on "Create User"
+      assert_selector ".user_name .error"
+      assert_selector ".user_email .error"
+    end
+  end
+
+  test "opening a page whose key is taken reuses that window; back returns" do
+    visit root_path
+    run_command "users"
+    window_titled "Users"
+
+    run_command "oleh"
+    window_titled "Oleh"
+    assert_selector ".col", count: 1
+
+    click_on "Back"
+    window_titled "Users"
+  end
+
+  test "new windows open as a column right of the focused one and the strip scrolls to it" do
+    visit users_path
+    users = window_titled("Users")
+    run_command "oleh", new_window: true
+    oleh = window_titled("Oleh")
+
+    assert_focused "Oleh"
+    assert_equal 12, window_insets(oleh)[2], "focused column is fully visible at the right edge"
+    assert_operator window_insets(users)[0], :<, 0, "strip scrolled the first column partly off-screen"
+
+    press :left
+    assert_focused "Users"
+    assert_equal 12, window_insets(users)[0]
+  end
+
+  test "column widths cycle and go full width" do
+    visit users_path
+    users = window_titled("Users")
+    width = -> { 1400 - window_insets(users).values_at(0, 2).sum }
+
+    assert_in_delta (1400 - 12) * 2 / 3.0 - 12, width.call, 2
+    press "r"
+    assert_in_delta (1400 - 12) / 3.0 - 12, width.call, 2
+    press "f"
+    assert_in_delta 1400 - 24, width.call, 2
+  end
+
+  test "alt+[ stacks a window into the neighbouring column, alt+] expels it" do
+    visit users_path
+    run_command "oleh", new_window: true
+    window_titled "Oleh"
+    assert_selector ".col", count: 2
+
+    press "["
+    assert_selector ".col", count: 1
+    assert_selector ".col > dialog.win", count: 2
+
+    press "]"
+    assert_selector ".col", count: 2
+  end
+
+  test "pages choose their workspace and mode; workspaces stack vertically" do
+    visit root_path
+    run_command "dashboard"
+    assert_workspace "overview"
+    assert_equal [ 12, 0, 12, 12 ], window_insets(window_titled("Dashboard"))
+
+    run_command "projects"
+    assert_workspace "projects"
+    window_titled "Projects"
+
+    press :up
+    assert_workspace "overview"
+    assert_focused "Dashboard"
+  end
+
+  test "overview zooms out; clicking a window focuses it" do
+    visit users_path
+    run_command "dashboard"
+    assert_workspace "overview"
+
+    press "o"
+    assert_selector "body.is-overview"
+    window_titled("Users").click
+    assert_no_selector "body.is-overview"
+    assert_focused "Users"
+  end
+
+  test "reload restores columns into their workspaces" do
+    visit root_path
+    run_command "users"
+    window_titled "Users"
+    run_command "projects"
+    assert_workspace "projects"
+
+    refresh
+    window_titled "Projects"
+    assert_workspace "projects"
+
+    find(".workspace-button", text: "1").click
+    window_titled "Users"
+  end
+
+  test "broadcast refreshes morph the listening window without dropping the others" do
+    visit root_path
+    run_command "users"
+    window_titled "Users"
+    run_command "desk ui"
+    window_titled "Desk UI"
+    assert_selector "turbo-cable-stream-source[connected]", count: 2, visible: :all
+
+    User.create!(name: "Linus", email: "linus@example.com")
+    Turbo::StreamsChannel.broadcast_refresh_to(:users)
+
+    find(".workspace-button", text: "1").click
+    within(window_titled("Users")) { assert_text "Linus" }
+    find(".workspace-button", text: "projects").click
+    window_titled "Desk UI"
+  end
+
+  test "Esc closes a modal window" do
+    visit new_project_path
+    assert_selector "dialog.win:modal"
+
+    find("dialog.win:modal").send_keys :escape
+    assert_no_selector "dialog.win[open]"
+    assert_current_path root_path
+  end
+end

@@ -1,0 +1,6 @@
+-# locals: (project:)
+%tr
+  %td= desk_link_to project.name, project
+  %td= render "projects/status", project: project
+  %td= desk_link_to project.user.name, project.user
+  %td= l(project.updated_at, format: :short)

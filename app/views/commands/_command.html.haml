@@ -1,0 +1,6 @@
+-# locals: (command:)
+%li.palette__item{ role: "option",
+  data: { palette_target: "item", url: command.url, desk_action: command.action, search: "#{command.label} #{command.group}",
+    action: "click->palette#pick mousemove->palette#hover" } }
+  %span.palette__label= command.label
+  %span.palette__group= command.group

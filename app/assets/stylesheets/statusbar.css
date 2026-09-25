@@ -1,0 +1,48 @@
+@layer components {
+  .statusbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 var(--gap);
+  }
+
+  .statusbar__hint {
+    margin-left: auto;
+    overflow: hidden;
+    color: var(--color-ink-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .minimap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .minimap__col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 22px;
+    padding: 2px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: width var(--motion) var(--ease);
+  }
+
+  .minimap__col.is-visible {
+    border-color: var(--color-line);
+  }
+
+  .minimap__col span {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--color-line);
+  }
+
+  .minimap__col span.is-focused {
+    background: var(--color-ink);
+  }
+}

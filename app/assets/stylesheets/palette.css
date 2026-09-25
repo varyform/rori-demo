@@ -1,0 +1,68 @@
+@layer components {
+  .palette {
+    width: min(36rem, calc(100vw - 2rem));
+    margin: 12vh auto auto;
+    padding: 0;
+    border: 1px solid var(--color-ink);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .palette::backdrop {
+    background: var(--color-backdrop);
+  }
+
+  .palette__input {
+    width: 100%;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 15px;
+    outline: none;
+  }
+
+  .palette__input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .palette__results {
+    display: block;
+    max-height: 22rem;
+    overflow: auto;
+  }
+
+  .palette__list {
+    padding: 4px;
+  }
+
+  .palette__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .palette__item[aria-selected="true"] {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .palette__group {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  .palette__empty {
+    padding: 16px;
+    color: var(--color-ink-muted);
+  }
+
+  .palette__hint {
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink-muted);
+    font-size: 12px;
+  }
+}

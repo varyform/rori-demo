@@ -1,0 +1,63 @@
+@layer components {
+  .simple_form {
+    display: grid;
+    gap: 12px;
+  }
+
+  .simple_form .input {
+    display: grid;
+    gap: 4px;
+  }
+
+  .simple_form label {
+    font-size: 12px;
+    color: var(--color-ink-muted);
+  }
+
+  .simple_form abbr {
+    text-decoration: none;
+  }
+
+  .simple_form input,
+  .simple_form select,
+  .simple_form textarea {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    background: var(--color-canvas);
+  }
+
+  .simple_form input,
+  .simple_form select {
+    height: 32px;
+  }
+
+  .simple_form textarea {
+    resize: vertical;
+  }
+
+  .simple_form :is(input, select, textarea):focus {
+    outline: none;
+    border-color: var(--color-ink);
+  }
+
+  .simple_form .hint {
+    font-size: 12px;
+    color: var(--color-ink-muted);
+  }
+
+  .simple_form .error {
+    font-size: 12px;
+    color: var(--color-danger);
+  }
+
+  .simple_form .field_with_errors :is(input, select, textarea) {
+    border-color: var(--color-danger);
+    background: var(--color-danger-surface);
+  }
+
+  .simple_form .actions {
+    margin-top: 4px;
+  }
+}

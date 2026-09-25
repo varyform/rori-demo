@@ -1,0 +1,9 @@
+-# locals: (project:)
+= simple_form_for project do |f|
+  = f.input :name, autofocus: true
+  = f.input :status, collection: Project::STATUSES.map { [ Project.human_status(it), it ] }, include_blank: false
+  = f.association :user
+  = f.input :description, input_html: { rows: 4 }
+  .actions
+    = f.button :button, class: "btn btn--primary"
+    %button.btn{ type: "button", data: { action: "desk#close" } }= t("helpers.cancel")

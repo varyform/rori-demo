@@ -28,4 +28,119 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  app_name: Desk
+
+  helpers:
+    cancel: Cancel
+
+  activerecord:
+    models:
+      user:
+        one: User
+        other: Users
+      project:
+        one: Project
+        other: Projects
+    attributes:
+      user:
+        name: Name
+        email: Email
+        created_at: Created
+        updated_at: Updated
+      project:
+        name: Name
+        status: Status
+        description: Description
+        user: Owner
+        updated_at: Updated
+    values:
+      project:
+        status:
+          idea: Idea
+          active: Active
+          paused: Paused
+          done: Done
+
+  # Palette entries. A parameterless GET route shows up once it has a label here.
+  commands:
+    groups:
+      open: Open
+      desk: Desk
+    routes:
+      users:
+        index: Users
+        new: New user
+      projects:
+        index: Projects
+        new: New project
+      dashboards:
+        show: Dashboard
+    desk:
+      overview: Toggle overview
+      new_workspace: New workspace
+      cycle_width: Cycle column width
+      full_width: Toggle full-width column
+      center_column: Center column
+      close_window: Close window
+
+  desk:
+    menubar:
+      workspaces: Workspaces
+      search: Search or run a command…
+    statusbar:
+      columns: Columns
+      hint_html: "<kbd>⌘K</kbd> commands · <kbd>⌥←→↑↓</kbd> focus · <kbd>⌥⇧</kbd> + arrows move · <kbd>⌥[</kbd> <kbd>⌥]</kbd> stack / unstack · <kbd>⌥R</kbd> width · <kbd>⌥F</kbd> full · <kbd>⌥O</kbd> overview · <kbd>⌥W</kbd> close"
+    wallpaper:
+      title: Nothing open
+      hint_html: "Press <kbd>⌘K</kbd> and type what you need — <em>new user</em>, <em>projects</em>, <em>dashboard</em>."
+    palette:
+      label: Command palette
+      placeholder: Type a command or search…
+      empty: Nothing matches.
+      hint_html: "<kbd>↵</kbd> open · <kbd>⇧↵</kbd> in a new window · <kbd>esc</kbd> close"
+    window:
+      back: Back
+      detach: Open in a new tab
+      close: Close
+      load_error: This page couldn't be shown in a window. Open it in a new tab (↗) to see what went wrong.
+
+  users:
+    index:
+      title: Users
+      new: New user
+      empty: No users yet.
+      count:
+        one: 1 user
+        other: "%{count} users"
+    show:
+      edit: Edit
+      destroy: Delete
+      confirm: Delete this user and all their projects?
+      new_project: New project
+      empty: No projects yet.
+    new:
+      title: New user
+    edit:
+      title: Edit user
+
+  projects:
+    index:
+      title: Projects
+      new: New project
+      empty: No projects yet.
+      count:
+        one: 1 project
+        other: "%{count} projects"
+    show:
+      edit: Edit
+      destroy: Delete
+      confirm: Delete this project?
+    new:
+      title: New project
+    edit:
+      title: Edit project
+
+  dashboards:
+    show:
+      title: Dashboard
+      recent: Recently updated

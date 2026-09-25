@@ -1,0 +1,121 @@
+@layer components {
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .toolbar__meta {
+    color: var(--color-ink-muted);
+    align-self: center;
+  }
+
+  .section {
+    display: grid;
+    gap: 8px;
+  }
+
+  .section__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .props {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 16px;
+  }
+
+  .props dt {
+    color: var(--color-ink-muted);
+  }
+
+  .list__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .list__item a {
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .list__item a:hover {
+    text-decoration: underline;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+  }
+
+  .stats__item {
+    padding: 12px 14px;
+  }
+
+  .stats__item+.stats__item {
+    border-left: 1px solid var(--color-line);
+  }
+
+  .stats dt {
+    font-size: 12px;
+    color: var(--color-ink-muted);
+  }
+
+  .stats dd {
+    font: 500 26px/1.2 var(--font-mono);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .badge--idea {
+    color: var(--color-info);
+    background: var(--color-info-surface);
+  }
+
+  .badge--active {
+    color: var(--color-success);
+    background: var(--color-success-surface);
+  }
+
+  .badge--paused {
+    color: var(--color-warning);
+    background: var(--color-warning-surface);
+  }
+
+  .badge--done {
+    color: var(--color-ink-muted);
+  }
+
+  .empty {
+    color: var(--color-ink-muted);
+  }
+
+  .prose {
+    max-width: 64ch;
+    line-height: 1.6;
+  }
+
+  .prose>*+* {
+    margin-top: 0.75em;
+  }
+}

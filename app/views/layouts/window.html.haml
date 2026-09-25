@@ -1,0 +1,10 @@
+-# Frame responses: Turbo only reads the frame matching the request, so the
+-# page is wrapped in whatever window frame asked for it.
+!!!
+%html{ lang: I18n.locale }
+  %head
+    %title= window_title
+  %body
+    = turbo_frame_tag turbo_frame_request_id do
+      = yield
+      = window_meta_tag

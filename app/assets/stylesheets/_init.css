@@ -1,0 +1,56 @@
+@layer reset, base, layout, components, utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark light;
+
+    /* Private palette — components never reference --brand-* directly. */
+    --brand-night: oklch(0.14 0 0);
+    --brand-day: oklch(0.95 0 0);
+    --brand-panel-night: oklch(0.195 0 0);
+    --brand-panel-day: oklch(0.995 0 0);
+    --brand-chalk: oklch(0.94 0 0);
+    --brand-graphite: oklch(0.2 0 0);
+    --brand-green: light-dark(oklch(0.55 0.12 150), oklch(0.74 0.1 150));
+    --brand-amber: light-dark(oklch(0.62 0.12 75), oklch(0.8 0.09 80));
+    --brand-red: light-dark(oklch(0.55 0.16 27), oklch(0.7 0.13 25));
+    --brand-blue: light-dark(oklch(0.52 0.1 250), oklch(0.75 0.08 250));
+
+    --white: oklch(1 0 0);
+    --black: oklch(0 0 0);
+
+    /* Semantic API */
+    --color-canvas: light-dark(var(--brand-day), var(--brand-night));
+    --color-surface: light-dark(var(--brand-panel-day), var(--brand-panel-night));
+    --color-ink: light-dark(var(--brand-graphite), var(--brand-chalk));
+    --color-ink-muted: color-mix(in oklch, var(--color-ink) 60%, var(--color-surface));
+    --color-line: color-mix(in oklch, var(--color-ink) 14%, var(--color-surface));
+    --color-primary: var(--color-ink);
+    --color-on-primary: var(--color-surface);
+    --color-success: var(--brand-green);
+    --color-warning: var(--brand-amber);
+    --color-danger: var(--brand-red);
+    --color-info: var(--brand-blue);
+    --color-success-surface: color-mix(in oklch, var(--color-success) 14%, transparent);
+    --color-warning-surface: color-mix(in oklch, var(--color-warning) 16%, transparent);
+    --color-danger-surface: color-mix(in oklch, var(--color-danger) 12%, transparent);
+    --color-info-surface: color-mix(in oklch, var(--color-info) 14%, transparent);
+    --color-hover: color-mix(in oklch, var(--color-ink) 6%, transparent);
+    --color-backdrop: color-mix(in oklch, var(--black) 45%, transparent);
+
+    --gap: 12px;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --motion: 320ms;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Inter, sans-serif;
+    --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion: 0ms;
+    }
+  }
+}

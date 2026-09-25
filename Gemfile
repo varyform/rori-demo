@@ -64,3 +64,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "haml-rails", "~> 3.1"
+gem "simple_form", "~> 5.4"

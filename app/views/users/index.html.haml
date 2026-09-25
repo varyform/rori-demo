@@ -1,0 +1,16 @@
+- window size: :lg
+= turbo_stream_from :users
+.toolbar
+  %p.toolbar__meta= t(".count", count: @users.size)
+  = desk_link_to t(".new"), new_user_path, class: "btn btn--primary"
+- if @users.any?
+  %table.table
+    %thead
+      %tr
+        %th= User.human_attribute_name(:name)
+        %th= User.human_attribute_name(:email)
+        %th.table__num= Project.model_name.human(count: 2)
+        %th= User.human_attribute_name(:updated_at)
+    %tbody= render @users
+- else
+  %p.empty= t(".empty")

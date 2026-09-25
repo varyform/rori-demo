@@ -1,0 +1,7 @@
+%header.menubar
+  %span.menubar__brand= t("app_name")
+  %nav.workspaces{ "aria-label": t(".workspaces"), data: { desk_target: "workspaces" } }
+  %button.menubar__search{ type: "button", data: { action: "palette#open" } }
+    = t(".search")
+    %kbd ⌘K
+  %time.menubar__clock{ data: { controller: "clock" } }

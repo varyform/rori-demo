@@ -1,0 +1,7 @@
+-# locals: (user:)
+= simple_form_for user do |f|
+  = f.input :name, autofocus: true
+  = f.input :email
+  .actions
+    = f.button :button, class: "btn btn--primary"
+    %button.btn{ type: "button", data: { action: "desk#close" } }= t("helpers.cancel")

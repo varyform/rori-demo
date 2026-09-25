@@ -1,0 +1,17 @@
+- content_for :title, @project.name
+- window size: :md, workspace: "projects", key: dom_id(@project)
+= turbo_stream_from :projects
+.toolbar
+  %dl.props
+    %dt= Project.human_attribute_name(:status)
+    %dd= render "projects/status", project: @project
+    %dt= Project.human_attribute_name(:user)
+    %dd= desk_link_to @project.user.name, @project.user
+    %dt= Project.human_attribute_name(:updated_at)
+    %dd= l(@project.updated_at, format: :short)
+  .actions
+    = desk_link_to t(".edit"), edit_project_path(@project), class: "btn"
+    = button_to t(".destroy"), @project, method: :delete, class: "btn btn--danger",
+      form: { data: { turbo_confirm: t(".confirm") } }
+- if @project.description?
+  .prose= simple_format @project.description
