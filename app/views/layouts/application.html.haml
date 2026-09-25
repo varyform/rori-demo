@@ -6,6 +6,11 @@
     %meta{ name: "apple-mobile-web-app-capable", content: "yes" }
     %meta{ name: "application-name", content: t("app_name") }
     %meta{ name: "mobile-web-app-capable", content: "yes" }
+    -# Turbo's hover-prefetch cache is keyed by URL alone and hands its response
+    -# to the next fetch of that URL, whatever frame asks. Window frames have
+    -# generated ids, so a page prefetched for `_top` or another window arrives
+    -# without the requesting frame and the window shows "missing frame".
+    %meta{ name: "turbo-prefetch", content: "false" }
     = csrf_meta_tags
     = csp_meta_tag
     = yield :head

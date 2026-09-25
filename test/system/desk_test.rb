@@ -17,6 +17,18 @@ class DeskTest < ApplicationSystemTestCase
     assert_current_path user_path(User.find_by!(email: "grace@example.com"))
   end
 
+  test "a hovered desk link opens its window (hover prefetch must not leak into window frames)" do
+    visit users_path
+    within(window_titled("Users")) do
+      find("a", text: "New user").hover
+      sleep 0.3
+      click_on "New user"
+    end
+
+    assert_selector "dialog.win:modal", text: "Name"
+    assert_no_text "couldn't be shown"
+  end
+
   test "invalid modal submissions keep the modal up with field errors" do
     visit root_path
     run_command "new user"
