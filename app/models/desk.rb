@@ -23,6 +23,17 @@ module Desk
   # nth workspace. Chords never fire inside text fields; Esc leaves the field.
   MODIFIERS = { "Alt" => "⌥", "Meta" => "⌘", "Control" => "⌃" }.freeze
   mattr_accessor :modifier, default: "Alt"
+
+  # The native shell (src-tauri) marks its webview's user agent; there ⌘ combos
+  # aren't taken by a browser, so pages rendered for it use `native_modifier`.
+  mattr_accessor :native_user_agent, default: "DeskApp"
+  mattr_accessor :native_modifier, default: "Meta"
+
+  # Per-modifier replacements for chords the platform already owns: with ⌘,
+  # ⌘C is Copy in the native Edit menu, which fires before the page sees it.
+  mattr_accessor :keymap_overrides, default: {
+    "Meta" => { center_column: %w[ Mod+Shift+KeyC ] }
+  }.freeze
   mattr_accessor :keymap, default: {
     focus_left: %w[ Mod+ArrowLeft Mod+KeyH ],
     focus_right: %w[ Mod+ArrowRight Mod+KeyL ],
@@ -68,13 +79,16 @@ module Desk
     def configure = yield(self)
 
     # The keymap with `Mod` spelled out, as desk_controller.js matches it.
-    def resolved_keymap
-      raise ArgumentError, "Desk.modifier must be one of #{MODIFIERS.keys.join(", ")}" unless MODIFIERS.key?(modifier)
+    def resolved_keymap(modifier = self.modifier)
+      raise ArgumentError, "Desk modifier must be one of #{MODIFIERS.keys.join(", ")}" unless MODIFIERS.key?(modifier)
 
-      keymap.transform_values { |chords| Array(chords).map { it.sub(/\AMod\+/, "#{modifier}+") } }
+      keymap.merge(keymap_overrides.fetch(modifier, {}))
+        .transform_values { |chords| Array(chords).map { it.sub(/\AMod\+/, "#{modifier}+") } }
     end
 
-    def modifier_symbol = MODIFIERS.fetch(modifier)
+    def modifier_symbol(modifier = self.modifier) = MODIFIERS.fetch(modifier)
+
+    def modifier_for(user_agent) = user_agent.to_s.include?(native_user_agent) ? native_modifier : modifier
 
     def resolved_hover_keymap = hover_keys ? hover_keymap : {}
   end

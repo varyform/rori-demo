@@ -11,6 +11,15 @@ class Desk::KeymapTest < ActiveSupport::TestCase
     assert_equal "⌘", Desk.modifier_symbol
   end
 
+  test "the native shell's user agent gets ⌘, with ⌘C left to Copy" do
+    assert_equal "Alt", Desk.modifier_for("Mozilla/5.0 … Safari/605.1.15")
+    assert_equal "Meta", Desk.modifier_for("Mozilla/5.0 … (KHTML, like Gecko) DeskApp/0.1")
+    assert_equal "Alt", Desk.modifier_for(nil)
+
+    assert_equal %w[ Meta+Shift+KeyC ], Desk.resolved_keymap("Meta")[:center_column]
+    assert_equal %w[ Alt+KeyC ], Desk.resolved_keymap("Alt")[:center_column]
+  end
+
   test "rejects unknown modifiers" do
     Desk.modifier = "Hyper"
 

@@ -13,4 +13,12 @@ class Desk::DesktopsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Desk.resolved_keymap.stringify_keys, keymap
     assert_select "dialog.palette turbo-frame#commands:not([src])"
   end
+
+  test "the native shell gets the ⌘ keymap and hint" do
+    get root_path, headers: { "User-Agent" => "Mozilla/5.0 (Macintosh) AppleWebKit/605.1.15 (KHTML, like Gecko) DeskApp/0.1" }
+
+    keymap = JSON.parse(css_select("body").first["data-desk-keymap-value"])
+    assert_equal %w[ Meta+ArrowLeft Meta+KeyH ], keymap["focus_left"]
+    assert_select ".statusbar__hint kbd", text: "⌘←→↑↓"
+  end
 end

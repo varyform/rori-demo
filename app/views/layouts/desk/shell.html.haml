@@ -29,7 +29,7 @@
     desk_load_error_value: t("desk.window.load_error"),
     desk_workspace_group_value: t("desk.commands.workspaces.group"),
     desk_new_workspace_label_value: t("desk.commands.workspaces.new"),
-    desk_keymap_value: Desk.resolved_keymap.to_json,
+    desk_keymap_value: Desk.resolved_keymap(desk_modifier).to_json,
     desk_hover_keymap_value: Desk.resolved_hover_keymap.to_json,
     desk_hover_timeout_value: (Desk.hover_timeout * 1000).round,
     desk_discard_prompt_value: t("desk.window.discard"),

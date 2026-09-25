@@ -1,0 +1,11 @@
+[package]
+name = "desk"
+version = "0.1.0"
+description = "Native shell for the desk (loads http://desk.localhost:3030)"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

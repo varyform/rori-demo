@@ -49,3 +49,6 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Native shell (Tauri), not part of the server image.
+/src-tauri/
