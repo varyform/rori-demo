@@ -29,7 +29,8 @@ export default class extends Controller {
   keydown(event) {
     if (event.code !== this.keyValue || event.metaKey || event.ctrlKey || event.altKey) return
     const inTerminal = this.panelTarget.contains(event.target)
-    if (!inTerminal && event.target.closest?.(FIELDS)) return
+    // A field in a closed dialog (see desk_controller.js `typing`) isn't being typed in.
+    if (!inTerminal && event.target.closest?.(FIELDS) && !event.target.closest("dialog:not([open])")) return
     if (document.querySelector("dialog:modal")) return
     event.preventDefault()
     this.toggle()

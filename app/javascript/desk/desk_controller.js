@@ -7,6 +7,9 @@ const SIZES = { sm: 1 / 3, md: 1 / 2, lg: 2 / 3, xl: 1 }
 const MODAL_WIDTHS = { sm: 440, md: 640, lg: 900, xl: 1200 }
 const MODIFIERS = ["Control", "Alt", "Meta", "Shift"]
 const FIELDS = "input, textarea, select, [contenteditable]"
+// Chrome can leave focus on a field inside a dialog that just closed (the
+// palette); nobody is typing there, so it mustn't swallow desk keys.
+const typing = (target) => Boolean(target.closest?.(FIELDS) && !target.closest("dialog:not([open])"))
 const CLOSED_LIMIT = 20
 // A resting pointer that jitters less than this doesn't re-arm hover keys.
 const HOVER_JITTER = 4
@@ -105,7 +108,7 @@ export default class extends Controller {
 
     const binding = this.bindings.get(this.#chord(event))
     // Chords edit text inside fields (⌥← jumps a word, ⌘← to line start): leave them be.
-    if (!binding || event.target.closest?.(FIELDS)) return
+    if (!binding || typing(event.target)) return
 
     event.preventDefault()
     this.#perform(binding.action, { workspace: this.#workspaceAt(binding.digit) })
@@ -137,7 +140,7 @@ export default class extends Controller {
       return this.toggleOverview()
     }
     const win = event.target.closest?.(".win")
-    if (win && !win.matches(":modal") && event.target.closest(FIELDS)) {
+    if (win && !win.matches(":modal") && typing(event.target)) {
       event.preventDefault()
       win.focus({ preventScroll: true })
     }
@@ -156,7 +159,7 @@ export default class extends Controller {
       if (this.armed) this.#disarm()
       return false
     }
-    if (!armed && event.target.closest?.(FIELDS)) return false
+    if (!armed && typing(event.target)) return false
 
     event.preventDefault()
     this.#perform(binding.action, { win: armed || undefined, workspace: this.#workspaceAt(binding.digit) })
@@ -172,7 +175,7 @@ export default class extends Controller {
     if (!["Space", "Enter", "NumpadEnter"].includes(event.code) || event.repeat || event.defaultPrevented) return false
     if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return false
     if (this.current?.querySelector(".win") || this.overview || document.querySelector("dialog:modal")) return false
-    if (event.target.closest?.(`${FIELDS}, button, a, summary`)) return false
+    if (typing(event.target) || event.target.closest?.("button, a, summary")) return false
 
     event.preventDefault()
     this.dispatch("open-palette")

@@ -3,11 +3,13 @@ require "test_helper"
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 900 ]
 
-  # Capybara clears sessionStorage and only then leaves the page, and the desk
-  # saves its layout on pagehide — so each test would restore the previous
-  # test's windows. Clear again after the desk's own pagehide listener runs.
-  teardown do
-    execute_script("addEventListener('pagehide', () => sessionStorage.clear())") if current_url.start_with?("http")
+  # The desk saves its layout to sessionStorage when a page is left, which can
+  # happen after Capybara's own reset clears storage — so a test could restore
+  # the previous test's windows. Start every test from clean storage instead,
+  # cleared on a same-origin page that has no desk to save anything.
+  setup do
+    visit rails_health_check_path
+    execute_script("sessionStorage.clear(); localStorage.clear()")
   end
 
   private
@@ -24,6 +26,29 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     def press(*keys)
       find("body").send_keys [ :alt, *keys ]
     end
+
+    def terminal_run(line)
+      input = find(".terminal__input")
+      input.set(line)
+      input.send_keys :enter
+      assert_selector ".terminal__entry--echo", text: line
+    end
+
+    def boxes(*elements)
+      sleep 0.4 # strip and width transitions
+      elements.map { |element| evaluate_script("arguments[0].getBoundingClientRect().toJSON()", element) }
+    end
+
+    # The page reads the timeout on load, so this wraps the visit.
+    def with_hover_timeout(seconds)
+      previous = Desk.hover_timeout
+      Desk.hover_timeout = seconds
+      yield
+    ensure
+      Desk.hover_timeout = previous
+    end
+
+    def focused_field_id = evaluate_script("document.activeElement.id")
 
     # Keys go to whatever has focus (a field, a window), like a real keyboard.
     def type_into_focus(keys)

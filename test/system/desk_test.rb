@@ -591,27 +591,6 @@ class DeskTest < ApplicationSystemTestCase
       execute_script("document.activeElement.setSelectionRange(99, 99)")
     end
 
-    def terminal_run(line)
-      input = find(".terminal__input")
-      input.set(line)
-      input.send_keys :enter
-      assert_selector ".terminal__entry--echo", text: line
-    end
-
-    def boxes(*elements)
-      sleep 0.4 # strip and width transitions
-      elements.map { |element| evaluate_script("arguments[0].getBoundingClientRect().toJSON()", element) }
-    end
-
-    # The page reads the timeout on load, so this wraps the visit.
-    def with_hover_timeout(seconds)
-      previous = Desk.hover_timeout
-      Desk.hover_timeout = seconds
-      yield
-    ensure
-      Desk.hover_timeout = previous
-    end
-
   public
 
   test "Esc closes a modal window" do

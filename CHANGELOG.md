@@ -32,6 +32,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** after running a ⌘K command, the next bare key or shortcut (`W`, `⌥W`, `` ` ``…) no longer occasionally does nothing: focus left behind in the closed palette's search box was treated as typing.
 - **Users:** table row lines now run to the window's edges instead of stopping short at its padding; text stays aligned with the rest of the window.
 - **Users:** zoomed in (or on narrow screens), focused windows were only partly revealed: the page grew wider than the window to fit the status-bar hint, so the desk scrolled against the wrong width.
 - **Users:** a form with unsaved edits is no longer reset when a live update refreshes its window.
