@@ -7,6 +7,7 @@
   .simple_form .input {
     display: grid;
     gap: 4px;
+    align-content: start;
   }
 
   .simple_form label {
@@ -31,6 +32,52 @@
   .simple_form input,
   .simple_form select {
     height: 32px;
+  }
+
+  .simple_form input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    accent-color: var(--color-primary);
+  }
+
+  .simple_form .boolean label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    font-size: 13px;
+    color: var(--color-ink);
+  }
+
+  .simple_form .input--code {
+    font: 12px/1.6 var(--font-mono);
+  }
+
+  /* Multi-section forms: sections stack; their fields go two-up once the
+     window (the query container, see desk/window.css) is wide enough. */
+  .form-section {
+    display: grid;
+    gap: 12px;
+    padding-top: 12px;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .form-section>legend {
+    float: left;
+    padding: 0;
+    font-weight: 600;
+  }
+
+  .form-section__fields {
+    display: grid;
+    gap: 12px;
+  }
+
+  @container (width > 40rem) {
+    .form-section__fields {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .simple_form textarea {

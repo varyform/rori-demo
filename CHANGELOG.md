@@ -6,11 +6,17 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** Services — a larger, multi-section form (source, runtime, health check, environment, notes) that opens as a ⅔-width column instead of a modal; fields go two-up in wide windows.
+- **Users:** hovering a field in an inactive window highlights it; one click activates the window and puts the cursor in that field.
+- **Users:** tabbing into another window makes it the active one.
 - **Users:** `⌥⇧1–9` moves the focused column to workspace 1–9 (creating it if needed) and follows it there.
 - **Users:** ⌘K → "Move column to workspace…" lists the other workspaces plus "New workspace".
+- **Developers:** window pages lay out against the window width (`container-type: inline-size` on the window body), so `@container` queries adapt to column width.
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** a form with unsaved edits is no longer reset when a live update refreshes its window.
+- **Users:** clicking a partly off-screen window no longer misses: the strip scrolls it into view after the click, not during it.
 - **Users:** the palette no longer shows the parent list under a nested list's breadcrumb when a slow response lands late.
 - **Users:** Enter pressed while a palette list is loading now runs once the list arrives instead of being dropped.
 - **Users:** a resting mouse pointer no longer steals the palette selection from the keyboard when the list re-renders.

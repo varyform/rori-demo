@@ -1,0 +1,9 @@
+-# locals: (service:)
+%tr
+  %td= link_to service.name, service
+  %td
+    %code= service.region
+  %td= service.human_size
+  %td.table__num= service.replicas
+  %td= desk_link_to service.user.name, service.user
+  %td= l(service.updated_at, format: :short)

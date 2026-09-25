@@ -3,6 +3,13 @@ require "test_helper"
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 900 ]
 
+  # Capybara clears sessionStorage and only then leaves the page, and the desk
+  # saves its layout on pagehide — so each test would restore the previous
+  # test's windows. Clear again after the desk's own pagehide listener runs.
+  teardown do
+    execute_script("addEventListener('pagehide', () => sessionStorage.clear())") if current_url.start_with?("http")
+  end
+
   private
     def run_command(query, new_window: false)
       find("body").send_keys [ :meta, "k" ]

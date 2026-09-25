@@ -15,8 +15,20 @@ en:
         email: Must be unique.
       project:
         description: Plain text; blank lines start new paragraphs.
+      service:
+        name: Lowercase letters, digits and dashes — used in hostnames.
+        repository: HTTPS clone URL.
+        replicas: With autoscale on, the maximum.
+        autoscale: Scale between 1 and the replica count by load.
+        environment: One KEY=value per line. Stored as plain text — keep real secrets elsewhere.
+    placeholders:
+      service:
+        repository: https://github.com/you/app
+        environment: "DATABASE_URL=postgres://…"
     prompts:
       project:
+        user: Choose an owner
+      service:
         user: Choose an owner
     # Examples
     # labels:

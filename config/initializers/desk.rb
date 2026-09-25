@@ -1,6 +1,6 @@
 # Reapplied after every code reload: Desk's settings live in a reloadable module.
 Rails.application.config.to_prepare do
   Desk.configure do |desk|
-    desk.records = %w[ User Project ]
+    desk.records = %w[ User Project Service ]
   end
 end

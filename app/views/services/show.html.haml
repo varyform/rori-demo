@@ -1,0 +1,35 @@
+- content_for :title, @service.name
+= turbo_stream_from :services
+.toolbar
+  %dl.props
+    %dt= Service.human_attribute_name(:user)
+    %dd= desk_link_to @service.user.name, @service.user
+    %dt= Service.human_attribute_name(:repository)
+    %dd= @service.repository.present? ? link_to(@service.repository, @service.repository, target: "_blank", rel: "noopener") : "—"
+    %dt= Service.human_attribute_name(:branch)
+    %dd
+      %code= @service.branch
+    %dt= Service.human_attribute_name(:region)
+    %dd
+      %code= @service.region
+    %dt= Service.human_attribute_name(:size)
+    %dd= @service.human_size
+    %dt= Service.human_attribute_name(:replicas)
+    %dd= t(@service.autoscale? ? ".replicas_autoscaled" : ".replicas", count: @service.replicas)
+    %dt= Service.human_attribute_name(:health_check_path)
+    %dd
+      %code= @service.health_check_path
+  .actions
+    = link_to t(".edit"), edit_service_path(@service), class: "btn"
+    = button_to t(".destroy"), @service, method: :delete, class: "btn btn--danger",
+      form: { data: { turbo_confirm: t(".confirm") } }
+- if @service.environment_keys.any?
+  %section.section
+    .section__head
+      %h2= Service.human_attribute_name(:environment)
+    %ul.list
+      - @service.environment_keys.each do |key|
+        %li.list__item
+          %code= key
+- if @service.notes?
+  .prose= simple_format @service.notes

@@ -1,0 +1,18 @@
+- window size: :lg
+= turbo_stream_from :services
+.toolbar
+  %p.toolbar__meta= t(".count", count: @services.size)
+  = link_to t(".new"), new_service_path, class: "btn btn--primary"
+- if @services.any?
+  %table.table
+    %thead
+      %tr
+        %th= Service.human_attribute_name(:name)
+        %th= Service.human_attribute_name(:region)
+        %th= Service.human_attribute_name(:size)
+        %th.table__num= Service.human_attribute_name(:replicas)
+        %th= Service.human_attribute_name(:user)
+        %th= Service.human_attribute_name(:updated_at)
+    %tbody= render @services
+- else
+  %p.empty= t(".empty")

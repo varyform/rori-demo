@@ -1,0 +1,22 @@
+gateway:
+  name: api-gateway
+  repository: https://github.com/oleh/api-gateway
+  branch: main
+  region: fra1
+  size: medium
+  replicas: 3
+  autoscale: true
+  health_check_path: /up
+  environment: |
+    RAILS_ENV=production
+    DATABASE_URL=postgres://db/gateway
+  user: oleh
+
+worker:
+  name: billing-worker
+  branch: fix/retry-queue
+  region: ams3
+  size: small
+  replicas: 1
+  health_check_path: /health
+  user: ada

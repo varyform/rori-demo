@@ -179,6 +179,7 @@ export default class extends Controller {
     this.layout()
   }
 
+  // Pointer or keyboard (Tab / focusin) entering a window makes it the focused one.
   focusWindow(event) {
     const win = this.#win(event)
     if (this.overview) {
@@ -187,7 +188,17 @@ export default class extends Controller {
       this.overview = false
       return this.focus(win)
     }
-    if (win !== this.focused) this.focus(win)
+    if (win === this.focused) return
+
+    // Revealing the column now would slide it under the pointer mid-click and
+    // the click would land elsewhere; scroll once the button is released.
+    if (event.type === "pointerdown") this.#holdRevealUntilPointerUp()
+    this.focus(win)
+  }
+
+  // Edited forms are skipped by broadcast reloads (see #busy).
+  markDirty(event) {
+    event.target.form?.toggleAttribute("data-desk-dirty", true)
   }
 
   layout() {
@@ -353,6 +364,9 @@ export default class extends Controller {
     this.focus(win)
   }
 
+  // TODO: closing (×, ⌥W, Esc, ⌘K "Close window") silently discards unsaved
+  // edits — confirm first when the window has a `form[data-desk-dirty]`, with
+  // the prompt passed in as a value from desk.en.yml.
   #remove(win) {
     if (!win) return
     const col = win.closest(".col")
@@ -527,7 +541,7 @@ export default class extends Controller {
 
     let offset = this.offsets.get(ws) || 0
     const focused = columns.indexOf(this.#focusIn(ws)?.closest(".col"))
-    if (reveal && focused >= 0) {
+    if (reveal && !this.holdingReveal && focused >= 0) {
       const [left, right] = spans[focused]
       if (right + GAP > offset + V) offset = right + GAP - V
       if (left - GAP < offset) offset = left - GAP
@@ -548,9 +562,24 @@ export default class extends Controller {
     }, 100)
   }
 
-  // Don't morph a form out from under the user: modals and windows being typed in are skipped.
+  #holdRevealUntilPointerUp() {
+    this.holdingReveal = true
+    const release = () => {
+      removeEventListener("pointerup", release)
+      removeEventListener("pointercancel", release)
+      this.holdingReveal = false
+      this.layout()
+    }
+    addEventListener("pointerup", release)
+    addEventListener("pointercancel", release)
+  }
+
+  // Don't morph a form out from under the user: modals, windows being typed in
+  // and windows with unsaved edits (even when you've moved on) are skipped.
   #busy(win) {
-    return win.dataset.mode === "modal" || Boolean(win.contains(document.activeElement) && document.activeElement.closest("form"))
+    return win.dataset.mode === "modal" ||
+      Boolean(win.querySelector("form[data-desk-dirty]")) ||
+      Boolean(win.contains(document.activeElement) && document.activeElement.closest("form"))
   }
 
   #pushHistory(win) {

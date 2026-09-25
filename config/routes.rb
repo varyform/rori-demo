@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   resources :users
   resources :projects
+  resources :services
   resource :dashboard, only: :show
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

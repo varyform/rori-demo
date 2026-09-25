@@ -138,6 +138,47 @@ class DeskTest < ApplicationSystemTestCase
     assert_selector ".col", count: 2
   end
 
+  test "a field hovered in an inactive window lights up; one click activates the window and focuses it" do
+    visit new_service_path
+    form = window_titled("New service")
+    run_command "oleh", new_window: true
+    assert_focused "Oleh"
+    assert_operator window_insets(form)[0], :<, 0, "the form is partly scrolled off-screen"
+
+    branch = find("#service_branch")
+    branch.hover
+    assert_equal "solid", evaluate_script("getComputedStyle(arguments[0]).outlineStyle", branch)
+
+    branch.click
+    assert_focused "New service"
+    assert_equal "service_branch", evaluate_script("document.activeElement.id")
+    assert_equal 12, window_insets(form)[0], "the strip scrolled the form into view after the click"
+  end
+
+  test "tabbing into another window focuses it" do
+    visit users_path
+    run_command "oleh", new_window: true
+    assert_focused "Oleh"
+
+    execute_script("document.querySelector('dialog.win:not(.is-focused) a').focus()")
+    assert_focused "Users"
+  end
+
+  test "a form with unsaved edits is not reloaded by broadcasts" do
+    visit new_service_path
+    fill_in "Name", with: "half-typed"
+    run_command "users", new_window: true
+    window_titled "Users"
+    execute_script("document.activeElement.blur()")
+
+    # No stream source inside the form window, so this refresh reloads every window.
+
+    execute_script("Turbo.renderStreamMessage('<turbo-stream action=\"refresh\"></turbo-stream>')")
+    sleep 0.5
+
+    assert_equal "half-typed", find("#service_name").value
+  end
+
   test "overview zooms out; clicking a window focuses it" do
     visit users_path
     run_command "dashboard"

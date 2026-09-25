@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_103956) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_161257) do
   create_table "projects", force: :cascade do |t|
     t.string "name", null: false
     t.string "status", default: "idea", null: false
@@ -19,6 +19,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_103956) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_projects_on_user_id"
+  end
+
+  create_table "services", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "repository"
+    t.string "branch", default: "main", null: false
+    t.string "region", null: false
+    t.string "size", default: "small", null: false
+    t.integer "replicas", default: 1, null: false
+    t.boolean "autoscale", default: false, null: false
+    t.string "health_check_path", default: "/up", null: false
+    t.text "environment"
+    t.text "notes"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_services_on_name", unique: true
+    t.index ["user_id"], name: "index_services_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -30,4 +48,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_103956) do
   end
 
   add_foreign_key "projects", "users"
+  add_foreign_key "services", "users"
 end

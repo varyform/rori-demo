@@ -41,6 +41,9 @@ en:
       project:
         one: Project
         other: Projects
+      service:
+        one: Service
+        other: Services
     attributes:
       user:
         name: Name
@@ -53,6 +56,19 @@ en:
         description: Description
         user: Owner
         updated_at: Updated
+      service:
+        name: Name
+        user: Owner
+        repository: Repository
+        branch: Branch
+        region: Region
+        size: Size
+        replicas: Replicas
+        autoscale: Autoscale
+        health_check_path: Health check path
+        environment: Environment
+        notes: Notes
+        updated_at: Updated
     values:
       project:
         status:
@@ -60,6 +76,19 @@ en:
           active: Active
           paused: Paused
           done: Done
+      service:
+        size:
+          small: Small · 1 vCPU
+          medium: Medium · 2 vCPU
+          large: Large · 4 vCPU
+    errors:
+      models:
+        service:
+          attributes:
+            name:
+              invalid: may only contain lowercase letters, digits and dashes
+            environment:
+              assignments: "has lines that aren't KEY=value: %{lines}"
 
   desk:
     commands:
@@ -73,6 +102,9 @@ en:
           new: New project
         dashboards:
           show: Dashboard
+        services:
+          index: Services
+          new: New service
 
   users:
     index:
@@ -109,6 +141,35 @@ en:
       title: New project
     edit:
       title: Edit project
+
+  services:
+    index:
+      title: Services
+      new: New service
+      empty: No services yet.
+      count:
+        one: 1 service
+        other: "%{count} services"
+    show:
+      edit: Edit
+      destroy: Delete
+      confirm: Delete this service?
+      replicas:
+        one: 1 replica
+        other: "%{count} replicas"
+      replicas_autoscaled:
+        one: up to 1 replica, autoscaled
+        other: up to %{count} replicas, autoscaled
+    new:
+      title: New service
+    edit:
+      title: Edit %{name}
+    form:
+      source: Source
+      runtime: Runtime
+      health: Health check
+      environment: Environment
+      notes: Notes
 
   dashboards:
     show:

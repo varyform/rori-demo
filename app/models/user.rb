@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_many :projects, dependent: :destroy
+  has_many :services, dependent: :destroy
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true

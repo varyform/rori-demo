@@ -1,0 +1,29 @@
+-# locals: (service:)
+= simple_form_for service, html: { class: "form--sections" } do |f|
+  %fieldset.form-section
+    %legend= t(".source")
+    .form-section__fields
+      = f.input :name, autofocus: true
+      = f.association :user
+      = f.input :repository
+      = f.input :branch
+  %fieldset.form-section
+    %legend= t(".runtime")
+    .form-section__fields
+      = f.input :region, collection: Service::REGIONS, include_blank: false
+      = f.input :size, collection: Service::SIZES.map { [ Service.human_size(it), it ] }, include_blank: false
+      = f.input :replicas, input_html: { min: 1, max: 20 }
+      = f.input :autoscale
+  %fieldset.form-section
+    %legend= t(".health")
+    .form-section__fields
+      = f.input :health_check_path
+  %fieldset.form-section
+    %legend= t(".environment")
+    = f.input :environment, input_html: { rows: 6, spellcheck: "false", class: "input--code" }
+  %fieldset.form-section
+    %legend= t(".notes")
+    = f.input :notes, input_html: { rows: 4 }
+  .actions
+    = f.button :button, class: "btn btn--primary"
+    %button.btn{ type: "button", data: { action: "desk#close" } }= t("helpers.cancel")
