@@ -4,7 +4,7 @@
 # `children` URL, or built in the browser from a named `source` for state the
 # server can't see (see desk-palette's `source` event).
 class Desk::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current)
-  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window ].freeze
+  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window ].freeze
 
   class << self
     def all = routes + records + actions + [ workspace_mover, theme_picker ] + app_commands

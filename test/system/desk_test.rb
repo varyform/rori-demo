@@ -185,6 +185,81 @@ class DeskTest < ApplicationSystemTestCase
     Desk.modifier = "Alt"
   end
 
+  test "hover keys: w over an inactive window closes it while a field elsewhere keeps focus; reopen brings it back" do
+    with_hover_timeout(3) do
+      editing_with_users_beside
+
+      find("dialog.win .win__title", exact_text: "Users").hover
+      assert_selector "dialog.win.is-armed .win__armed"
+      type_into_focus "w"
+
+      assert_no_selector "dialog.win .win__title", exact_text: "Users"
+      assert_equal [ "service_name", "api-gateway" ], evaluate_script("[document.activeElement.id, document.activeElement.value]")
+
+      type_into_focus :escape
+      type_into_focus [ :alt, :shift, "t" ]
+      window_titled "Users"
+    end
+  end
+
+  test "hover keys disarm once the pointer rests; then letters go to the field" do
+    with_hover_timeout(0.3) do
+      editing_with_users_beside
+
+      find("dialog.win .win__title", exact_text: "Users").hover
+      assert_selector "dialog.win.is-armed"
+      assert_no_selector "dialog.win.is-armed", wait: 2
+      type_into_focus "w"
+
+      assert_equal "api-gatewayw", find("#service_name").value
+      window_titled "Users"
+    end
+  end
+
+  test "typing any other key disarms; hover keys need fresh pointer movement" do
+    with_hover_timeout(3) do
+      editing_with_users_beside
+
+      find("dialog.win .win__title", exact_text: "Users").hover
+      assert_selector "dialog.win.is-armed"
+      type_into_focus "x"
+      assert_no_selector "dialog.win.is-armed"
+      type_into_focus "w"
+
+      assert_equal "api-gatewayxw", find("#service_name").value
+      window_titled "Users"
+    end
+  end
+
+
+
+  test "hover keys stay off while a modal is open" do
+    with_hover_timeout(3) do
+      visit users_path
+      run_command "oleh", new_window: true
+      window_titled "Oleh"
+      run_command "new project"
+      assert_selector "dialog.win:modal"
+
+      find("dialog.win .win__title", exact_text: "Users").hover
+      type_into_focus "w"
+
+      assert_equal "w", find("#project_name").value
+      window_titled "Users"
+    end
+  end
+
+  test "closing a window with unsaved edits asks first" do
+    visit new_service_path
+    fill_in "Name", with: "draft"
+
+    dismiss_confirm(/unsaved changes/) { click_button "Close" }
+    window_titled "New service"
+
+    accept_confirm(/unsaved changes/) { click_button "Close" }
+    assert_no_selector "dialog.win[open]"
+  end
+
   test "tabbing into another window focuses it" do
     visit users_path
     run_command "oleh", new_window: true
@@ -291,6 +366,29 @@ class DeskTest < ApplicationSystemTestCase
     refresh
     assert_selector "html[data-theme=nord]", visible: :all
   end
+
+  private
+    # A service edit form (name field focused) with the users list beside it.
+    def editing_with_users_beside
+      visit edit_service_path(services(:gateway))
+      window_titled "Edit api-gateway"
+      run_command "users", new_window: true
+      window_titled "Users"
+      find("#service_name").click
+      assert_focused "Edit api-gateway"
+      execute_script("document.activeElement.setSelectionRange(99, 99)")
+    end
+
+    # The page reads the timeout on load, so this wraps the visit.
+    def with_hover_timeout(seconds)
+      previous = Desk.hover_timeout
+      Desk.hover_timeout = seconds
+      yield
+    ensure
+      Desk.hover_timeout = previous
+    end
+
+  public
 
   test "Esc closes a modal window" do
     visit new_project_path

@@ -6,6 +6,9 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** Blender-style hover keys (opt-in, `Desk.hover_keys`): move the pointer onto an inactive window and bare keys act on it — `W` close, `U` reopen, `R` width, `F` full, `C` centre, `[` `]` stack, `⇧H`/`⇧L` move, `1–9` send to workspace — while the cursor stays in your field. The target shows "keys → here"; it disarms when the pointer rests (`Desk.hover_timeout`, 1.5 s), leaves, or you type any other key.
+- **Users:** closed windows can be reopened where they were: `⌥⇧T`, hover `U`, or ⌘K "Reopen closed window".
+- **Users:** closing a window with unsaved edits asks first.
 - **Users:** Services — a larger, multi-section form (source, runtime, health check, environment, notes) that opens as a ⅔-width column instead of a modal; fields go two-up in wide windows.
 - **Users:** hovering a field in an inactive window highlights it; one click activates the window and puts the cursor in that field.
 - **Users:** tabbing into another window makes it the active one.

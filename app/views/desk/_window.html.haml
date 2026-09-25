@@ -6,6 +6,7 @@
   %header.win__bar{ data: { action: "dblclick->desk#toggleFullWidth" } }
     %button.win__btn{ type: "button", title: t(".back"), disabled: true, data: { action: "desk#back", window_part: "back" } } ←
     %span.win__title{ data: { window_part: "title" } }
+    %span.win__armed= t(".armed")
     %button.win__btn{ type: "button", title: t(".detach"), data: { action: "desk#detach" } } ↗
     %button.win__btn{ type: "button", title: t(".close"), data: { action: "desk#close" } } ×
   .win__body

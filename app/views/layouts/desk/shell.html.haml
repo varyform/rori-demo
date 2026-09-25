@@ -30,6 +30,9 @@
     desk_workspace_group_value: t("desk.commands.workspaces.group"),
     desk_new_workspace_label_value: t("desk.commands.workspaces.new"),
     desk_keymap_value: Desk.resolved_keymap.to_json,
+    desk_hover_keymap_value: Desk.resolved_hover_keymap.to_json,
+    desk_hover_timeout_value: (Desk.hover_timeout * 1000).round,
+    desk_discard_prompt_value: t("desk.window.discard"),
     action: ["keydown@window->desk#keydown",
       "keydown@window->desk-palette#keydown",
       "resize@window->desk#layout",
@@ -43,7 +46,7 @@
       "desk-palette:preview->desk-theme#preview",
       "desk-palette:closed->desk-theme#revert"].join(" ") } }
     = render "desk/menubar"
-    %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive" } }
+    %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
       = render "desk/wallpaper"
       .stack{ data: { desk_target: "stack" } }
       -# Windows wait here until their page says where they go; modals stay here.

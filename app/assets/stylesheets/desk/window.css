@@ -122,6 +122,29 @@
     opacity: 0;
   }
 
+  /* Hover keys (Desk.hover_keys) will act on this window: say so plainly. */
+  .win.is-armed {
+    outline: 2px dashed var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  .win.is-armed::after {
+    opacity: 0.4;
+  }
+
+  .win__armed {
+    display: none;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    white-space: nowrap;
+  }
+
+  .win.is-armed .win__armed {
+    display: block;
+  }
+
   /* The field under the pointer in an inactive window lights up: one click
      activates the window and focuses that field. */
   .win:not(.is-focused, :modal) :is(.simple_form .input, input, select, textarea):hover {

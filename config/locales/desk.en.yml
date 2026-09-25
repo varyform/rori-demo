@@ -8,6 +8,7 @@ en:
         desk: Desk
       actions:
         overview: Toggle overview
+        reopen_window: Reopen closed window
         new_workspace: New workspace
         cycle_width: Cycle column width
         full_width: Toggle full-width column
@@ -29,7 +30,7 @@ en:
     statusbar:
       columns: Columns
       # %{mod} is Desk.modifier's symbol (⌥, ⌘ or ⌃).
-      hint_html: "<kbd>⌘K</kbd> commands · <kbd>%{mod}←→↑↓</kbd> focus · <kbd>%{mod}1–9</kbd> workspace · <kbd>%{mod}⇧</kbd> + arrows / 1–9 move · <kbd>%{mod}[</kbd> <kbd>%{mod}]</kbd> stack / unstack · <kbd>%{mod}R</kbd> width · <kbd>%{mod}F</kbd> full · <kbd>%{mod}O</kbd> overview · <kbd>%{mod}W</kbd> close · <kbd>esc</kbd> leave field"
+      hint_html: "<kbd>⌘K</kbd> commands · <kbd>%{mod}←→↑↓</kbd> focus · <kbd>%{mod}1–9</kbd> workspace · <kbd>%{mod}⇧</kbd> + arrows / 1–9 move · <kbd>%{mod}[</kbd> <kbd>%{mod}]</kbd> stack / unstack · <kbd>%{mod}R</kbd> width · <kbd>%{mod}F</kbd> full · <kbd>%{mod}O</kbd> overview · <kbd>%{mod}W</kbd> close · <kbd>%{mod}⇧T</kbd> reopen · <kbd>esc</kbd> leave field"
     wallpaper:
       title: Nothing open
       hint_html: "Press <kbd>⌘K</kbd> to open a page or run a command."
@@ -42,4 +43,6 @@ en:
       back: Back
       detach: Open in a new tab
       close: Close
+      armed: keys → here
+      discard: This window has unsaved changes. Close it anyway?
       load_error: This page couldn't be shown in a window. Open it in a new tab (↗) to see what went wrong.

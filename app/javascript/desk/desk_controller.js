@@ -7,6 +7,9 @@ const SIZES = { sm: 1 / 3, md: 1 / 2, lg: 2 / 3, xl: 1 }
 const MODAL_WIDTHS = { sm: 440, md: 640, lg: 900, xl: 1200 }
 const MODIFIERS = ["Control", "Alt", "Meta", "Shift"]
 const FIELDS = "input, textarea, select, [contenteditable]"
+const CLOSED_LIMIT = 20
+// A resting pointer that jitters less than this doesn't re-arm hover keys.
+const HOVER_JITTER = 4
 
 const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 
@@ -20,7 +23,10 @@ const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 // says where they belong; modals stay there, shown with showModal().
 export default class extends Controller {
   static targets = ["viewport", "stack", "floating", "window", "template", "workspaces", "minimap"]
-  static values = { rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String, keymap: Object }
+  static values = {
+    rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String, discardPrompt: String,
+    keymap: Object, hoverKeymap: Object, hoverTimeout: { type: Number, default: 1500 },
+  }
 
   initialize() {
     this.offsets = new WeakMap()      // workspace → strip scroll offset
@@ -29,6 +35,7 @@ export default class extends Controller {
     this.lastInColumn = new WeakMap() // column → window
     this.histories = new WeakMap()    // window → back stack
     this.pendingReloads = new Set()
+    this.closed = []                  // recently closed windows, for reopen_window
     this.overview = false
   }
 
@@ -40,23 +47,19 @@ export default class extends Controller {
 
   // Chord ("Alt+Shift+Digit2") → { action, digit } from Desk.keymap (see app/models/desk.rb).
   keymapValueChanged(keymap) {
-    this.bindings = new Map()
-    for (const [action, chords] of Object.entries(keymap)) {
-      for (const chord of chords) {
-        const digits = chord.endsWith("Digit*") ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [null]
-        for (const digit of digits) {
-          const spelled = digit ? chord.replace(/\*$/, digit) : chord
-          this.bindings.set(this.#normalize(spelled.split("+")), { action, digit })
-        }
-      }
-    }
+    this.bindings = this.#bindingsFrom(keymap)
+  }
+
+  // Desk.hover_keymap: bare keys for the window under the pointer (empty when off).
+  hoverKeymapValueChanged(keymap) {
+    this.hoverBindings = this.#bindingsFrom(keymap)
   }
 
   // Entry points ---------------------------------------------------------------
 
   command({ detail: { url, action, param, newWindow } }) {
     if (url) return this.#spawn(url, { reuse: !newWindow })
-    this.#perform(action, param)
+    this.#perform(action, { workspace: param })
   }
 
   // Client-side palette lists (Desk::Command `source:`): workspaces only exist in the browser.
@@ -93,16 +96,33 @@ export default class extends Controller {
   }
 
   keydown(event) {
+    if (this.#hoverKey(event)) return
     if (event.key === "Escape") return this.#escape(event)
 
-    const binding = this.bindings.get(this.#normalize([...MODIFIERS.filter((key) => event.getModifierState(key)), event.code]))
+    const binding = this.bindings.get(this.#chord(event))
     // Chords edit text inside fields (⌥← jumps a word, ⌘← to line start): leave them be.
     if (!binding || event.target.closest?.(FIELDS)) return
 
     event.preventDefault()
-    const workspace = binding.digit && (this.#workspaces()[binding.digit - 1]?.dataset.name ?? "")
-    this.#perform(binding.action, workspace)
+    this.#perform(binding.action, { workspace: this.#workspaceAt(binding.digit) })
     if (this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
+  }
+
+  // Blender-style: after the pointer deliberately moves onto an inactive window,
+  // bare hover keys act on that window (even while a field elsewhere has focus)
+  // until the pointer rests for hoverTimeout, leaves, or you type anything else.
+  hover(event) {
+    if (!this.hoverBindings?.size || this.overview || !["mouse", "pen"].includes(event.pointerType)) return
+    this.pointer = [event.clientX, event.clientY]
+    const win = event.target.closest(".col > .win")
+    if (!win || win === this.focused) return this.#disarm()
+    if (win !== this.armed && this.restingAt &&
+      Math.hypot(event.clientX - this.restingAt[0], event.clientY - this.restingAt[1]) < HOVER_JITTER) return
+    this.#arm(win)
+  }
+
+  unhover() {
+    this.#disarm()
   }
 
   // Esc closes the overview, or hands focus from a field back to its window so
@@ -119,36 +139,96 @@ export default class extends Controller {
     }
   }
 
-  // Every desk action, whether from the keymap or a ⌘K command. `workspace` is a
-  // workspace name; "" means a new one.
-  #perform(action, workspace) {
+  #hoverKey(event) {
+    if (!this.armed || MODIFIERS.includes(event.key)) return false
+
+    const binding = this.hoverBindings.get(this.#chord(event))
+    const blocked = event.isComposing || this.overview || !this.armed.isConnected || document.querySelector("dialog:modal")
+    if (!binding || blocked) {
+      this.#disarm()
+      return false
+    }
+
+    event.preventDefault()
+    const win = this.armed
+    this.#perform(binding.action, { win, workspace: this.#workspaceAt(binding.digit) })
+    win.isConnected && win.closest(".workspace") === this.current ? this.#arm(win) : this.#disarm()
+    return true
+  }
+
+  #arm(win) {
+    if (win !== this.armed) {
+      this.armed?.classList.remove("is-armed")
+      win.classList.add("is-armed")
+      this.armed = win
+    }
+    this.restingAt = null
+    clearTimeout(this.armTimer)
+    this.armTimer = setTimeout(() => this.#disarm(), this.hoverTimeoutValue)
+  }
+
+  // Re-arming needs fresh movement from where the pointer is now.
+  #disarm() {
+    clearTimeout(this.armTimer)
+    this.armed?.classList.remove("is-armed")
+    this.armed = null
+    this.restingAt = this.pointer
+  }
+
+  // Every desk action, whether from a key or a ⌘K command. `win` defaults to the
+  // focused window; `workspace` is a workspace name, "" meaning a new one.
+  #perform(action, { win, workspace } = {}) {
     const target = () => (workspace ? this.#workspace(workspace) : null)
     const actions = {
       focus_left: () => this.#focusDirection("left"),
       focus_right: () => this.#focusDirection("right"),
       focus_up: () => this.#focusDirection("up"),
       focus_down: () => this.#focusDirection("down"),
-      move_left: () => this.#move("left"),
-      move_right: () => this.#move("right"),
-      move_up: () => this.#move("up"),
-      move_down: () => this.#move("down"),
+      move_left: () => this.#move("left", win),
+      move_right: () => this.#move("right", win),
+      move_up: () => this.#move("up", win),
+      move_down: () => this.#move("down", win),
       switch_to_workspace: () => this.#switchTo(target() || this.#newWorkspace()),
-      move_to_workspace: () => this.#moveToWorkspace(target()),
+      move_to_workspace: () => this.#moveToWorkspace(target(), win),
       new_workspace: () => this.#switchTo(this.#newWorkspace()),
-      consume_left: () => this.#consumeOrExpel(-1),
-      consume_right: () => this.#consumeOrExpel(1),
-      cycle_width: () => this.#cycleWidth(),
-      full_width: () => this.#toggleFullWidth(),
-      center_column: () => this.#center(),
+      consume_left: () => this.#consumeOrExpel(-1, win),
+      consume_right: () => this.#consumeOrExpel(1, win),
+      cycle_width: () => this.#cycleWidth(win),
+      full_width: () => this.#toggleFullWidth(win),
+      center_column: () => this.#center(win),
       overview: () => this.toggleOverview(),
-      close_window: () => this.#remove(this.focused),
+      close_window: () => this.#remove(win || this.focused),
+      reopen_window: () => this.#reopen(),
     }
     actions[action]?.()
+  }
+
+  #bindingsFrom(keymap) {
+    const bindings = new Map()
+    for (const [action, chords] of Object.entries(keymap)) {
+      for (const chord of chords) {
+        const digits = chord.endsWith("Digit*") ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [null]
+        for (const digit of digits) {
+          const spelled = digit ? chord.replace(/\*$/, digit) : chord
+          bindings.set(this.#normalize(spelled.split("+")), { action, digit })
+        }
+      }
+    }
+    return bindings
+  }
+
+  #chord(event) {
+    return this.#normalize([...MODIFIERS.filter((key) => event.getModifierState(key)), event.code])
   }
 
   #normalize(keys) {
     const code = keys.at(-1)
     return [...MODIFIERS.filter((key) => keys.includes(key)), code].join("+")
+  }
+
+  // Digit bindings address the nth workspace; past the last one means a new one ("").
+  #workspaceAt(digit) {
+    return digit ? (this.#workspaces()[digit - 1]?.dataset.name ?? "") : undefined
   }
 
   // Horizontal wheel / trackpad swipes scroll the strip; focus follows once it settles.
@@ -198,6 +278,7 @@ export default class extends Controller {
   // Window actions -------------------------------------------------------------
 
   focus(win) {
+    if (win && win === this.armed) this.#disarm()
     if (win) {
       const ws = this.#wsOf(win)
       if (ws) {
@@ -399,19 +480,45 @@ export default class extends Controller {
     this.focus(win)
   }
 
-  // TODO: closing (×, ⌥W, Esc, ⌘K "Close window") silently discards unsaved
-  // edits — confirm first when the window has a `form[data-desk-dirty]`, with
-  // the prompt passed in as a value from desk.en.yml.
+  // Every close (×, keys, Esc on a modal, ⌘K) ends here. Unsaved edits ask
+  // first; tiled windows can be brought back with reopen_window.
   #remove(win) {
     if (!win) return
+    if (win.querySelector("form[data-desk-dirty]") && !window.confirm(this.discardPromptValue)) return
+
     const col = win.closest(".col")
     const neighbour = col && (win.nextElementSibling || win.previousElementSibling ||
       this.#remembered(col.nextElementSibling) || this.#remembered(col.previousElementSibling))
+    if (col && this.#src(win)) this.#rememberClosed(win, col)
 
     win.remove()
     if (col && !col.querySelector(".win")) col.remove()
     if (win !== this.focused && this.focused?.isConnected) return this.layout()
     this.focus(neighbour || this.#focusIn(this.current) || this.current.querySelector(".win"))
+  }
+
+  #rememberClosed(win, col) {
+    const ws = this.#wsOf(col)
+    this.closed.push({
+      url: this.#src(win), mode: win.dataset.mode, size: win.dataset.size, w: col.dataset.w,
+      workspace: ws.dataset.name, index: this.#columns(ws).indexOf(col),
+    })
+    if (this.closed.length > CLOSED_LIMIT) this.closed.shift()
+  }
+
+  // Brings the last closed window back as a column where it was.
+  #reopen() {
+    const entry = this.closed.pop()
+    if (!entry) return
+
+    const ws = this.#workspace(entry.workspace) || this.current
+    const col = this.#createColumn(entry.w)
+    const at = this.#columns(ws)[entry.index]
+    at ? at.before(col) : this.#strip(ws).append(col)
+    const win = this.#spawn(entry.url, { into: col })
+    Object.assign(win.dataset, { placed: "1", mode: entry.mode, size: entry.size })
+    this.#open(win)
+    this.focus(win)
   }
 
   #moveTo(win, parent, before = null) {
@@ -482,38 +589,39 @@ export default class extends Controller {
     }
   }
 
-  #move(direction) {
-    const win = this.#focusIn(this.current)
+  // Window actions below act on `win` — the focused window by default, or the
+  // hovered one for hover keys — and only move focus when it was the focused one.
+
+  #move(direction, win = this.#focusIn(this.current)) {
     if (!win) return
     const col = win.closest(".col")
 
     const workspaces = this.#workspaces()
     const i = workspaces.indexOf(this.current)
-    if (direction === "up") return i > 0 && this.#moveToWorkspace(workspaces[i - 1])
-    if (direction === "down") return this.#moveToWorkspace(workspaces[i + 1])
+    if (direction === "up") return i > 0 && this.#moveToWorkspace(workspaces[i - 1], win)
+    if (direction === "down") return this.#moveToWorkspace(workspaces[i + 1], win)
 
     if (direction === "left") col.previousElementSibling?.before(col)
     else col.nextElementSibling?.after(col)
-    this.focus(win)
+    this.#settle(win)
   }
 
-  // Moves the focused column to `target` — a new workspace when missing — and follows it.
-  #moveToWorkspace(target) {
-    const win = this.#focusIn(this.current)
-    if (!win || target === this.current) return
+  // Moves the window's column to `target` — a new workspace when missing. Focus
+  // follows only if the column holds the focused window.
+  #moveToWorkspace(target, win = this.#focusIn(this.current)) {
+    if (!win || target === this.#wsOf(win)) return
 
     target ||= this.#newWorkspace()
     const col = win.closest(".col")
     const anchor = this.#focusIn(target)?.closest(".col")
     anchor ? anchor.after(col) : this.#strip(target).append(col)
     this.#windowsIn(col).forEach((other) => this.#open(other))
-    this.focus(win)
+    col.contains(this.focused) ? this.focus(this.focused) : this.#settle(win)
   }
 
   // niri's consume-or-expel: a window alone in its column joins the neighbouring
   // column; a stacked window leaves into a new column on that side.
-  #consumeOrExpel(side) {
-    const win = this.#focusIn(this.current)
+  #consumeOrExpel(side, win = this.#focusIn(this.current)) {
     if (!win) return
     const col = win.closest(".col")
 
@@ -528,19 +636,23 @@ export default class extends Controller {
       col.remove()
     }
     this.#open(win)
-    this.focus(win)
+    this.#settle(win)
   }
 
-  #cycleWidth() {
-    const col = this.#focusIn(this.current)?.closest(".col")
+  #settle(win) {
+    win === this.focused ? this.focus(win) : this.layout()
+  }
+
+  #cycleWidth(win = this.#focusIn(this.current)) {
+    const col = win?.closest(".col")
     if (!col) return
     col.dataset.w = WIDTHS.find((width) => width > Number(col.dataset.w) + 0.01) || WIDTHS[0]
     delete col.dataset.previous
     this.layout()
   }
 
-  #toggleFullWidth() {
-    const col = this.#focusIn(this.current)?.closest(".col")
+  #toggleFullWidth(win = this.#focusIn(this.current)) {
+    const col = win?.closest(".col")
     if (!col) return
     if (Number(col.dataset.w) === 1) {
       col.dataset.w = col.dataset.previous || SIZES.md
@@ -552,10 +664,10 @@ export default class extends Controller {
     this.layout()
   }
 
-  #center() {
+  #center(win = this.#focusIn(this.current)) {
     const ws = this.current
-    const col = this.#focusIn(ws)?.closest(".col")
-    if (!col) return
+    const col = win?.closest(".col")
+    if (!col || this.#wsOf(col) !== ws) return
     const [left, right] = this.spans.get(ws).spans[this.#columns(ws).indexOf(col)]
     this.offsets.set(ws, left - (this.viewportTarget.clientWidth - (right - left)) / 2)
     this.#layoutStrip(ws, { reveal: false })
