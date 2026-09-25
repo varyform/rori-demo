@@ -29,6 +29,7 @@
     desk_load_error_value: t("desk.window.load_error"),
     desk_workspace_group_value: t("desk.commands.workspaces.group"),
     desk_new_workspace_label_value: t("desk.commands.workspaces.new"),
+    desk_keymap_value: Desk.resolved_keymap.to_json,
     action: ["keydown@window->desk#keydown",
       "keydown@window->desk-palette#keydown",
       "resize@window->desk#layout",

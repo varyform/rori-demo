@@ -5,10 +5,8 @@ const STORAGE_KEY = "desk"
 const WIDTHS = [1 / 3, 1 / 2, 2 / 3]
 const SIZES = { sm: 1 / 3, md: 1 / 2, lg: 2 / 3, xl: 1 }
 const MODAL_WIDTHS = { sm: 440, md: 640, lg: 900, xl: 1200 }
-const DIRECTIONS = {
-  ArrowLeft: "left", KeyH: "left", ArrowRight: "right", KeyL: "right",
-  ArrowUp: "up", KeyK: "up", ArrowDown: "down", KeyJ: "down",
-}
+const MODIFIERS = ["Control", "Alt", "Meta", "Shift"]
+const FIELDS = "input, textarea, select, [contenteditable]"
 
 const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 
@@ -22,7 +20,7 @@ const clamp = (n, min, max) => Math.max(min, Math.min(n, max))
 // says where they belong; modals stay there, shown with showModal().
 export default class extends Controller {
   static targets = ["viewport", "stack", "floating", "window", "template", "workspaces", "minimap"]
-  static values = { rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String }
+  static values = { rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String, keymap: Object }
 
   initialize() {
     this.offsets = new WeakMap()      // workspace → strip scroll offset
@@ -40,21 +38,25 @@ export default class extends Controller {
     requestAnimationFrame(() => requestAnimationFrame(() => this.element.classList.remove("is-booting")))
   }
 
+  // Chord ("Alt+Shift+Digit2") → { action, digit } from Desk.keymap (see app/models/desk.rb).
+  keymapValueChanged(keymap) {
+    this.bindings = new Map()
+    for (const [action, chords] of Object.entries(keymap)) {
+      for (const chord of chords) {
+        const digits = chord.endsWith("Digit*") ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [null]
+        for (const digit of digits) {
+          const spelled = digit ? chord.replace(/\*$/, digit) : chord
+          this.bindings.set(this.#normalize(spelled.split("+")), { action, digit })
+        }
+      }
+    }
+  }
+
   // Entry points ---------------------------------------------------------------
 
   command({ detail: { url, action, param, newWindow } }) {
     if (url) return this.#spawn(url, { reuse: !newWindow })
-
-    const actions = {
-      overview: () => this.toggleOverview(),
-      new_workspace: () => this.#switchTo(this.#newWorkspace()),
-      move_to_workspace: () => this.#moveToWorkspace(param ? this.#workspace(param) : null),
-      close_window: () => this.#remove(this.focused),
-      cycle_width: () => this.#cycleWidth(),
-      full_width: () => this.#toggleFullWidth(),
-      center_column: () => this.#center(),
-    }
-    actions[action]?.()
+    this.#perform(action, param)
   }
 
   // Client-side palette lists (Desk::Command `source:`): workspaces only exist in the browser.
@@ -91,29 +93,62 @@ export default class extends Controller {
   }
 
   keydown(event) {
-    if (event.key === "Escape" && this.overview) return this.toggleOverview()
-    if (!event.altKey || event.metaKey || event.ctrlKey) return
-    // Alt+arrows edit text (word jumps); leave fields alone.
-    if (event.target.closest?.("input, textarea, select, [contenteditable]")) return
+    if (event.key === "Escape") return this.#escape(event)
 
-    const direction = DIRECTIONS[event.code]
-    const digit = event.code.match(/^Digit([1-9])$/)?.[1]
-
-    if (digit && event.shiftKey) this.#moveToWorkspace(this.#workspaces()[digit - 1])
-    else if (digit) this.#switchTo(this.#workspaces()[digit - 1] || this.#newWorkspace())
-    else if (direction && event.shiftKey) this.#move(direction)
-    else if (direction) this.#focusDirection(direction)
-    else if (event.code === "BracketLeft") this.#consumeOrExpel(-1)
-    else if (event.code === "BracketRight") this.#consumeOrExpel(1)
-    else if (event.code === "KeyR") this.#cycleWidth()
-    else if (event.code === "KeyF") this.#toggleFullWidth()
-    else if (event.code === "KeyC") this.#center()
-    else if (event.code === "KeyO") this.toggleOverview()
-    else if (event.code === "KeyW") this.#remove(this.focused)
-    else return
+    const binding = this.bindings.get(this.#normalize([...MODIFIERS.filter((key) => event.getModifierState(key)), event.code]))
+    // Chords edit text inside fields (⌥← jumps a word, ⌘← to line start): leave them be.
+    if (!binding || event.target.closest?.(FIELDS)) return
 
     event.preventDefault()
+    const workspace = binding.digit && (this.#workspaces()[binding.digit - 1]?.dataset.name ?? "")
+    this.#perform(binding.action, workspace)
     if (this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
+  }
+
+  // Esc closes the overview, or hands focus from a field back to its window so
+  // the keymap applies again. In modals Esc keeps closing the modal.
+  #escape(event) {
+    if (this.overview) {
+      event.preventDefault()
+      return this.toggleOverview()
+    }
+    const win = event.target.closest?.(".win")
+    if (win && !win.matches(":modal") && event.target.closest(FIELDS)) {
+      event.preventDefault()
+      win.focus({ preventScroll: true })
+    }
+  }
+
+  // Every desk action, whether from the keymap or a ⌘K command. `workspace` is a
+  // workspace name; "" means a new one.
+  #perform(action, workspace) {
+    const target = () => (workspace ? this.#workspace(workspace) : null)
+    const actions = {
+      focus_left: () => this.#focusDirection("left"),
+      focus_right: () => this.#focusDirection("right"),
+      focus_up: () => this.#focusDirection("up"),
+      focus_down: () => this.#focusDirection("down"),
+      move_left: () => this.#move("left"),
+      move_right: () => this.#move("right"),
+      move_up: () => this.#move("up"),
+      move_down: () => this.#move("down"),
+      switch_to_workspace: () => this.#switchTo(target() || this.#newWorkspace()),
+      move_to_workspace: () => this.#moveToWorkspace(target()),
+      new_workspace: () => this.#switchTo(this.#newWorkspace()),
+      consume_left: () => this.#consumeOrExpel(-1),
+      consume_right: () => this.#consumeOrExpel(1),
+      cycle_width: () => this.#cycleWidth(),
+      full_width: () => this.#toggleFullWidth(),
+      center_column: () => this.#center(),
+      overview: () => this.toggleOverview(),
+      close_window: () => this.#remove(this.focused),
+    }
+    actions[action]?.()
+  }
+
+  #normalize(keys) {
+    const code = keys.at(-1)
+    return [...MODIFIERS.filter((key) => keys.includes(key)), code].join("+")
   }
 
   // Horizontal wheel / trackpad swipes scroll the strip; focus follows once it settles.

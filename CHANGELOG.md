@@ -9,6 +9,8 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Users:** Services — a larger, multi-section form (source, runtime, health check, environment, notes) that opens as a ⅔-width column instead of a modal; fields go two-up in wide windows.
 - **Users:** hovering a field in an inactive window highlights it; one click activates the window and puts the cursor in that field.
 - **Users:** tabbing into another window makes it the active one.
+- **Users:** Esc inside a window's field hands focus back to the window, so desk shortcuts work again without reaching for the mouse (⌥←/→ keep jumping words while you type).
+- **Developers:** shortcuts live in one table, `Desk.keymap` (action → `KeyboardEvent#code` chords), with `Mod` standing for `Desk.modifier` (`Alt` by default; `Meta` or `Control` for a native shell such as Tauri). ⌘K commands and shortcuts share the same actions, and the status-bar hint shows the configured modifier.
 - **Users:** `⌥⇧1–9` moves the focused column to workspace 1–9 (creating it if needed) and follows it there.
 - **Users:** ⌘K → "Move column to workspace…" lists the other workspaces plus "New workspace".
 - **Developers:** window pages lay out against the window width (`container-type: inline-size` on the window body), so `@container` queries adapt to column width.

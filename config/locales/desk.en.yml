@@ -28,7 +28,8 @@ en:
       search: Search or run a command…
     statusbar:
       columns: Columns
-      hint_html: "<kbd>⌘K</kbd> commands · <kbd>⌥←→↑↓</kbd> focus · <kbd>⌥1–9</kbd> workspace · <kbd>⌥⇧</kbd> + arrows / 1–9 move · <kbd>⌥[</kbd> <kbd>⌥]</kbd> stack / unstack · <kbd>⌥R</kbd> width · <kbd>⌥F</kbd> full · <kbd>⌥O</kbd> overview · <kbd>⌥W</kbd> close"
+      # %{mod} is Desk.modifier's symbol (⌥, ⌘ or ⌃).
+      hint_html: "<kbd>⌘K</kbd> commands · <kbd>%{mod}←→↑↓</kbd> focus · <kbd>%{mod}1–9</kbd> workspace · <kbd>%{mod}⇧</kbd> + arrows / 1–9 move · <kbd>%{mod}[</kbd> <kbd>%{mod}]</kbd> stack / unstack · <kbd>%{mod}R</kbd> width · <kbd>%{mod}F</kbd> full · <kbd>%{mod}O</kbd> overview · <kbd>%{mod}W</kbd> close · <kbd>esc</kbd> leave field"
     wallpaper:
       title: Nothing open
       hint_html: "Press <kbd>⌘K</kbd> to open a page or run a command."

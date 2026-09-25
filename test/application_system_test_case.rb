@@ -25,6 +25,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       find("body").send_keys [ :alt, *keys ]
     end
 
+    # Keys go to whatever has focus (a field, a window), like a real keyboard.
+    def type_into_focus(keys)
+      *modifiers, key = Array(keys)
+      actions = page.driver.browser.action
+      modifiers.each { actions.key_down(it) }
+      actions.send_keys(key)
+      modifiers.reverse_each { actions.key_up(it) }
+      actions.perform
+    end
+
     def window_titled(title)
       find("dialog.win[open]", text: title) { it.find(".win__title").text == title }
     end

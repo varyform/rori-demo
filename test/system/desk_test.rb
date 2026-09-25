@@ -155,6 +155,36 @@ class DeskTest < ApplicationSystemTestCase
     assert_equal 12, window_insets(form)[0], "the strip scrolled the form into view after the click"
   end
 
+  test "desk chords are text editing inside a field; Esc leaves the field and they work again" do
+    visit users_path
+    run_command "new service"
+    window_titled "New service"
+    assert_equal "service_name", evaluate_script("document.activeElement.id")
+
+    type_into_focus [ :alt, :left ]
+    assert_focused "New service"
+
+    type_into_focus :escape
+    assert_equal "DIALOG", evaluate_script("document.activeElement.tagName")
+    type_into_focus [ :alt, :left ]
+    assert_focused "Users"
+  end
+
+  test "the keymap modifier is configurable" do
+    Desk.modifier = "Control"
+    visit users_path
+    run_command "oleh", new_window: true
+    assert_focused "Oleh"
+    assert_selector ".statusbar__hint kbd", text: "⌃←→↑↓"
+
+    type_into_focus [ :alt, :left ]
+    assert_focused "Oleh"
+    type_into_focus [ :control, :left ]
+    assert_focused "Users"
+  ensure
+    Desk.modifier = "Alt"
+  end
+
   test "tabbing into another window focuses it" do
     visit users_path
     run_command "oleh", new_window: true
