@@ -1,8 +1,13 @@
 @layer layout {
+
+  /* minmax(0, 1fr): an implicit `auto` column would grow to the widest bar's
+     content (e.g. the unwrapped status hint) and push the viewport past the
+     window on narrow or zoomed screens, leaving focused columns cut off. */
   body {
     height: 100vh;
     display: grid;
     grid-template-rows: 32px 1fr 36px;
+    grid-template-columns: minmax(0, 1fr);
     overflow: hidden;
   }
 

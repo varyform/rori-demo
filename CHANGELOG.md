@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** the macOS app zooms like a browser: View → Zoom In / Zoom Out / Actual Size (`⌘=`, `⌘-`, `⌘0`), in steps from 50% to 300%.
 - **Users:** the window whose text field has focus wears a green `<input>` tag on its left edge (right edge when there's no room; inside the bottom-left corner of full-width windows), so it's clear keys will type rather than drive the desk.
 - **Users:** a native macOS app (`src-tauri`, `cargo tauri dev`) wrapping the desk, where ⌘ is the shortcut modifier (⌘←→ focus, ⌘1–9 workspaces, ⌘W close…; centre column is ⌘⇧C since ⌘C copies).
 - **Developers:** development runs on exactly one origin, `http://desk.localhost:3030`; other hosts get 403. Pages served to the app's user agent (`Desk.native_user_agent`) use `Desk.native_modifier`, with `Desk.keymap_overrides` for chords the platform owns.
@@ -24,6 +25,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** zoomed in (or on narrow screens), focused windows were only partly revealed: the page grew wider than the window to fit the status-bar hint, so the desk scrolled against the wrong width.
 - **Users:** a form with unsaved edits is no longer reset when a live update refreshes its window.
 - **Users:** clicking a partly off-screen window no longer misses: the strip scrolls it into view after the click, not during it.
 - **Users:** the palette no longer shows the parent list under a nested list's breadcrumb when a slow response lands late.

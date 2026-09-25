@@ -68,6 +68,23 @@ class DeskTest < ApplicationSystemTestCase
     assert_equal 12, window_insets(users)[0]
   end
 
+  test "zoomed in, the viewport still fits the window and focused columns are fully revealed" do
+    # 150% browser zoom: fewer CSS pixels than the status hint is wide.
+    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 933, height: 600, deviceScaleFactor: 1.5, mobile: false)
+    visit users_path
+    run_command "oleh", new_window: true
+    oleh = window_titled("Oleh")
+
+    assert_equal evaluate_script("innerWidth"), evaluate_script("document.querySelector('.viewport').clientWidth")
+    assert_equal 12, window_insets(oleh)[2]
+
+    users = find("dialog.win .win__title", exact_text: "Users").ancestor("dialog.win")
+    users.find(".win__title").click
+    assert_equal 12, window_insets(users)[0]
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+  end
+
   test "column widths cycle and go full width" do
     visit users_path
     users = window_titled("Users")
