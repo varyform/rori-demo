@@ -1,4 +1,14 @@
 @layer components {
+
+  /* Edge to edge: rules run to the container's borders, not its padding. The
+     table bleeds out by the container's --container-padding (set by windows,
+     cards…; 0 elsewhere), which the outer cells take back so text stays in line. */
+  .table {
+    --bleed: var(--container-padding, 0px);
+    width: calc(100% + 2 * var(--bleed));
+    margin-inline: calc(-1 * var(--bleed));
+  }
+
   .table th {
     text-align: left;
     font-size: 12px;
@@ -12,6 +22,14 @@
     padding: 0 12px 0 0;
     border-bottom: 1px solid var(--color-line);
     white-space: nowrap;
+  }
+
+  .table :is(th, td):first-child {
+    padding-left: var(--bleed);
+  }
+
+  .table :is(th, td):last-child {
+    padding-right: var(--bleed);
   }
 
   .table tbody tr:last-child td {

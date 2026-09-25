@@ -157,10 +157,12 @@
     outline-offset: 1px;
   }
 
+  /* --container-padding: edge-to-edge content (tables.css) bleeds by this much. */
   .win__body>turbo-frame {
+    --container-padding: 16px;
     display: grid;
     gap: 16px;
-    padding: 14px 16px 16px;
+    padding: 14px var(--container-padding) 16px;
   }
 
   .win__error {

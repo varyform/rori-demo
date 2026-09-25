@@ -194,6 +194,19 @@ class DeskTest < ApplicationSystemTestCase
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
+  test "tables run edge to edge: row rules touch the window's borders, text stays aligned" do
+    visit users_path
+    window = window_titled("Users")
+    body, table, first_cell, meta = boxes(window.find(".win__body"), window.find("table.table"),
+      window.find("tbody td:first-child", match: :first), window.find(".toolbar__meta"))
+
+    assert_in_delta body["left"], table["left"], 1
+    assert_in_delta body["right"], table["right"], 1
+    text_left = evaluate_script("(() => { const range = document.createRange(); range.selectNodeContents(arguments[0].querySelector('a')); return range.getBoundingClientRect().left })()", window.find("tbody td:first-child", match: :first))
+    assert_in_delta meta["left"], text_left, 1, "first-column text lines up with the content above"
+    assert_operator first_cell["left"], :<, text_left
+  end
+
   test "column widths cycle and go full width" do
     visit users_path
     users = window_titled("Users")
