@@ -99,6 +99,7 @@ export default class extends Controller {
   keydown(event) {
     // Surfaces that own the keyboard (the terminal) opt out of every desk key.
     if (event.target.closest?.("[data-desk-keys=off]")) return
+    if (this.#emptyDeskKey(event)) return
     if (this.#bareKey(event)) return
     if (event.key === "Escape") return this.#escape(event)
 
@@ -162,6 +163,19 @@ export default class extends Controller {
 
     if (armed) armed.isConnected && armed.closest(".workspace") === this.current ? this.#arm(armed) : this.#disarm()
     else if (this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
+    return true
+  }
+
+  // On an empty workspace there's nothing for keys to act on, so Space or Enter
+  // opens ⌘K — the one useful next step. Buttons and links keep their own.
+  #emptyDeskKey(event) {
+    if (!["Space", "Enter", "NumpadEnter"].includes(event.code) || event.repeat || event.defaultPrevented) return false
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return false
+    if (this.current?.querySelector(".win") || this.overview || document.querySelector("dialog:modal")) return false
+    if (event.target.closest?.(`${FIELDS}, button, a, summary`)) return false
+
+    event.preventDefault()
+    this.dispatch("open-palette")
     return true
   }
 

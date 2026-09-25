@@ -57,7 +57,8 @@
       "desk-command:run->desk-wallpaper#run",
       "desk-command:preview->desk-wallpaper#preview",
       "desk-command:closed->desk-wallpaper#revert",
-      "desk:toggle-terminal->desk-terminal#toggle"].join(" ") } }
+      "desk:toggle-terminal->desk-terminal#toggle",
+      "desk:open-palette->desk-palette#open"].join(" ") } }
     = render "desk/menubar"
     %main.viewport{ data: { desk_target: "viewport", action: "wheel->desk#wheel:!passive pointermove->desk#hover pointerleave->desk#unhover" } }
       = render "desk/wallpaper"

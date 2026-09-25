@@ -31,6 +31,7 @@ export default class extends Controller {
   }
 
   open() {
+    this.returnFocus = document.activeElement
     this.inputTarget.value = ""
     this.dialogTarget.showModal()
     // Flattened tree for top-level queries, crawled in the background.
@@ -42,9 +43,15 @@ export default class extends Controller {
     this.filter()
   }
 
+  // Every close goes through here (Esc included, see navigate), so focus is back
+  // on the page before the next keystroke: Chrome sometimes leaves it on the
+  // closed dialog's input, where the next key would vanish.
   close() {
     this.pendingRun = null
     this.dialogTarget.close()
+    if (!this.dialogTarget.contains(document.activeElement)) return
+    const back = this.returnFocus
+    back?.isConnected && back !== document.body ? back.focus({ preventScroll: true }) : document.activeElement.blur()
   }
 
   closed() {
@@ -108,6 +115,9 @@ export default class extends Controller {
       const newWindow = event.shiftKey || event.metaKey || event.ctrlKey
       if (this.navigating || this.searching) this.pendingRun = { newWindow }
       else if (this.selected) this.#run(this.selected, newWindow)
+    } else if (event.key === "Escape" && !this.stack.length) {
+      event.preventDefault()
+      this.close()
     } else if (this.stack.length && (event.key === "Escape" || (event.key === "Backspace" && !this.inputTarget.value))) {
       event.preventDefault()
       this.#go(this.stack.slice(0, -1))

@@ -138,6 +138,27 @@ class DeskTest < ApplicationSystemTestCase
     assert_no_selector ".terminal"
   end
 
+  test "on an empty desk Space or Enter opens ⌘K; with a window open they don't" do
+    visit root_path
+    assert_text "Nothing open"
+
+    type_into_focus :space
+    assert_selector "dialog.palette[open]"
+    find(".palette__input").send_keys :escape
+    assert_no_selector "dialog.palette[open]"
+
+
+    type_into_focus :enter
+    assert_selector "dialog.palette[open]"
+    find(".palette__input").set("users")
+    assert_selector ".palette__item[aria-selected=true]", text: "Users"
+    find(".palette__input").send_keys :enter
+    window_titled "Users"
+
+    type_into_focus :space
+    assert_no_selector "dialog.palette[open]"
+  end
+
   test "invalid modal submissions keep the modal up with field errors" do
     visit root_path
     run_command "new user"

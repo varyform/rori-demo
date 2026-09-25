@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** on an empty desk, Space or Enter opens ⌘K.
 - **Developers:** `bin/rails db:seed:scale` bulk-adds users, projects and services (`USERS=200 PROJECTS=2000 SERVICES=300` by default, `SEED=` for a different repeatable world) to check lists, ⌘K search and refreshes at volume. Development only; each run adds on top.
 - **Users:** fuzzy matching spans nested lists in ⌘K and the terminal: `uthen` finds UI › Theme › Nord, `uwc` UI › Wallpaper › Cover bars. Matches are ranked by word and segment starts, runs and gaps (best alignment, not first letters found), shallow paths first when equally good.
 - **Users:** a drop-down terminal on `` ` `` (outside text fields; `Desk.terminal_key`, or `⌥``/`⌘`` and ⌘K "Toggle terminal"). It runs every ⌘K command with the same matching: words walk the nested lists (`ui wallpaper cover`, `new user`, `oleh`), Tab completes one level at a time, ↑↓ recall history, `help` lists the top level, `clear` wipes the scrollback.
