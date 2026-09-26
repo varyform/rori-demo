@@ -340,6 +340,10 @@ export default class extends Controller {
   // Pointer or keyboard (Tab / focusin) entering a window makes it the focused one.
   focusWindow(event) {
     const win = this.#win(event)
+    // Focus on the <dialog> itself is programmatic: dialog.show() moves focus to
+    // the window it opens (e.g. every window a reload restores, sometimes after
+    // the restore has finished). Only focus inside the content is the user's.
+    if (event.type === "focusin" && event.target === win) return
     if (this.overview) {
       if (event.type !== "pointerdown") return
       event.preventDefault()

@@ -472,6 +472,19 @@ class DeskTest < ApplicationSystemTestCase
     assert_no_selector "dialog.win[open]"
   end
 
+  test "programmatic focus on a window's dialog (as dialog.show() does) doesn't switch focus or workspace" do
+    visit users_path
+    window_titled "Users"
+    run_command "projects"
+    assert_workspace "projects"
+
+    # What a restored window's show() does, possibly after the restore finished.
+    execute_script("document.querySelector('.workspace[data-name=\"1\"] dialog.win').focus()")
+    assert_workspace "projects"
+    assert_focused "Projects"
+    assert_current_path projects_path
+  end
+
   test "tabbing into another window focuses it" do
     visit users_path
     run_command "oleh", new_window: true
