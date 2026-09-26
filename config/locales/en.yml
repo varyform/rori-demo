@@ -105,6 +105,16 @@ en:
         services:
           index: Services
           new: New service
+      # Server-side commands (Rori.command in config/initializers/rori.rb).
+      custom:
+        reindex_search: Reindex search
+
+  reindex_search:
+    started: Reindexing in the background. You'll be notified when it's done.
+    finished: Search reindexed
+    records:
+      one: 1 record indexed
+      other: "%{count} records indexed"
 
   users:
     index:

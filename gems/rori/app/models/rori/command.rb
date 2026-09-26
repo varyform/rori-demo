@@ -1,13 +1,14 @@
 # A command-palette entry. Running it either opens `url` in a desk window,
 # fires a client-side `action` (with an optional `param`) that the desk or
-# theme controller picks up, or drills into a nested list: served at the
-# `children` URL, or built in the browser from a named `source` for state the
-# server can't see (see rori-palette's `source` event).
-class Rori::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current)
+# theme controller picks up, runs a server-side command (`run`, see
+# `Rori.command`; `confirm` asks first), or drills into a nested list: served
+# at the `children` URL, or built in the browser from a named `source` for
+# state the server can't see (see rori-palette's `source` event).
+class Rori::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current, :run, :confirm)
   ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window toggle_terminal shortcuts ].freeze
 
   class << self
-    def all = routes + records + actions + [ workspace_mover, theme_picker, ui_menu ] + app_commands
+    def all = routes + records + actions + [ workspace_mover, theme_picker, ui_menu ] + runs + app_commands
 
     # Every parameterless GET route becomes a command once it has a label under
     # `desk.commands.routes.<controller>.<action>` — adding the locale key opts it in.
@@ -32,6 +33,11 @@ class Rori::Command < Data.define(:label, :group, :url, :action, :param, :childr
 
     def actions
       ACTIONS.map { new(label: I18n.t(it, scope: "rori.commands.actions"), group: group(:rori), action: it) }
+    end
+
+    # The app's server-side commands (`Rori.command`).
+    def runs
+      Rori.runnables.values.map { new(label: it.label, group: group(:run), run: it.name, confirm: it.confirm) }
     end
 
     def workspace_mover
@@ -93,7 +99,7 @@ class Rori::Command < Data.define(:label, :group, :url, :action, :param, :childr
       def url_helpers = Rails.application.routes.url_helpers
   end
 
-  def initialize(label:, group:, url: nil, action: nil, param: nil, children: nil, source: nil, current: false) = super
+  def initialize(label:, group:, url: nil, action: nil, param: nil, children: nil, source: nil, current: false, run: nil, confirm: false) = super
 
   def to_partial_path = "rori/commands/command"
 end

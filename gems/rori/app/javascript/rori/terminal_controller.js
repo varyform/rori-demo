@@ -6,6 +6,7 @@ const HISTORY_KEY = "rori:terminal:history"
 const HISTORY_LIMIT = 100
 const SUGGESTIONS = 8
 const FIELDS = "input, textarea, select, [contenteditable]"
+const YES = /^y(es)?$/i
 
 const format = (template, values) => template.replace(/%\{(\w+)\}/g, (_, key) => values[key] ?? "")
 // "Pick theme…" → "pick-theme": one word per label, so a trail reads as words.
@@ -16,7 +17,8 @@ const words = (trail) => trail.map(({ label }) => token(label)).join(" ")
 // server-rendered lists, client-side sources, fuzzy matcher and command bus.
 // Input matches whole paths through the tree, so `ui wallpaper cover` and
 // just `uthen` (UI › Theme › Nord) both work; a path ending on a nested item
-// lists it. Opens with Rori.terminal_key outside text fields.
+// lists it. Opens with Rori.terminal_key outside text fields. Commands that
+// ask first (`confirm`) wait for a `y` on the next line; anything else cancels.
 export default class extends Controller {
   static targets = ["panel", "output", "input", "suggestions"]
   static values = { root: String, key: String, prompt: String, messages: Object }
@@ -50,6 +52,7 @@ export default class extends Controller {
   }
 
   close() {
+    this.confirming = null
     this.panelTarget.hidden = true
     this.suggestionsTarget.replaceChildren()
     if (this.returnFocus?.isConnected) this.returnFocus.focus({ preventScroll: true })
@@ -106,6 +109,7 @@ export default class extends Controller {
     const line = this.inputTarget.value.trim()
     this.inputTarget.value = ""
     this.#print(`${this.promptValue} ${line}`, "echo")
+    if (this.confirming) return this.#answer(line)
     if (!line) return this.suggest()
     this.#remember(line)
 
@@ -126,9 +130,25 @@ export default class extends Controller {
     const { item, trail } = best
     const path = trail.map(({ label }) => label).join(" › ")
     if (isNested(item)) return this.#printList(format(this.messagesValue.list, { path }), await this.index.list(item))
+    if (item.confirm) {
+      this.confirming = { item, path }
+      return this.#print(format(this.messagesValue.confirm, { path }), "muted")
+    }
+    this.#execute(item, path)
+  }
 
-    this.dispatch("run", { prefix: BUS, detail: { url: item.url, action: item.action, param: item.param, newWindow: false } })
-    this.#print(format(item.url ? this.messagesValue.opened : this.messagesValue.ran, { path }), "ok")
+  #answer(line) {
+    const { item, path } = this.confirming
+    this.confirming = null
+    if (YES.test(line)) this.#execute(item, path)
+    else this.#print(this.messagesValue.cancelled, "muted")
+    this.suggest()
+  }
+
+  #execute(item, path) {
+    const { url, action, param, run } = item
+    this.dispatch("run", { prefix: BUS, detail: { url, action, param, run, newWindow: false } })
+    this.#print(format(url ? this.messagesValue.opened : this.messagesValue.ran, { path }), "ok")
     this.#reindex() // runs change state: the current theme, workspaces, records
   }
 

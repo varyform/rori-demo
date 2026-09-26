@@ -28,6 +28,17 @@ module Rori
   # every palette open (so they can list fresh data).
   mattr_accessor :commands, default: []
 
+  # Server-side commands registered with `Rori.command`, by name.
+  Runnable = Data.define(:name, :confirm, :block) do
+    def label = I18n.t(name, scope: "rori.commands.custom")
+
+    def call = block.call
+  end
+  mattr_accessor :runnables, default: {}
+
+  # `Rori.notify` broadcasts here; every open desk subscribes (turbo_stream_from).
+  mattr_accessor :notifications_stream, default: "rori_notifications"
+
   # Ghostty themes compiled by `bin/rails rori:themes:build`; both default to
   # the ones bundled with the gem (paths resolve lazily, after boot).
   mattr_writer :themes_directory, :themes_stylesheet
@@ -128,6 +139,26 @@ module Rori
 
   class << self
     def configure = yield(self)
+
+    # A command that runs on the server, listed in ⌘K and the terminal under
+    # Run and labelled by `rori.commands.custom.<name>` in the app's locale:
+    #
+    #   rori.command :reindex_search, confirm: true do
+    #     SearchReindexJob.perform_later
+    #     "Reindexing…"
+    #   end
+    #
+    # The block runs inside the request, so hand slow work to a job (which can
+    # `Rori.notify` when it's done). A String it returns becomes the
+    # notification's text. `confirm: true` asks first: ↵ twice in ⌘K, y in the
+    # terminal.
+    def command(name, confirm: false, &block)
+      runnables[name.to_s] = Runnable.new(name: name.to_s, confirm:, block:)
+    end
+
+    # A notification in the corner of every open desk, e.g. from a job:
+    #   Rori.notify "Search reindexed", "1,204 records", kind: :success
+    def notify(title, body = nil, kind: :info) = Notification.new(title:, body:, kind:).broadcast
 
     # The keymap with `Mod` spelled out, as rori_controller.js matches it.
     def resolved_keymap(modifier = self.modifier)

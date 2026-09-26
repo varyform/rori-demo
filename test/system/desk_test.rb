@@ -552,7 +552,8 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "Users"
     run_command "desk ui"
     window_titled "Desk UI"
-    assert_selector "turbo-cable-stream-source[connected]", count: 2, visible: :all
+    # The two windows' streams, plus the shell's notifications stream.
+    assert_selector "turbo-cable-stream-source[connected]", count: 3, visible: :all
 
     User.create!(name: "Linus", email: "linus@example.com")
     Turbo::StreamsChannel.broadcast_refresh_to(:users)

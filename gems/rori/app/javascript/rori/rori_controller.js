@@ -60,7 +60,9 @@ export default class extends Controller {
 
   // Entry points ---------------------------------------------------------------
 
-  command({ detail: { url, action, param, newWindow } }) {
+  // Server-side commands (`run`) are rori-notifications' job.
+  command({ detail: { url, action, param, run, newWindow } }) {
+    if (run) return
     if (url) return this.#spawn(url, { reuse: !newWindow })
     this.#perform(action, { workspace: param })
   }

@@ -7,6 +7,7 @@ import ClockController from "rori/clock_controller"
 import WallpaperController from "rori/wallpaper_controller"
 import TerminalController from "rori/terminal_controller"
 import PrefsController from "rori/prefs_controller"
+import NotificationsController from "rori/notifications_controller"
 
 export function registerRori(application) {
   application.register("rori", RoriController)
@@ -16,4 +17,5 @@ export function registerRori(application) {
   application.register("rori-wallpaper", WallpaperController)
   application.register("rori-terminal", TerminalController)
   application.register("rori-prefs", PrefsController)
+  application.register("rori-notifications", NotificationsController)
 }

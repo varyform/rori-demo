@@ -25,7 +25,8 @@
 
   %body{ class: rori_body_classes,
     style: ("--rori-wallpaper: #{rori_wallpaper.css_image}" if rori_wallpaper),
-    data: { controller: "rori rori-palette rori-theme rori-wallpaper rori-terminal rori-prefs",
+    data: { controller: "rori rori-palette rori-theme rori-wallpaper rori-terminal rori-prefs rori-notifications",
+    rori_notifications_url_value: rori_commands_runs_path,
     rori_prefs_bars_cookie_value: Rori.bars_cookie,
     rori_prefs_bars_value: rori_bars,
     rori_prefs_hint_cookie_value: Rori.hint_cookie,
@@ -41,6 +42,7 @@
     rori_terminal_prompt_value: t("rori.terminal.prompt"),
     rori_terminal_messages_value: t("rori.terminal.messages").to_json,
     rori_palette_root_value: rori_commands_path,
+    rori_palette_confirm_value: t("rori.palette.confirm"),
     rori_root_url_value: root_path,
     rori_load_error_value: t("rori.window.load_error"),
     rori_workspace_group_value: t("rori.commands.workspaces.group"),
@@ -69,6 +71,7 @@
       "rori-command:run->rori-prefs#run",
       "rori-command:preview->rori-prefs#preview",
       "rori-command:closed->rori-prefs#revert",
+      "rori-command:run->rori-notifications#run",
       "rori:open-shortcuts->rori-prefs#openShortcuts",
       "rori:toggle-terminal->rori-terminal#toggle",
       "rori:open-palette->rori-palette#open"].join(" ") } }
@@ -88,5 +91,6 @@
     = render "rori/terminal"
     = render "rori/shortcuts"
     = render "rori/palette"
+    = render "rori/notifications"
     %template{ data: { rori_target: "template" } }
       = render "rori/window"

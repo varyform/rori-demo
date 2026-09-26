@@ -7,5 +7,7 @@ namespace :rori do
     resources :themes, only: :index
     resources :wallpapers, only: :index
     resources :bars, only: :index
+    # Server-side commands (Rori.command).
+    resources :runs, only: :create
   end
 end

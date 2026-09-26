@@ -31,17 +31,18 @@
     --rori-danger: var(--color-danger, light-dark(oklch(0.55 0.16 27), oklch(0.7 0.13 25)));
     --rori-hover: var(--color-hover, color-mix(in oklch, var(--rori-ink) 6%, transparent));
     --rori-backdrop: var(--color-backdrop, color-mix(in oklch, oklch(0 0 0) 45%, transparent));
+    --rori-shadow: var(--shadow, 0 8px 24px color-mix(in oklch, oklch(0 0 0) 22%, transparent));
   }
 }
 
 /* Just enough reset for the desk's own chrome, whatever the host resets.
    :where() keeps it at zero specificity; window content is left to the host. */
 @layer rori.reset {
-  :where(.rori-menubar, .rori-viewport, .rori-palette, .rori-terminal, .rori-shortcuts) :where(*, *::before, *::after) {
+  :where(.rori-menubar, .rori-viewport, .rori-palette, .rori-terminal, .rori-shortcuts, .rori-notifications) :where(*, *::before, *::after) {
     box-sizing: border-box;
   }
 
-  :where(.rori-menubar, .rori-palette, .rori-terminal, .rori-win__bar, .rori-wallpaper, .rori-shortcuts) :where(button, input:not([type="checkbox"]), ul, p, dl, dd, label) {
+  :where(.rori-menubar, .rori-palette, .rori-terminal, .rori-win__bar, .rori-wallpaper, .rori-shortcuts, .rori-notifications) :where(button, input:not([type="checkbox"]), ul, p, dl, dd, label) {
     margin: 0;
     padding: 0;
     border: 0;

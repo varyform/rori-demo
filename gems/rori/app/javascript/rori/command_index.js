@@ -16,6 +16,8 @@ export function parseList(html) {
     param: item.dataset.param,
     children: item.dataset.children,
     source: item.dataset.source,
+    run: item.dataset.run,
+    confirm: "confirm" in item.dataset,
     shortcut: item.dataset.shortcut,
     current: "current" in item.dataset,
   }))
@@ -24,7 +26,8 @@ export function parseList(html) {
 export const isNested = (item) => Boolean(item.children || item.source)
 
 // What running an entry does; entries reachable by two paths share it.
-const target = (item) => item.url || item.children || item.source || `${item.action}:${item.param ?? ""}`
+const target = (item) =>
+  item.url || item.children || item.source || (item.run && `run:${item.run}`) || `${item.action}:${item.param ?? ""}`
 
 // Every command reachable from the root list, flattened with its trail
 // ("UI › Theme › Nord"), so a query matches whole paths instead of one level

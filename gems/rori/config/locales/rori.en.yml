@@ -7,6 +7,7 @@ en:
         open: Open
         rori: Desk
         ui: UI
+        run: Run
       actions:
         overview: Toggle overview
         reopen_window: Reopen closed window
@@ -41,6 +42,10 @@ en:
         auto: Follows system
         dark: Dark
         light: Light
+      runs:
+        create:
+          done: Done
+          failed: Something went wrong. Check the server log.
     menubar:
       workspaces: Workspaces
       search: Search or run a command…
@@ -103,12 +108,20 @@ en:
         empty: "  (nothing here)"
         opened: "→ %{path}"
         ran: "✓ %{path}"
+        confirm: "Run %{path}? y to confirm, anything else cancels."
+        cancelled: Cancelled.
         no_match: "No match for “%{query}”."
     palette:
       label: Command palette
       placeholder: Type a command or search…
       empty: Nothing matches.
+      confirm: ↵ again to run
       hint_html: "<kbd>↵</kbd> open · <kbd>⇧↵</kbd> in a new window · <kbd>⌫</kbd> back · <kbd>esc</kbd> close"
+    notifications:
+      label: Notifications
+      failed: The command couldn't be run.
+    notification:
+      dismiss: Dismiss
     window:
       back: Back
       detach: Open in a new tab

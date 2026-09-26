@@ -1,0 +1,10 @@
+-# Corner notifications (rori-notifications, on <body>): `Rori.notify`
+-# broadcasts reach every open desk through this stream; a server-side
+-# command's result arrives in its run's response. A manual popover, so they
+-# sit in the top layer above modal windows too.
+= turbo_stream_from Rori.notifications_stream
+%section#rori-notifications.rori-notifications{ popover: "manual", "aria-label": t(".label"),
+  data: { rori_notifications_target: "stack" } }
+-# Shown when a run gets no answer (network down, server error page).
+%template{ data: { rori_notifications_target: "failure" } }
+  = render "rori/notification", notification: Rori::Notification.new(title: t(".failed"), kind: :error)

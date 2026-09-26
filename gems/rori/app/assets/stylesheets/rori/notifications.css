@@ -1,0 +1,120 @@
+/* Corner notifications (rori/_notifications), next to the menu bar with the
+   newest nearest it. The stack is a manual popover, so it sits above modal
+   windows too. Each notification fades out after a while (the animation's end
+   removes it, rori-notifications#expire); the pointer on the stack pauses
+   them. Sticky ones (errors) wait for ×. */
+@layer rori.components {
+  .rori-notifications {
+    position: fixed;
+    inset: 40px 8px auto auto;
+    width: min(22rem, calc(100vw - 16px));
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  .rori-notifications:popover-open {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .bars-bottom .rori-notifications {
+    inset: auto 8px 40px auto;
+  }
+
+  .bars-bottom .rori-notifications:popover-open {
+    flex-direction: column;
+  }
+
+  .rori-notification {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 10px 36px 10px 14px;
+    border: 1px solid var(--rori-line);
+    border-left: 3px solid var(--rori-primary);
+    border-radius: var(--rori-radius);
+    background: color-mix(in oklch, var(--rori-surface) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: var(--rori-shadow);
+    color: var(--rori-ink);
+    /* Out after 6s: the delay is the notification's life, so pausing it holds. */
+    animation:
+      rori-notification-in 220ms var(--rori-ease),
+      rori-notification-out 300ms var(--rori-ease) 6s forwards;
+  }
+
+  .rori-notification--success {
+    border-left-color: var(--rori-success);
+  }
+
+  .rori-notification--error {
+    border-left-color: var(--rori-danger);
+  }
+
+  .rori-notification--sticky {
+    animation: rori-notification-in 220ms var(--rori-ease);
+  }
+
+  .rori-notifications:hover .rori-notification {
+    animation-play-state: paused;
+  }
+
+  .rori-notification__title {
+    font-weight: 600;
+  }
+
+  .rori-notification__body {
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-notification__close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    color: var(--rori-ink-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+
+  .rori-notification:hover .rori-notification__close,
+  .rori-notification__close:focus-visible {
+    opacity: 1;
+  }
+
+  .rori-notification__close:hover {
+    background: var(--rori-hover);
+    color: var(--rori-ink);
+  }
+
+  @keyframes rori-notification-in {
+    from {
+      opacity: 0;
+      translate: 24px 0;
+    }
+  }
+
+  @keyframes rori-notification-out {
+    to {
+      opacity: 0;
+      translate: 24px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rori-notification {
+      animation: rori-notification-out 1ms 6s forwards;
+    }
+
+    .rori-notification--sticky {
+      animation: none;
+    }
+  }
+}

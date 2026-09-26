@@ -18,6 +18,14 @@ class Rori::CommandTest < ActiveSupport::TestCase
     end
   end
 
+  test "lists server-side commands from Rori.command under Run, labelled from the locale" do
+    command = Rori::Command.all.find { it.run == "reindex_search" }
+
+    assert_equal "Reindex search", command.label
+    assert_equal "Run", command.group
+    assert command.confirm
+  end
+
   private
     def with_desk(**settings)
       previous = settings.to_h { |key, _| [ key, Rori.public_send(key) ] }

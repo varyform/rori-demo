@@ -78,6 +78,39 @@ See `lib/rori.rb` for everything: `app_name`, `records`, `commands`, `keymap`,
 `modifier` / `native_modifier` / `native_user_agent`, `hover_keys`,
 `terminal_key`, `wallpapers`, theme and wallpaper files and cookies.
 
+### Server-side commands and notifications
+
+```ruby
+Rori.configure do |rori|
+  rori.command :reindex_search, confirm: true do
+    SearchReindexJob.perform_later
+    I18n.t("search.reindex_started")   # optional: the notification's text (default "Done")
+  end
+end
+```
+
+```yaml
+en:
+  rori:
+    commands:
+      custom:
+        reindex_search: Reindex search
+```
+
+The command shows up in ⌘K and the terminal under **Run**. Picking it POSTs
+to `/rori/commands/runs`, runs the block and shows the result as a corner
+notification (errors stay until dismissed). `confirm: true` asks first: ↵
+twice in ⌘K, `y` in the terminal. The block runs inside the request, so
+hand slow work to a job, which can report back from anywhere:
+
+```ruby
+Rori.notify "Search reindexed", "1,204 records", kind: :success   # :info, :success, :error
+```
+
+`Rori.notify` broadcasts over Action Cable to `Rori.notifications_stream`,
+which every open desk subscribes to — all users see it, so keep it to
+single-user or admin desks.
+
 ### Your own themes and wallpapers
 
 ```ruby

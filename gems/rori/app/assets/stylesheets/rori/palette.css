@@ -87,6 +87,14 @@
     white-space: nowrap;
   }
 
+  /* A command that asks first, armed by the first ↵ (rori-palette#arm). */
+  .rori-palette__confirm {
+    align-self: center;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
   .rori-palette__more,
   .rori-palette__check {
     margin: 0 4px;

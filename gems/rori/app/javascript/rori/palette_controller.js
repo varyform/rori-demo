@@ -15,10 +15,11 @@ const BUS = "rori-command"
 // to that URL and pushes a breadcrumb; Backspace on an empty query or Esc goes
 // back up. Runs are handed out as `rori-command:run`, the selection as
 // `rori-command:preview` (e.g. live theme preview), and `rori-command:closed`
-// on close.
+// on close. Commands with `data-confirm` run on the second ↵ (or click); the
+// first one arms them, and moving the selection disarms.
 export default class extends Controller {
   static targets = ["dialog", "input", "frame", "list", "item", "itemTemplate", "empty", "crumbs"]
-  static values = { root: String }
+  static values = { root: String, confirm: String }
 
   connect() {
     this.stack = []
@@ -138,6 +139,8 @@ export default class extends Controller {
   }
 
   #run(item, newWindow) {
+    if ("confirm" in item.dataset && !("armed" in item.dataset)) return this.#arm(item)
+
     const usage = this.#usage()
     const id = this.#id(item)
     usage[id] = (usage[id] || 0) + 1
@@ -152,6 +155,22 @@ export default class extends Controller {
     }
     this.close()
     this.dispatch("run", { prefix: BUS, detail: this.#detail(item, { newWindow }) })
+  }
+
+  #arm(item) {
+    item.dataset.armed = ""
+    const hint = document.createElement("span")
+    hint.className = "rori-palette__confirm"
+    hint.textContent = this.confirmValue
+    item.querySelector(".rori-palette__group").before(hint)
+  }
+
+  #disarm(except) {
+    for (const item of this.itemTargets) {
+      if (item === except || !("armed" in item.dataset)) continue
+      delete item.dataset.armed
+      item.querySelector(".rori-palette__confirm")?.remove()
+    }
   }
 
   async #searchPaths(query) {
@@ -226,11 +245,12 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  #buildItem({ label, group, action, param, url, children, source, trail, current, shortcut }) {
+  #buildItem({ label, group, action, param, url, children, source, run, confirm, trail, current, shortcut }) {
     const item = this.itemTemplateTarget.content.firstElementChild.cloneNode(true)
-    const data = { roriAction: action, param: param ?? "", url, children, source, trail, shortcut, search: `${label} ${group}` }
+    const data = { roriAction: action, param: param ?? "", url, children, source, run, trail, shortcut, search: `${label} ${group}` }
     for (const [key, value] of Object.entries(data)) if (value !== undefined) item.dataset[key] = value
     if (current) item.dataset.current = ""
+    if (confirm) item.dataset.confirm = ""
     item.querySelector(".rori-palette__label").textContent = label + (children || source ? " ›" : "")
     const groupElement = item.querySelector(".rori-palette__group")
     groupElement.textContent = (current ? "✓ " : "") + group
@@ -255,6 +275,7 @@ export default class extends Controller {
   }
 
   #select(item) {
+    this.#disarm(item)
     this.itemTargets.forEach((other) => other.setAttribute("aria-selected", other === item))
     this.selected = item
     item?.scrollIntoView({ block: "nearest" })
@@ -263,17 +284,17 @@ export default class extends Controller {
   }
 
   #detail(item, extra = {}) {
-    const { url, roriAction: action, param } = item.dataset
-    return { url, action, param, ...extra }
+    const { url, roriAction: action, param, run } = item.dataset
+    return { url, action, param, run, ...extra }
   }
 
   #id(item) {
-    const { url, roriAction: action, param, children, source } = item.dataset
-    return this.#idOf({ url, action, param, children, source })
+    const { url, roriAction: action, param, children, source, run } = item.dataset
+    return this.#idOf({ url, action, param, children, source, run })
   }
 
-  #idOf({ url, action, param, children, source }) {
-    return url || children || source || [action, param].filter((part) => part !== undefined).join(":")
+  #idOf({ url, action, param, children, source, run }) {
+    return url || children || source || (run && `run:${run}`) || [action, param].filter((part) => part !== undefined).join(":")
   }
 
   #usage() {

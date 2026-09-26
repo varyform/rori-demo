@@ -6,6 +6,8 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** notifications in the corner of the desk, next to the menu bar: results of commands that run on the server, and news from background work (they fade out after a few seconds, hovering holds them; errors stay until dismissed). The demo's ⌘K / terminal → Run › **Reindex search** asks first, takes 5 seconds in the background and notifies when it's done.
+- **Developers:** `Rori.command :name, confirm: true do … end` registers a server-side command, listed under Run in ⌘K and the terminal and labelled by `rori.commands.custom.<name>`; a String the block returns becomes the notification's text. `confirm: true` asks first (↵ twice in ⌘K, `y` in the terminal). `Rori.notify(title, body, kind:)` sends a notification to every open desk (Action Cable, `Rori.notifications_stream`), e.g. from a job.
 - **Users:** UI › **Menu bar** › Top | Bottom moves the menu bar to the bottom edge (the terminal then rises from below), remembered across launches. The status bar is gone: its column minimap, photo credit and shortcuts button now live in the menu bar, so the desk has one bar.
 - **Users:** a **Keyboard shortcuts** modal lists every shortcut from the live keymap (⌘ in the macOS app): `⌥?` / `⌘?`, the menu bar's `⌥?` button, or ⌘K. It replaces the long shortcut line in the old status bar.
 - **Users:** the empty-desk hint points to the shortcuts and can be dismissed (×); the shortcuts modal's "Show the hint on an empty desk" brings it back.

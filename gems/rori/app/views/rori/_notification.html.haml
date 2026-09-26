@@ -1,0 +1,9 @@
+-# locals: (notification:)
+%article{ class: class_names("rori-notification", "rori-notification--#{notification.kind}", "rori-notification--sticky" => notification.sticky?),
+  role: notification.sticky? ? "alert" : "status",
+  data: { rori_notifications_target: "notification", action: "animationend->rori-notifications#expire" } }
+  %strong.rori-notification__title= notification.title
+  - if notification.body
+    %p.rori-notification__body= notification.body
+  %button.rori-notification__close{ type: "button", title: t(".dismiss"), "aria-label": t(".dismiss"),
+    data: { action: "rori-notifications#dismiss" } } ×
