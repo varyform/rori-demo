@@ -66,9 +66,25 @@
     color: var(--color-on-primary);
   }
 
+  .palette__label {
+    flex: 1;
+  }
+
   .palette__group {
     font-size: 12px;
     opacity: 0.6;
+  }
+
+  /* The command's keyboard shortcut, before its group. currentColor keeps it
+     legible on the inverted selected row too. */
+  .palette__shortcut {
+    align-self: center;
+    padding: 0 5px;
+    border: 1px solid color-mix(in oklch, currentColor 30%, transparent);
+    border-radius: 4px;
+    color: inherit;
+    opacity: 0.75;
+    white-space: nowrap;
   }
 
   .palette__more,

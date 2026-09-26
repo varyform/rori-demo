@@ -16,6 +16,7 @@ export function parseList(html) {
     param: item.dataset.param,
     children: item.dataset.children,
     source: item.dataset.source,
+    shortcut: item.dataset.shortcut,
     current: "current" in item.dataset,
   }))
 }

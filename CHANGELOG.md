@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** ⌘K shows the keyboard shortcut next to each command that has one (⌥W, ⌥⇧T, ⌥`…; ⌘ in the macOS app).
 - **Users:** the macOS app toggles full screen with fn/Globe+F or ⌃⌘F (View → Toggle Full Screen).
 - **Users:** on an empty desk, Space or Enter opens ⌘K.
 - **Developers:** `bin/rails db:seed:scale` bulk-adds users, projects and services (`USERS=200 PROJECTS=2000 SERVICES=300` by default, `SEED=` for a different repeatable world) to check lists, ⌘K search and refreshes at volume. Development only; each run adds on top.

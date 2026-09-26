@@ -226,13 +226,20 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  #buildItem({ label, group, action, param, url, children, source, trail, current }) {
+  #buildItem({ label, group, action, param, url, children, source, trail, current, shortcut }) {
     const item = this.itemTemplateTarget.content.firstElementChild.cloneNode(true)
-    const data = { deskAction: action, param: param ?? "", url, children, source, trail, search: `${label} ${group}` }
+    const data = { deskAction: action, param: param ?? "", url, children, source, trail, shortcut, search: `${label} ${group}` }
     for (const [key, value] of Object.entries(data)) if (value !== undefined) item.dataset[key] = value
     if (current) item.dataset.current = ""
     item.querySelector(".palette__label").textContent = label + (children || source ? " ›" : "")
-    item.querySelector(".palette__group").textContent = (current ? "✓ " : "") + group
+    const groupElement = item.querySelector(".palette__group")
+    groupElement.textContent = (current ? "✓ " : "") + group
+    if (shortcut) {
+      const kbd = document.createElement("kbd")
+      kbd.className = "palette__shortcut"
+      kbd.textContent = shortcut
+      groupElement.before(kbd)
+    }
     return item
   }
 
