@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** the macOS app toggles full screen with fn/Globe+F or ⌃⌘F (View → Toggle Full Screen).
 - **Users:** on an empty desk, Space or Enter opens ⌘K.
 - **Developers:** `bin/rails db:seed:scale` bulk-adds users, projects and services (`USERS=200 PROJECTS=2000 SERVICES=300` by default, `SEED=` for a different repeatable world) to check lists, ⌘K search and refreshes at volume. Development only; each run adds on top.
 - **Users:** fuzzy matching spans nested lists in ⌘K and the terminal: `uthen` finds UI › Theme › Nord, `uwc` UI › Wallpaper › Cover bars. Matches are ranked by word and segment starts, runs and gaps (best alignment, not first letters found), shallow paths first when equally good.
@@ -32,6 +33,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** in the macOS app, Esc no longer takes the window out of full screen — also when it's closing a modal; it still closes dialogs, leaves fields and exits the overview.
 - **Users:** after running a ⌘K command, the next bare key or shortcut (`W`, `⌥W`, `` ` ``…) no longer occasionally does nothing: focus left behind in the closed palette's search box was treated as typing.
 - **Users:** table row lines now run to the window's edges instead of stopping short at its padding; text stays aligned with the rest of the window.
 - **Users:** zoomed in (or on narrow screens), focused windows were only partly revealed: the page grew wider than the window to fit the status-bar hint, so the desk scrolled against the wrong width.

@@ -593,6 +593,44 @@ class DeskTest < ApplicationSystemTestCase
 
   public
 
+  test "in the native app the page claims every Esc (so macOS stays full screen) and still closes modals" do
+    # Recorded after the page's own handlers (bubble phase on window, added last).
+    escape_default_prevented = lambda do
+      execute_script("addEventListener('keydown', (e) => { if (e.key === 'Escape') window.__escPrevented = e.defaultPrevented }, { once: true })")
+      type_into_focus :escape
+      evaluate_script("window.__escPrevented")
+    end
+
+    visit users_path
+    window_titled "Users"
+    assert_equal false, escape_default_prevented.call, "browsers keep Esc as is"
+
+    page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: "Mozilla/5.0 (Macintosh) AppleWebKit/605.1.15 (KHTML, like Gecko) DeskApp/0.1")
+    visit users_path
+    window_titled "Users"
+    assert_equal true, escape_default_prevented.call
+
+    run_command "new user"
+    assert_selector "dialog.win:modal #user_name:focus"
+    assert_equal true, escape_default_prevented.call, "claimed with a modal open too"
+    assert_no_selector "dialog.win:modal"
+    window_titled "Users"
+
+    run_command "new user"
+    fill_in "Name", with: "draft"
+    dismiss_confirm(/unsaved changes/) { type_into_focus :escape }
+    assert_selector "dialog.win:modal"
+    accept_confirm(/unsaved changes/) { type_into_focus :escape }
+    assert_no_selector "dialog.win:modal"
+
+    find("body").send_keys [ :meta, "k" ]
+    assert_selector "dialog.palette[open]"
+    assert_equal true, escape_default_prevented.call
+    assert_no_selector "dialog.palette[open]"
+  ensure
+    page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: "")
+  end
+
   test "Esc closes a modal window" do
     visit new_project_path
     assert_selector "dialog.win:modal"

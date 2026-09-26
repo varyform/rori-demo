@@ -21,7 +21,9 @@ fn main() {
             // App, Edit and View only. Edit keeps ⌘C/⌘V/⌘X/⌘Z/⌘A working in the
             // webview; leaving out File, Window and Hide frees ⌘W, ⌘M and ⌘H for
             // the desk's keymap (menu shortcuts win over the page). ⌘= ⌘- ⌘0 zoom
-            // the page; the desk keymap uses none of them.
+            // the page; the desk keymap uses none of them. Full screen is macOS's
+            // own toggleFullScreen: item (⌃⌘F), which is also what fn/Globe+F
+            // looks for — without a menu item carrying it, neither works.
             let app_menu = Submenu::with_items(
                 app,
                 "Desk",
@@ -60,6 +62,8 @@ fn main() {
                         true,
                         Some("CmdOrCtrl+0"),
                     )?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::fullscreen(app, Some("Toggle Full Screen"))?,
                 ],
             )?;
             Menu::with_items(app, &[&app_menu, &edit_menu, &view_menu])

@@ -38,6 +38,7 @@
     desk_workspace_group_value: t("desk.commands.workspaces.group"),
     desk_new_workspace_label_value: t("desk.commands.workspaces.new"),
     desk_keymap_value: Desk.resolved_keymap(desk_modifier).to_json,
+    desk_native_value: desk_native?.to_s,
     desk_hover_keymap_value: Desk.resolved_hover_keymap.to_json,
     desk_hover_timeout_value: (Desk.hover_timeout * 1000).round,
     desk_discard_prompt_value: t("desk.window.discard"),

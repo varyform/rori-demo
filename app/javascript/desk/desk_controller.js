@@ -28,7 +28,7 @@ export default class extends Controller {
   static targets = ["viewport", "stack", "floating", "window", "template", "workspaces", "minimap"]
   static values = {
     rootUrl: String, loadError: String, workspaceGroup: String, newWorkspaceLabel: String, discardPrompt: String,
-    keymap: Object, hoverKeymap: Object, hoverTimeout: { type: Number, default: 1500 },
+    keymap: Object, hoverKeymap: Object, hoverTimeout: { type: Number, default: 1500 }, native: Boolean,
   }
 
   initialize() {
@@ -142,8 +142,23 @@ export default class extends Controller {
     const win = event.target.closest?.(".win")
     if (win && !win.matches(":modal") && typing(event.target)) {
       event.preventDefault()
-      win.focus({ preventScroll: true })
+      return win.focus({ preventScroll: true })
     }
+    // Native shell: WebKit hands an Esc the page didn't claim to the window, and
+    // a macOS full-screen window leaves full screen — even when the Esc also
+    // closed a modal (its default action). So claim every Esc and close the
+    // topmost modal ourselves, the way the browser would.
+    if (this.nativeValue && !event.defaultPrevented) {
+      event.preventDefault()
+      this.#cancelTopModal()
+    }
+  }
+
+  // What Esc does to a modal <dialog>: a cancelable `cancel`, then close unless
+  // a listener objected (modal windows handle cancel themselves, see #cancel).
+  #cancelTopModal() {
+    const modal = [...document.querySelectorAll("dialog:modal")].at(-1)
+    if (modal?.dispatchEvent(new Event("cancel", { cancelable: true }))) modal.close()
   }
 
   // Bare keys (Desk.hover_keymap) act on the armed hovered window — even while a

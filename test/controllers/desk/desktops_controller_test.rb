@@ -44,5 +44,12 @@ class Desk::DesktopsControllerTest < ActionDispatch::IntegrationTest
     keymap = JSON.parse(css_select("body").first["data-desk-keymap-value"])
     assert_equal %w[ Meta+ArrowLeft Meta+KeyH ], keymap["focus_left"]
     assert_select ".statusbar__hint kbd", text: "⌘←→↑↓"
+    assert_select "body[data-desk-native-value=true]"
+  end
+
+  test "browsers aren't the native shell" do
+    get root_path
+
+    assert_select "body[data-desk-native-value=false]"
   end
 end

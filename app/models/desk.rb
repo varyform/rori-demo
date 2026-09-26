@@ -99,7 +99,9 @@ module Desk
 
     def modifier_symbol(modifier = self.modifier) = MODIFIERS.fetch(modifier)
 
-    def modifier_for(user_agent) = user_agent.to_s.include?(native_user_agent) ? native_modifier : modifier
+    def native?(user_agent) = user_agent.to_s.include?(native_user_agent)
+
+    def modifier_for(user_agent) = native?(user_agent) ? native_modifier : modifier
 
     def resolved_hover_keymap = hover_keys ? hover_keymap : {}
   end
