@@ -60,9 +60,11 @@ class Rori::DesktopsControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_select "dialog.rori-shortcuts h3", text: "Workspaces"
-    assert_select "dialog.rori-shortcuts dt", text: "Send column to workspace"
+    assert_select "dialog.rori-shortcuts dt", text: "Move column to workspace and follow it"
     assert_select "dialog.rori-shortcuts dd kbd", text: "⌥⇧1–9"
     assert_select "dialog.rori-shortcuts h3", text: "Bare keys"
+    assert_select "dialog.rori-shortcuts dd kbd", text: "1–9"
+    assert_select "dialog.rori-shortcuts dd kbd", text: "⇧1–9"
     assert_select "dialog.rori-shortcuts input[type=checkbox][data-rori-prefs-target=hintToggle]"
 
     Rori.hover_keys = false

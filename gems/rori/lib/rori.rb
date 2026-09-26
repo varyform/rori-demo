@@ -134,7 +134,8 @@ module Rori
     consume_right: %w[ BracketRight ],
     move_left: %w[ Shift+KeyH ],
     move_right: %w[ Shift+KeyL ],
-    move_to_workspace: %w[ Digit* ]
+    switch_to_workspace: %w[ Digit* ],
+    move_to_workspace: %w[ Shift+Digit* ]
   }.freeze
 
   class << self

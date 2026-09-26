@@ -86,7 +86,7 @@ en:
         move_up: To the workspace above
         move_down: To the workspace below
         switch_to_workspace: Go to workspace
-        move_to_workspace: Send column to workspace
+        move_to_workspace: Move column to workspace and follow it
         consume_left: Stack into the left column / unstack
         consume_right: Stack into the right column / unstack
         cycle_width: Cycle width

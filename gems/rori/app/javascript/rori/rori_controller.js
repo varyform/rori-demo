@@ -181,8 +181,10 @@ export default class extends Controller {
     event.preventDefault()
     this.#perform(binding.action, { win: armed || undefined, workspace: this.#workspaceAt(binding.digit) })
 
-    if (armed) armed.isConnected && armed.closest(".rori-workspace") === this.current ? this.#arm(armed) : this.#disarm()
-    else if (this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
+    if (armed) armed.isConnected && armed !== this.focused && armed.closest(".rori-workspace") === this.current ? this.#arm(armed) : this.#disarm()
+    // A field left behind on another workspace would take the next keys unseen.
+    const stayInField = armed && this.current?.contains(document.activeElement)
+    if (!stayInField && this.focused && !this.focused.contains(document.activeElement)) this.focused.focus({ preventScroll: true })
     return true
   }
 
@@ -232,7 +234,7 @@ export default class extends Controller {
       move_up: () => this.#move("up", win),
       move_down: () => this.#move("down", win),
       switch_to_workspace: () => this.#switchTo(target() || this.#newWorkspace()),
-      move_to_workspace: () => this.#moveToWorkspace(target(), win),
+      move_to_workspace: () => this.#moveToWorkspace(target(), win, { follow: true }),
       new_workspace: () => this.#switchTo(this.#newWorkspace()),
       consume_left: () => this.#consumeOrExpel(-1, win),
       consume_right: () => this.#consumeOrExpel(1, win),
@@ -663,16 +665,19 @@ export default class extends Controller {
   }
 
   // Moves the window's column to `target` — a new workspace when missing. Focus
-  // follows only if the column holds the focused window.
-  #moveToWorkspace(target, win = this.#focusIn(this.current)) {
-    if (!win || target === this.#wsOf(win)) return
+  // follows if the column holds the focused window; with `follow` (the move-to-
+  // workspace action, e.g. a hovered window's ⇧1–9) it always goes to `win`, so
+  // the moved window never just vanishes from view.
+  #moveToWorkspace(target, win = this.#focusIn(this.current), { follow = false } = {}) {
+    if (!win || target === this.#wsOf(win)) return follow && this.focus(win)
 
     target ||= this.#newWorkspace()
     const col = win.closest(".rori-col")
     const anchor = this.#focusIn(target)?.closest(".rori-col")
     anchor ? anchor.after(col) : this.#strip(target).append(col)
     this.#windowsIn(col).forEach((other) => this.#open(other))
-    col.contains(this.focused) ? this.focus(this.focused) : this.#settle(win)
+    if (follow) this.focus(win)
+    else col.contains(this.focused) ? this.focus(this.focused) : this.#settle(win)
   }
 
   // niri's consume-or-expel: a window alone in its column joins the neighbouring
