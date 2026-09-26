@@ -4,7 +4,7 @@ const ONE_YEAR = 60 * 60 * 24 * 365
 
 // Applies the UI › Wallpaper commands:
 //   wallpaper (safe | cover | off) — classes on <body>: the photo inside the
-//     desk, behind the bars too, or none. Previews as you move through the
+//     desk, behind the menu bar too, or none. Previews as you move through the
 //     list and reverts if you don't pick, like rori-theme.
 //   wallpaper_next — the next photo in the pool, swapped in place.
 //   wallpaper_pin  — keep the current photo across launches (toggles).

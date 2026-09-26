@@ -121,7 +121,7 @@ precise:
    }
    ```
 3. **Components** — every chrome element has a `rori-` class
-   (`.rori-win`, `.rori-win__bar`, `.rori-menubar`, `.rori-statusbar`,
+   (`.rori-win`, `.rori-win__bar`, `.rori-menubar`, `.rori-minimap`,
    `.rori-palette`, `.rori-terminal`, `.rori-col`…):
    ```css
    @layer overrides {

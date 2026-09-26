@@ -1,0 +1,110 @@
+/* The keyboard shortcuts modal (rori/_shortcuts). */
+@layer rori.components {
+  .rori-shortcuts {
+    width: min(52rem, calc(100vw - 2rem));
+    max-height: min(85vh, 44rem);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--rori-ink);
+    border-radius: var(--rori-radius);
+    background: var(--rori-surface);
+    color: var(--rori-ink);
+  }
+
+  .rori-shortcuts[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rori-shortcuts::backdrop {
+    background: var(--rori-backdrop);
+  }
+
+  .rori-shortcuts__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rori-line);
+  }
+
+  .rori-shortcuts__head h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .rori-shortcuts__close {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .rori-shortcuts__close:hover {
+    background: var(--rori-hover);
+  }
+
+  .rori-shortcuts__body {
+    overflow: auto;
+    padding: 12px 16px 16px;
+    columns: 2 18rem;
+    column-gap: 32px;
+  }
+
+  .rori-shortcuts__section {
+    break-inside: avoid;
+    margin-bottom: 16px;
+  }
+
+  .rori-shortcuts__section h3 {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-shortcuts__section dl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    margin: 0;
+  }
+
+  .rori-shortcuts__section dd {
+    display: flex;
+    gap: 4px;
+    justify-content: end;
+    margin: 0;
+  }
+
+  .rori-shortcuts__note {
+    margin: 0 0 6px;
+    color: var(--rori-ink-muted);
+    font-size: 12px;
+  }
+
+  .rori-shortcuts kbd {
+    padding: 0 5px;
+    border: 1px solid var(--rori-line);
+    border-radius: 4px;
+    font: 12px var(--rori-font-mono);
+    white-space: nowrap;
+  }
+
+  .rori-shortcuts__foot {
+    padding: 10px 16px;
+    border-top: 1px solid var(--rori-line);
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-shortcuts__foot label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+}

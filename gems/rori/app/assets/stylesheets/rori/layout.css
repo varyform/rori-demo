@@ -15,9 +15,18 @@
   body {
     height: 100vh;
     display: grid;
-    grid-template-rows: 32px 1fr 36px;
+    grid-template-rows: 32px 1fr;
     grid-template-columns: minmax(0, 1fr);
     overflow: hidden;
+  }
+
+  /* UI › Menu bar › Bottom (order reorders the grid items). */
+  body.bars-bottom {
+    grid-template-rows: 1fr 32px;
+  }
+
+  body.bars-bottom .rori-menubar {
+    order: 1;
   }
 
   /* Workspaces stack vertically; each is an endless horizontal strip of columns.
@@ -92,19 +101,43 @@
     pointer-events: none;
   }
 
+  /* A centred panel, so the dismiss button sits by the text. Above the (empty)
+     stack so the button takes clicks; the panel itself lets them through. */
   .rori-wallpaper {
     position: absolute;
-    inset: 0;
+    z-index: 1;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
     display: grid;
-    place-content: center;
     gap: 6px;
+    padding: 14px 36px;
+    border-radius: var(--rori-radius);
     text-align: center;
     color: var(--rori-ink-muted);
     pointer-events: none;
   }
 
-  .rori-viewport:not(.is-empty) .rori-wallpaper {
+  .rori-viewport:not(.is-empty) .rori-wallpaper,
+  .hint-hidden .rori-wallpaper {
     display: none;
+  }
+
+  .rori-wallpaper__dismiss {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    color: var(--rori-ink-muted);
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .rori-wallpaper__dismiss:hover {
+    background: var(--rori-hover);
+    color: var(--rori-ink);
   }
 
   .rori-wallpaper__title {

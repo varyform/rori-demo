@@ -6,5 +6,6 @@ namespace :rori do
     resource :ui, only: :show, controller: "ui"
     resources :themes, only: :index
     resources :wallpapers, only: :index
+    resources :bars, only: :index
   end
 end

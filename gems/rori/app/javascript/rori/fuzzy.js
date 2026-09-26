@@ -1,7 +1,7 @@
 // The one fuzzy matcher behind ⌘K and the terminal.
 //
 // Every query character must appear in order (spaces and dashes in the query
-// are ignored, so "cover-bars" and "cover bars" match "Cover bars"). Among all
+// are ignored, so "cover-menu" and "cover menu" match "Cover menu bar"). Among all
 // ways to place them, it keeps the best-scoring one: characters at word starts
 // — including each "›" segment of a path — and consecutive runs score high,
 // gaps cost a little. That's what lets "uthen" find "UI › Theme › Nord":

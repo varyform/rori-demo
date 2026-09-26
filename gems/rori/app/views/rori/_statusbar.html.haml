@@ -1,6 +1,0 @@
-%footer.rori-statusbar
-  %nav.rori-minimap{ "aria-label": t(".columns"), data: { rori_target: "minimap" } }
-  %span.rori-statusbar__hint= t(".hint_html", mod: Rori.modifier_symbol(rori_modifier))
-  - if rori_wallpaper
-    = link_to t(".wallpaper"), rori_wallpaper.credit_url || "#", class: "rori-statusbar__credit", target: "_blank", rel: "noopener",
-      hidden: rori_wallpaper.credit_url.nil?, data: { rori_wallpaper_target: "credit" }

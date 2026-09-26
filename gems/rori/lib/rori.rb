@@ -45,6 +45,10 @@ module Rori
   mattr_accessor :wallpaper_cookie, default: "wallpaper"
   mattr_accessor :wallpaper_pin_cookie, default: "wallpaper_pin"
 
+  # UI › Menu bar (top | bottom) and the dismissible empty-desk hint.
+  mattr_accessor :bars_cookie, default: "bars"
+  mattr_accessor :hint_cookie, default: "hint"
+
   # The app's own wallpapers: a folder in its asset path (e.g. "wallpapers" for
   # app/assets/images/wallpapers). When set, its images replace the bundled
   # Unsplash photos.
@@ -97,7 +101,8 @@ module Rori
     overview: %w[ Mod+KeyO ],
     close_window: %w[ Mod+KeyW ],
     reopen_window: %w[ Mod+Shift+KeyT ],
-    toggle_terminal: %w[ Mod+Backquote ]
+    toggle_terminal: %w[ Mod+Backquote ],
+    shortcuts: %w[ Mod+Shift+Slash ]
   }.freeze
 
   # Bare keys (opt-in). Blender-style: once the pointer deliberately moves onto

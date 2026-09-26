@@ -9,7 +9,7 @@ class Rori::Wallpaper < Data.define(:id, :local)
   CDN = "https://images.unsplash.com"
   IMAGE = /\.(jpe?g|png|webp|avif)\z/i
 
-  # safe: inside the desk only; cover: behind the menu and status bars too.
+  # safe: inside the desk only; cover: behind the menu bar too.
   MODES = %w[ safe cover off ].freeze
 
   class << self

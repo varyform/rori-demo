@@ -47,10 +47,10 @@ class DeskTest < ApplicationSystemTestCase
 
     type_into_focus "`"
     assert_selector ".rori-terminal"
-    assert_equal "terminal__input", evaluate_script("document.activeElement.className")
+    assert_equal "rori-terminal__input", evaluate_script("document.activeElement.className")
 
     terminal_run "ui wallpaper cover"
-    assert_selector ".rori-terminal__entry--ok", text: "✓ UI › Wallpaper › Cover bars"
+    assert_selector ".rori-terminal__entry--ok", text: "✓ UI › Wallpaper › Cover menu bar"
     assert_selector "body.wallpaper-cover", visible: :all
 
     terminal_run "new user"
@@ -345,7 +345,7 @@ class DeskTest < ApplicationSystemTestCase
     visit users_path
     run_command "oleh", new_window: true
     assert_focused "Oleh"
-    assert_selector ".rori-statusbar__hint kbd", text: "⌃←→↑↓"
+    assert_selector ".rori-menubar__shortcuts kbd", text: "⌃?"
 
     type_into_focus [ :alt, :left ]
     assert_focused "Oleh"

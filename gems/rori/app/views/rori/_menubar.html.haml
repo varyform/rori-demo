@@ -1,7 +1,16 @@
+-# The desk's one bar (UI › Menu bar moves it to the bottom edge).
 %header.rori-menubar
   %span.rori-menubar__brand= Rori.app_name
   %nav.rori-workspaces{ "aria-label": t(".workspaces"), data: { rori_target: "workspaces" } }
+  %nav.rori-minimap{ "aria-label": t(".columns"), data: { rori_target: "minimap" } }
   %button.rori-menubar__search{ type: "button", data: { action: "rori-palette#open" } }
     = t(".search")
     %kbd ⌘K
+  - if rori_wallpaper
+    = link_to t(".wallpaper"), rori_wallpaper.credit_url || "#", class: "rori-menubar__credit", target: "_blank", rel: "noopener",
+      hidden: rori_wallpaper.credit_url.nil?, data: { rori_wallpaper_target: "credit" }
+  - if (keys = rori_shortcut(:shortcuts))
+    %button.rori-menubar__shortcuts{ type: "button", title: t(".shortcuts"), "aria-label": t(".shortcuts"),
+      data: { action: "rori-prefs#openShortcuts" } }
+      %kbd= keys
   %time.rori-menubar__clock{ data: { controller: "rori-clock" } }

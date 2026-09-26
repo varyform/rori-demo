@@ -1,0 +1,47 @@
+-# Keyboard shortcuts, from the same keymap the desk matches (so ⌘ in the
+-# native app). Opened by the `shortcuts` action (Mod+?), the menu bar or ⌘K.
+%dialog.rori-shortcuts{ "aria-labelledby": "rori-shortcuts-title",
+  data: { rori_prefs_target: "shortcuts", action: "click->rori-prefs#shortcutsBackdrop" } }
+  %header.rori-shortcuts__head
+    %h2#rori-shortcuts-title= t(".title")
+    %button.rori-shortcuts__close{ type: "button", title: t(".close"), data: { action: "rori-prefs#closeShortcuts" } } ×
+  .rori-shortcuts__body
+    %section.rori-shortcuts__section
+      %h3= t(".sections.general")
+      %dl
+        %dt= t(".general.palette")
+        %dd
+          %kbd ⌘K
+        %dt= t(".general.terminal")
+        %dd
+          %kbd `
+        %dt= t(".general.leave_field")
+        %dd
+          %kbd esc
+        %dt= t(".general.empty_desk")
+        %dd
+          %kbd ␣
+          %kbd ↵
+    - rori_shortcut_sections.each do |section, rows|
+      %section.rori-shortcuts__section
+        %h3= t(section, scope: "rori.shortcuts.sections")
+        %dl
+          - rows.each do |action, keys|
+            %dt= t(action, scope: "rori.shortcuts.actions")
+            %dd
+              - keys.each do |key|
+                %kbd= key
+    - if (hover = rori_hover_shortcuts).any?
+      %section.rori-shortcuts__section
+        %h3= t(".sections.hover")
+        %p.rori-shortcuts__note= t(".hover_note")
+        %dl
+          - hover.each do |action, keys|
+            %dt= t(action, scope: "rori.shortcuts.actions")
+            %dd
+              - keys.each do |key|
+                %kbd= key
+  %footer.rori-shortcuts__foot
+    %label
+      %input{ type: "checkbox", data: { rori_prefs_target: "hintToggle", action: "rori-prefs#toggleHint" } }
+      = t(".show_hint")

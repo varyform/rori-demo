@@ -241,6 +241,7 @@ export default class extends Controller {
       close_window: () => this.#remove(win || this.focused),
       reopen_window: () => this.#reopen(),
       toggle_terminal: () => this.dispatch("toggle-terminal"),
+      shortcuts: () => this.dispatch("open-shortcuts"),
     }
     actions[action]?.()
   }

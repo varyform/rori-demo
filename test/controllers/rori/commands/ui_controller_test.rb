@@ -16,12 +16,28 @@ class Rori::Commands::UiControllerTest < ActionDispatch::IntegrationTest
     assert_select "li[data-children=?]", rori_commands_wallpapers_path, text: /Wallpaper/
   end
 
+  test "UI › Menu bar lists top and bottom with the current one marked" do
+    get rori_commands_ui_path
+    assert_select "li[data-children=?]", rori_commands_bars_path, text: /Menu bar/
+
+    cookies[Rori.bars_cookie] = "bottom"
+    get rori_commands_bars_path
+    assert_select "li[data-rori-action=bars]", count: 2
+    assert_select "li[data-param=bottom][data-current]", text: /Bottom/
+  end
+
+  test "the root palette has Keyboard shortcuts with its chord" do
+    get rori_commands_path
+
+    assert_select "li[data-rori-action=shortcuts] kbd", text: "⌥?"
+  end
+
   test "wallpaper modes are commands with the current one marked" do
     cookies[Rori.wallpaper_cookie] = "cover"
     get rori_commands_wallpapers_path
 
     assert_select "li[data-rori-action=wallpaper]", count: 3
-    assert_select "li[data-param=cover][data-current]", text: /Cover bars/
+    assert_select "li[data-param=cover][data-current]", text: /Cover menu bar/
     assert_select "li[data-param=safe]:not([data-current])"
     assert_select "li[data-rori-action=wallpaper_next]", text: /Next wallpaper/
     assert_select "li[data-rori-action=wallpaper_pin]:not([data-current])", text: /Pin wallpaper/

@@ -16,13 +16,18 @@ en:
         center_column: Center column
         close_window: Close window
         toggle_terminal: Toggle terminal
+        shortcuts: Keyboard shortcuts
       ui:
         label: UI
         theme: Theme
         wallpaper: Wallpaper
+        bars: Menu bar
+      bars:
+        top: Top
+        bottom: Bottom
       wallpapers:
         safe: Safe
-        cover: Cover bars
+        cover: Cover menu bar
         "off": "Off"
         next: Next wallpaper
         pin: Pin wallpaper
@@ -39,14 +44,54 @@ en:
     menubar:
       workspaces: Workspaces
       search: Search or run a command…
-    statusbar:
       columns: Columns
       wallpaper: Photo · Unsplash
-      # %{mod} is Rori.modifier's symbol (⌥, ⌘ or ⌃).
-      hint_html: "<kbd>⌘K</kbd> commands · <kbd>%{mod}←→↑↓</kbd> focus · <kbd>%{mod}1–9</kbd> workspace · <kbd>%{mod}⇧</kbd> + arrows / 1–9 move · <kbd>%{mod}[</kbd> <kbd>%{mod}]</kbd> stack / unstack · <kbd>%{mod}R</kbd> width · <kbd>%{mod}F</kbd> full · <kbd>%{mod}O</kbd> overview · <kbd>%{mod}W</kbd> close · <kbd>%{mod}⇧T</kbd> reopen · <kbd>`</kbd> terminal · <kbd>esc</kbd> leave field"
+      shortcuts: Keyboard shortcuts
     wallpaper:
       title: Nothing open
       hint_html: "Press <kbd>⌘K</kbd>, <kbd>space</kbd> or <kbd>↵</kbd> to open a page or run a command."
+      # %{keys}: the chord bound to the shortcuts action (⌥? in a browser, ⌘? in the app).
+      shortcuts_html: "<kbd>%{keys}</kbd> shows every keyboard shortcut."
+      dismiss: Hide this hint (bring it back from the shortcuts)
+    shortcuts:
+      title: Keyboard shortcuts
+      close: Close
+      show_hint: Show the hint on an empty desk
+      hover_note: On the window under the pointer, or the focused one when no field has focus.
+      sections:
+        general: General
+        focus: Focus
+        move: Move column
+        workspaces: Workspaces
+        columns: Columns
+        windows: Windows
+        hover: Bare keys
+      general:
+        palette: Commands (⌘K)
+        terminal: Terminal
+        leave_field: Leave a text field
+        empty_desk: Commands, on an empty desk
+      actions:
+        focus_left: Left
+        focus_right: Right
+        focus_up: Up / previous workspace
+        focus_down: Down / next workspace
+        move_left: Left
+        move_right: Right
+        move_up: To the workspace above
+        move_down: To the workspace below
+        switch_to_workspace: Go to workspace
+        move_to_workspace: Send column to workspace
+        consume_left: Stack into the left column / unstack
+        consume_right: Stack into the right column / unstack
+        cycle_width: Cycle width
+        full_width: Full width
+        center_column: Centre
+        overview: Overview
+        close_window: Close
+        reopen_window: Reopen closed window
+        toggle_terminal: Terminal
+        shortcuts: This list
     terminal:
       label: Terminal
       prompt: "desk ›"

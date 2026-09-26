@@ -23,9 +23,12 @@
     = rori_local_themes_style_tag
     = javascript_importmap_tags
 
-  %body{ class: rori_wallpaper_classes,
+  %body{ class: rori_body_classes,
     style: ("--rori-wallpaper: #{rori_wallpaper.css_image}" if rori_wallpaper),
-    data: { controller: "rori rori-palette rori-theme rori-wallpaper rori-terminal",
+    data: { controller: "rori rori-palette rori-theme rori-wallpaper rori-terminal rori-prefs",
+    rori_prefs_bars_cookie_value: Rori.bars_cookie,
+    rori_prefs_bars_value: rori_bars,
+    rori_prefs_hint_cookie_value: Rori.hint_cookie,
     rori_theme_cookie_value: Rori.theme_cookie,
     rori_wallpaper_cookie_value: Rori.wallpaper_cookie,
     rori_wallpaper_mode_value: rori_wallpaper_mode,
@@ -63,6 +66,10 @@
       "rori-command:run->rori-wallpaper#run",
       "rori-command:preview->rori-wallpaper#preview",
       "rori-command:closed->rori-wallpaper#revert",
+      "rori-command:run->rori-prefs#run",
+      "rori-command:preview->rori-prefs#preview",
+      "rori-command:closed->rori-prefs#revert",
+      "rori:open-shortcuts->rori-prefs#openShortcuts",
       "rori:toggle-terminal->rori-terminal#toggle",
       "rori:open-palette->rori-palette#open"].join(" ") } }
     = render "rori/menubar"
@@ -78,8 +85,8 @@
       -# Tags the window whose field has focus (rori/typing_badge.css, anchor positioning).
       %span.rori-typing-badge.rori-typing-badge--side{ "aria-hidden": "true" }= t("rori.window.typing")
       %span.rori-typing-badge.rori-typing-badge--inside{ "aria-hidden": "true" }= t("rori.window.typing")
-    = render "rori/statusbar"
     = render "rori/terminal"
+    = render "rori/shortcuts"
     = render "rori/palette"
     %template{ data: { rori_target: "template" } }
       = render "rori/window"

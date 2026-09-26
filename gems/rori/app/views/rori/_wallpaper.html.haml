@@ -1,3 +1,7 @@
+-# The empty-desk hint (dismissible; the shortcuts modal brings it back).
 .rori-wallpaper
+  %button.rori-wallpaper__dismiss{ type: "button", title: t(".dismiss"), data: { action: "rori-prefs#dismissHint" } } ×
   %p.rori-wallpaper__title= t(".title")
   %p.rori-wallpaper__hint= t(".hint_html")
+  - if (shortcuts = rori_shortcut(:shortcuts))
+    %p.rori-wallpaper__hint= t(".shortcuts_html", keys: shortcuts)

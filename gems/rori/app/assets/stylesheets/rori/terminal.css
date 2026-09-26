@@ -22,6 +22,19 @@
     }
   }
 
+  /* Menu bar at the bottom: the terminal rises from it instead. */
+  .bars-bottom .rori-terminal {
+    inset: auto 0 32px;
+    border-top: 1px solid var(--rori-ink);
+    border-bottom: 0;
+  }
+
+  @starting-style {
+    .bars-bottom .rori-terminal {
+      translate: 0 100%;
+    }
+  }
+
   .rori-terminal__output {
     overflow: auto;
     padding: 10px var(--rori-gap) 4px;

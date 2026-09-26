@@ -4,7 +4,7 @@
 # `children` URL, or built in the browser from a named `source` for state the
 # server can't see (see rori-palette's `source` event).
 class Rori::Command < Data.define(:label, :group, :url, :action, :param, :children, :source, :current)
-  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window toggle_terminal ].freeze
+  ACTIONS = %w[ overview new_workspace cycle_width full_width center_column close_window reopen_window toggle_terminal shortcuts ].freeze
 
   class << self
     def all = routes + records + actions + [ workspace_mover, theme_picker, ui_menu ] + app_commands
@@ -50,7 +50,16 @@ class Rori::Command < Data.define(:label, :group, :url, :action, :param, :childr
     def ui
       theme = new(label: I18n.t("rori.commands.ui.theme"), group: group(:ui), children: url_helpers.rori_commands_themes_path)
       wallpaper = new(label: I18n.t("rori.commands.ui.wallpaper"), group: group(:ui), children: url_helpers.rori_commands_wallpapers_path)
-      Rori.wallpapers ? [ theme, wallpaper ] : [ theme ]
+      bars = new(label: I18n.t("rori.commands.ui.bars"), group: group(:ui), children: url_helpers.rori_commands_bars_path)
+      Rori.wallpapers ? [ theme, wallpaper, bars ] : [ theme, bars ]
+    end
+
+    # "UI › Menu bar ›": top or bottom.
+    def bars(current:)
+      Rori::PrefsHelper::BAR_POSITIONS.map do |position|
+        new(label: I18n.t(position, scope: "rori.commands.bars"), group: I18n.t("rori.commands.ui.bars"),
+          action: "bars", param: position, current: position == current)
+      end
     end
 
     # The modes, then Next (swap the photo now) and Pin (keep it across launches).

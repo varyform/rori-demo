@@ -1,10 +1,37 @@
 @layer rori.components {
+
+  /* The desk's only bar: brand, workspaces, the column minimap (takes the
+     slack), search, photo credit, shortcuts, clock. */
   .rori-menubar {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
     padding: 0 var(--rori-gap);
+  }
+
+  .rori-menubar .rori-minimap {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .rori-menubar__credit,
+  .rori-menubar__shortcuts {
+    flex: none;
+    color: var(--rori-ink-muted);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .rori-menubar__credit:hover,
+  .rori-menubar__shortcuts:hover {
+    color: var(--rori-ink);
+  }
+
+  body:not(.has-wallpaper) .rori-menubar__credit {
+    display: none;
   }
 
   .rori-menubar__brand {
@@ -60,5 +87,37 @@
   .rori-workspace-button[aria-current] {
     background: var(--rori-primary);
     color: var(--rori-on-primary);
+  }
+
+  .rori-minimap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rori-minimap__col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 20px;
+    padding: 2px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: width var(--rori-motion) var(--rori-ease);
+  }
+
+  .rori-minimap__col.is-visible {
+    border-color: var(--rori-line);
+  }
+
+  .rori-minimap__col span {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--rori-line);
+  }
+
+  .rori-minimap__col span.is-focused {
+    background: var(--rori-ink);
   }
 }
