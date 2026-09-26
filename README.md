@@ -71,12 +71,12 @@ bin/ci                    # style, security audits, tests, seeds
 bin/rails test:system     # browser tests (headless Chrome), not part of bin/ci
 ```
 
-To work on the gem alongside the app, point Bundler at a local checkout (the
-Gemfile keeps the GitHub source; `Gemfile.lock` follows the checkout's HEAD):
+The app uses the released gem from rubygems.org. To work on the gem alongside
+it, point the Gemfile at a checkout next to this app for as long as you need
+(and leave `Gemfile` and `Gemfile.lock` out of commits meanwhile):
 
-```sh
-bundle config set --local local.rori ../rori   # absolute path is safest
-bundle config unset --local local.rori         # back to GitHub
+```ruby
+gem "rori", path: "../rori"   # instead of gem "rori", "~> 0.1"; then bundle install
 ```
 
 Themes are compiled from the gem's `vendor/themes/ghostty`: after adding one,
