@@ -50,8 +50,9 @@ en:
       workspaces: Workspaces
       search: Search or run a command…
       columns: Columns
-      wallpaper: Photo · Unsplash
       shortcuts: Keyboard shortcuts
+    wallpaper_credit:
+      label: Photo · Unsplash
     wallpaper:
       title: Nothing open
       hint_html: "Press <kbd>⌘K</kbd>, <kbd>space</kbd> or <kbd>↵</kbd> to open a page or run a command."

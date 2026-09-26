@@ -20,13 +20,28 @@
     overflow: hidden;
   }
 
-  /* UI › Menu bar › Bottom (order reorders the grid items). */
+  /* Rows are assigned explicitly: other body children (turbo-cable-stream-source,
+     a host's own elements) fall into implicit rows after them instead of
+     taking the bar's row. */
+  .rori-menubar {
+    grid-row: 1;
+  }
+
+  .rori-viewport {
+    grid-row: 2;
+  }
+
+  /* UI › Menu bar › Bottom. */
   body.bars-bottom {
     grid-template-rows: 1fr 32px;
   }
 
   body.bars-bottom .rori-menubar {
-    order: 1;
+    grid-row: 2;
+  }
+
+  body.bars-bottom .rori-viewport {
+    grid-row: 1;
   }
 
   /* Workspaces stack vertically; each is an endless horizontal strip of columns.

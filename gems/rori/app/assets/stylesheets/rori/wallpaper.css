@@ -25,4 +25,28 @@
   body.has-wallpaper .rori-wallpaper {
     background: color-mix(in oklch, var(--rori-surface) 88%, transparent);
   }
+
+  /* The photo credit, in the desk's bottom-right corner (right above the menu
+     bar when that sits at the bottom). Small enough for the gutter under the
+     windows, so it stays above them without covering one. */
+  .rori-wallpaper-credit {
+    position: absolute;
+    z-index: 1;
+    right: 6px;
+    bottom: 3px;
+    color: var(--rori-ink-muted);
+    font-size: 10px;
+    line-height: 1;
+    text-shadow: 0 0 4px var(--rori-canvas);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .rori-wallpaper-credit:hover {
+    color: var(--rori-ink);
+  }
+
+  body:not(.has-wallpaper) .rori-wallpaper-credit {
+    display: none;
+  }
 }

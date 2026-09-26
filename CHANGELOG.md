@@ -8,7 +8,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ### Added
 - **Users:** notifications in the corner of the desk, next to the menu bar: results of commands that run on the server, and news from background work (they fade out after a few seconds, hovering holds them; errors stay until dismissed). The demo's ⌘K / terminal → Run › **Reindex search** asks first, takes 5 seconds in the background and notifies when it's done.
 - **Developers:** `Rori.command :name, confirm: true do … end` registers a server-side command, listed under Run in ⌘K and the terminal and labelled by `rori.commands.custom.<name>`; a String the block returns becomes the notification's text. `confirm: true` asks first (↵ twice in ⌘K, `y` in the terminal). `Rori.notify(title, body, kind:)` sends a notification to every open desk (Action Cable, `Rori.notifications_stream`), e.g. from a job.
-- **Users:** UI › **Menu bar** › Top | Bottom moves the menu bar to the bottom edge (the terminal then rises from below), remembered across launches. The status bar is gone: its column minimap, photo credit and shortcuts button now live in the menu bar, so the desk has one bar.
+- **Users:** UI › **Menu bar** › Top | Bottom moves the menu bar to the bottom edge (the terminal then rises from below), remembered across launches. The status bar is gone: its column minimap and shortcuts button now live in the menu bar, so the desk has one bar, and the photo credit is a small tab in the desk's bottom-right corner.
 - **Users:** a **Keyboard shortcuts** modal lists every shortcut from the live keymap (⌘ in the macOS app): `⌥?` / `⌘?`, the menu bar's `⌥?` button, or ⌘K. It replaces the long shortcut line in the old status bar.
 - **Users:** the empty-desk hint points to the shortcuts and can be dismissed (×); the shortcuts modal's "Show the hint on an empty desk" brings it back.
 - **Users:** UI › Wallpaper › **Next wallpaper** swaps the photo in place, and **Pin wallpaper** keeps the current one across launches instead of a random one each time.
@@ -27,7 +27,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Users:** a drop-down terminal on `` ` `` (outside text fields; `Rori.terminal_key`, or `⌥``/`⌘`` and ⌘K "Toggle terminal"). It runs every ⌘K command with the same matching: words walk the nested lists (`ui wallpaper cover`, `new user`, `oleh`), Tab completes one level at a time, ↑↓ recall history, `help` lists the top level, `clear` wipes the scrollback.
 - **Users:** ⌘K / terminal → UI › Theme and UI › Wallpaper › Safe (inside the desk) | Cover menu bar (behind the menu bar too) | Off, remembered across launches.
 - **Developers:** ⌘K and the terminal share one command bus (`rori-command:run|preview|closed|source`, was `desk-palette:*`) and one fuzzy matcher (`rori/fuzzy.js`).
-- **Users:** optional wallpapers (`Rori.wallpapers`): a random landscape photo from Unsplash on each launch, tinted toward the current theme and credited in the menu bar.
+- **Users:** optional wallpapers (`Rori.wallpapers`): a random landscape photo from Unsplash on each launch, tinted toward the current theme and credited in the desk's bottom-right corner.
 - **Users:** the macOS app zooms like a browser: View → Zoom In / Zoom Out / Actual Size (`⌘=`, `⌘-`, `⌘0`), in steps from 50% to 300%.
 - **Users:** the window whose text field has focus wears a green `<input>` tag on its left edge (right edge when there's no room; inside the bottom-left corner of full-width windows), so it's clear keys will type rather than drive the desk.
 - **Users:** a native macOS app (`src-tauri`, `cargo tauri dev`) wrapping the desk, where ⌘ is the shortcut modifier (⌘←→ focus, ⌘1–9 workspaces, ⌘W close…; centre column is ⌘⇧C since ⌘C copies).
@@ -47,6 +47,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Rori::Command` a `source:` and answer the `rori-command:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** a workspace number past the last one (`3` or `⌥3` with two workspaces) no longer opens an empty workspace; it does nothing.
 - **Users:** commands run from the terminal (and ⌘K path results) do their action again — the rename to rori had left the terminal reading the old `data-desk-action` attribute.
 - **Users:** closing a modal (Esc, ×, Cancel) puts focus back where it was — e.g. the terminal prompt after `new user` — instead of dropping it on the page.
 - **Users:** a sideways swipe over the bare desk (the gutters between windows) scrolls the strip again, instead of doing nothing.

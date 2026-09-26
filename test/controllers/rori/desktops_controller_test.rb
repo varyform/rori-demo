@@ -17,12 +17,12 @@ class Rori::DesktopsControllerTest < ActionDispatch::IntegrationTest
   test "wallpapers are optional: none by default, a random photo with credit when on" do
     get root_path
     assert_select "body.has-wallpaper", count: 0
-    assert_select ".rori-menubar__credit", count: 0
+    assert_select ".rori-wallpaper-credit", count: 0
 
     Rori.wallpapers = true
     get root_path
     assert_select "body.has-wallpaper:not(.wallpaper-cover)[style*=?]", "--rori-wallpaper: image-set(url(\"https://images.unsplash.com/photo-"
-    assert_select "a.rori-menubar__credit[target=_blank][href^=?]", "https://images.unsplash.com/photo-", text: "Photo · Unsplash"
+    assert_select "a.rori-wallpaper-credit[target=_blank][href^=?]", "https://images.unsplash.com/photo-", text: "Photo · Unsplash"
   ensure
     Rori.wallpapers = false
   end

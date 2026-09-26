@@ -78,6 +78,7 @@
     = render "rori/menubar"
     %main.rori-viewport{ data: { rori_target: "viewport", action: "wheel->rori#wheel:!passive pointermove->rori#hover pointerleave->rori#unhover" } }
       = render "rori/wallpaper"
+      = render "rori/wallpaper_credit" if rori_wallpaper
       .rori-stack{ data: { rori_target: "stack" } }
       -# Windows wait here until their page says where they go; modals stay here.
       .rori-floating{ data: { rori_target: "floating" } }

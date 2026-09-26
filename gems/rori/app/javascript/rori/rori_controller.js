@@ -233,7 +233,9 @@ export default class extends Controller {
       move_right: () => this.#move("right", win),
       move_up: () => this.#move("up", win),
       move_down: () => this.#move("down", win),
-      switch_to_workspace: () => this.#switchTo(target() || this.#newWorkspace()),
+      // Only to workspaces that exist: a number past the last isn't worth an empty
+      // one (⌥↓ and New workspace make those). Moving there does make one.
+      switch_to_workspace: () => target() && this.#switchTo(target()),
       move_to_workspace: () => this.#moveToWorkspace(target(), win, { follow: true }),
       new_workspace: () => this.#switchTo(this.#newWorkspace()),
       consume_left: () => this.#consumeOrExpel(-1, win),
