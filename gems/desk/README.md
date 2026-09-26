@@ -46,13 +46,29 @@ Pages declare how they're shown with `window size:, mode:, workspace:, key:`
 `desk_link_to`. A parameterless GET route shows up in ⌘K once it has a
 label under `desk.commands.routes.<controller>.<action>` in the app's locale.
 
+## CSS
+
+The desk's CSS lives in its own cascade layer, `desk` (sub-layers
+`desk.reset`, `desk.tokens`, `desk.base`, `desk.layout`, `desk.components`,
+`desk.themes`), so it never mixes into the host's layers. Place it among
+yours with one name:
+
+```css
+@layer reset, base, desk, layout, components, utilities;
+```
+
+Unmentioned, it lands after your layers (it loads later).
+
+It needs nothing from the host: its components use only `--desk-*` tokens,
+each falling back from a host token when present — `--color-canvas`,
+`--color-surface`, `--color-ink`, `--color-ink-muted`, `--color-line`,
+`--color-primary`, `--color-on-primary`, `--color-success`, `--color-danger`,
+`--color-hover`, `--color-backdrop`, `--gap`, `--radius`, `--radius-sm`,
+`--ease`, `--motion`, `--font-sans`, `--font-mono` — to a built-in default.
+Themes set those host tokens, so they re-colour the host's pages as well.
+
 ## What the host provides
 
-- **Design tokens** in its own CSS, loaded before the desk's (the shell links
-  `stylesheet_link_tag :app` first): `@layer reset, base, layout, components,
-  utilities`, the `--color-*` semantic tokens, `--gap`, `--radius`,
-  `--radius-sm`, `--ease`, `--motion`, `--font-sans`, `--font-mono`. Themes
-  override the colour tokens.
 - **Page styles** (buttons, forms, tables); the desk styles only its chrome.
 - **Head tags** (favicons…): override `app/views/layouts/desk/_head.html.haml`.
 

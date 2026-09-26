@@ -1,4 +1,4 @@
-@layer layout {
+@layer desk.layout {
 
   /* minmax(0, 1fr): an implicit `auto` column would grow to the widest bar's
      content (e.g. the unwrapped status hint) and push the viewport past the
@@ -33,7 +33,7 @@
     position: absolute;
     inset: 0;
     transform-origin: 0 0;
-    transition: transform var(--motion) var(--ease);
+    transition: transform var(--desk-motion) var(--desk-ease);
   }
 
   .workspace {
@@ -47,20 +47,20 @@
 
   .strip {
     display: flex;
-    gap: var(--gap);
+    gap: var(--desk-gap);
     width: max-content;
     height: 100%;
-    padding: var(--gap);
-    transition: transform var(--motion) var(--ease);
+    padding: var(--desk-gap);
+    transition: transform var(--desk-motion) var(--desk-ease);
   }
 
   .col {
     flex: none;
     display: flex;
     flex-direction: column;
-    gap: var(--gap);
+    gap: var(--desk-gap);
     min-width: 0;
-    transition: width var(--motion) var(--ease);
+    transition: width var(--desk-motion) var(--desk-ease);
   }
 
   /* Loading windows wait here unseen; modals live here in the top layer. */
@@ -80,7 +80,7 @@
   }
 
   .is-overview .workspace {
-    outline: 1px dashed var(--color-line);
+    outline: 1px dashed var(--desk-line);
     outline-offset: -1px;
   }
 
@@ -99,7 +99,7 @@
     place-content: center;
     gap: 6px;
     text-align: center;
-    color: var(--color-ink-muted);
+    color: var(--desk-ink-muted);
     pointer-events: none;
   }
 
@@ -109,6 +109,6 @@
 
   .wallpaper__title {
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--desk-ink);
   }
 }

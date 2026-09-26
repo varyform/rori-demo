@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Developers:** the desk's CSS is self-contained: one `desk` cascade layer (with `reset`, `tokens`, `base`, `layout`, `components`, `themes` sub-layers) hosts place with a single name, and `--desk-*` tokens that fall back from the host's tokens to built-in defaults, plus a reset scoped to its chrome. A host with no CSS gets a working desk.
 - **Developers:** the desk is now a Rails engine gem in `gems/desk` (`gem "desk", path: "gems/desk"`): views, Stimulus controllers (pinned by the gem), CSS, locales, routes (`draw :desk`), rake tasks, Ghostty themes and wallpapers ship with it. Hosts provide design tokens, page styles and head tags (override `layouts/desk/_head`); `Desk.app_name` replaces the app's `app_name` in the chrome.
 - **Users:** ⌘K shows the keyboard shortcut next to each command that has one (⌥W, ⌥⇧T, ⌥`…; ⌘ in the macOS app).
 - **Users:** the macOS app toggles full screen with fn/Globe+F or ⌃⌘F (View → Toggle Full Screen).

@@ -1,23 +1,23 @@
-@layer components {
+@layer desk.components {
   .statusbar {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 0 var(--gap);
+    padding: 0 var(--desk-gap);
   }
 
   .statusbar__hint {
     min-width: 0;
     margin-left: auto;
     overflow: hidden;
-    color: var(--color-ink-muted);
+    color: var(--desk-ink-muted);
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
   .statusbar__credit {
     flex: none;
-    color: var(--color-ink-muted);
+    color: var(--desk-ink-muted);
     text-decoration: none;
   }
 
@@ -26,7 +26,7 @@
   }
 
   .statusbar__credit:hover {
-    color: var(--color-ink);
+    color: var(--desk-ink);
     text-decoration: underline;
   }
 
@@ -45,20 +45,20 @@
     border: 1px solid transparent;
     border-radius: 4px;
     cursor: pointer;
-    transition: width var(--motion) var(--ease);
+    transition: width var(--desk-motion) var(--desk-ease);
   }
 
   .minimap__col.is-visible {
-    border-color: var(--color-line);
+    border-color: var(--desk-line);
   }
 
   .minimap__col span {
     flex: 1;
     border-radius: 2px;
-    background: var(--color-line);
+    background: var(--desk-line);
   }
 
   .minimap__col span.is-focused {
-    background: var(--color-ink);
+    background: var(--desk-ink);
   }
 }

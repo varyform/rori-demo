@@ -1,8 +1,8 @@
-@layer components {
+@layer desk.components {
 
   /* Author styles beat the UA's dialog rules, so restate the closed state. */
   .win {
-    --bar-height: 30px;
+    --desk-bar-height: 30px;
     position: relative;
     isolation: isolate;
     flex: 1;
@@ -15,10 +15,10 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    background: var(--color-surface);
-    color: var(--color-ink);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius);
+    background: var(--desk-surface);
+    color: var(--desk-ink);
+    border: 1px solid var(--desk-line);
+    border-radius: var(--desk-radius);
     overflow: hidden;
     outline: none;
     transition: border-color 150ms, box-shadow 150ms;
@@ -29,8 +29,8 @@
   }
 
   .win.is-focused {
-    border-color: var(--color-ink);
-    box-shadow: 0 0 0 1px var(--color-ink);
+    border-color: var(--desk-ink);
+    box-shadow: 0 0 0 1px var(--desk-ink);
   }
 
   .win:modal {
@@ -40,12 +40,12 @@
     flex: none;
     height: fit-content;
     max-height: min(85vh, 48rem);
-    border-color: var(--color-ink);
+    border-color: var(--desk-ink);
     pointer-events: auto;
   }
 
   .win::backdrop {
-    background: var(--color-backdrop);
+    background: var(--desk-backdrop);
   }
 
   .win__bar {
@@ -53,17 +53,17 @@
     align-items: center;
     gap: 2px;
     flex: none;
-    height: var(--bar-height);
+    height: var(--desk-bar-height);
     padding: 0 4px;
-    border-bottom: 1px solid var(--color-line);
-    font: 11px var(--font-mono);
-    color: var(--color-ink-muted);
+    border-bottom: 1px solid var(--desk-line);
+    font: 11px var(--desk-font-mono);
+    color: var(--desk-ink-muted);
     user-select: none;
   }
 
   .win.is-focused .win__bar,
   .win:modal .win__bar {
-    color: var(--color-ink);
+    color: var(--desk-ink);
   }
 
   .win__title {
@@ -85,7 +85,7 @@
   }
 
   .win__btn:hover:not(:disabled) {
-    background: var(--color-hover);
+    background: var(--desk-hover);
   }
 
   .win__btn:disabled {
@@ -109,9 +109,9 @@
   .win::after {
     content: "";
     position: absolute;
-    inset: var(--bar-height) 0 0;
+    inset: var(--desk-bar-height) 0 0;
     z-index: 1;
-    background: color-mix(in oklch, var(--color-surface) 45%, transparent);
+    background: color-mix(in oklch, var(--desk-surface) 45%, transparent);
     pointer-events: none;
     opacity: 0;
     transition: opacity 150ms;
@@ -127,7 +127,7 @@
 
   /* Hover keys (Desk.hover_keys) will act on this window: say so plainly. */
   .win.is-armed {
-    outline: 2px dashed var(--color-ink);
+    outline: 2px dashed var(--desk-ink);
     outline-offset: 2px;
   }
 
@@ -139,8 +139,8 @@
     display: none;
     padding: 0 6px;
     border-radius: 4px;
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--desk-primary);
+    color: var(--desk-on-primary);
     white-space: nowrap;
   }
 
@@ -156,7 +156,7 @@
   }
 
   .win:not(.is-focused, :modal) :is(.simple_form .input:hover :is(input, select, textarea), input:hover, select:hover, textarea:hover):not([type="hidden"], [type="checkbox"]) {
-    outline: 2px solid var(--color-ink);
+    outline: 2px solid var(--desk-ink);
     outline-offset: 1px;
   }
 
@@ -169,6 +169,6 @@
   }
 
   .win__error {
-    color: var(--color-danger);
+    color: var(--desk-danger);
   }
 }

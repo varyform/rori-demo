@@ -1,7 +1,7 @@
 /* Optional photo (Desk.wallpapers; UI › Wallpaper picks the mode). Windows are
    opaque, so it shows through the gutters and on an empty desk. `safe` keeps it
    inside the desk; `wallpaper-cover` runs it behind the menu and status bars. */
-@layer layout {
+@layer desk.layout {
 
   body.has-wallpaper:not(.wallpaper-cover) .viewport,
   body.has-wallpaper.wallpaper-cover {
@@ -14,19 +14,19 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: color-mix(in oklch, var(--color-canvas) 35%, transparent);
+    background: color-mix(in oklch, var(--desk-canvas) 35%, transparent);
     pointer-events: none;
   }
 
   body.has-wallpaper.wallpaper-cover :is(.menubar, .statusbar) {
-    background: color-mix(in oklch, var(--color-canvas) 72%, transparent);
+    background: color-mix(in oklch, var(--desk-canvas) 72%, transparent);
   }
 
   body.has-wallpaper .wallpaper {
     inset: 50% auto auto 50%;
     translate: -50% -50%;
     padding: 14px 20px;
-    border-radius: var(--radius);
-    background: color-mix(in oklch, var(--color-surface) 88%, transparent);
+    border-radius: var(--desk-radius);
+    background: color-mix(in oklch, var(--desk-surface) 88%, transparent);
   }
 }

@@ -1,28 +1,28 @@
-@layer components {
+@layer desk.components {
   .palette {
     width: min(36rem, calc(100vw - 2rem));
     margin: 12vh auto auto;
     padding: 0;
-    border: 1px solid var(--color-ink);
-    border-radius: var(--radius);
-    background: var(--color-surface);
-    color: var(--color-ink);
+    border: 1px solid var(--desk-ink);
+    border-radius: var(--desk-radius);
+    background: var(--desk-surface);
+    color: var(--desk-ink);
   }
 
   .palette::backdrop {
-    background: var(--color-backdrop);
+    background: var(--desk-backdrop);
   }
 
   .palette__field {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--desk-line);
   }
 
   .palette__crumbs {
     padding-left: 16px;
-    font: 12px var(--font-mono);
-    color: var(--color-ink-muted);
+    font: 12px var(--desk-font-mono);
+    color: var(--desk-ink-muted);
     white-space: nowrap;
   }
 
@@ -57,13 +57,13 @@
     justify-content: space-between;
     gap: 12px;
     padding: 7px 12px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--desk-radius-sm);
     cursor: pointer;
   }
 
   .palette__item[aria-selected="true"] {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--desk-primary);
+    color: var(--desk-on-primary);
   }
 
   .palette__label {
@@ -94,13 +94,13 @@
 
   .palette__empty {
     padding: 16px;
-    color: var(--color-ink-muted);
+    color: var(--desk-ink-muted);
   }
 
   .palette__hint {
     padding: 8px 12px;
-    border-top: 1px solid var(--color-line);
-    color: var(--color-ink-muted);
+    border-top: 1px solid var(--desk-line);
+    color: var(--desk-ink-muted);
     font-size: 12px;
   }
 }

@@ -1,6 +1,6 @@
 /* Quake-style drop-down under the menubar (desk-terminal). Fixed, so it stays
    out of the body grid; slides in via @starting-style. */
-@layer components {
+@layer desk.components {
   .terminal {
     position: fixed;
     inset: 32px 0 auto;
@@ -8,12 +8,12 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto auto;
     height: min(44vh, 28rem);
-    border-bottom: 1px solid var(--color-ink);
-    background: var(--color-surface);
-    color: var(--color-ink);
-    font: 12px/1.6 var(--font-mono);
+    border-bottom: 1px solid var(--desk-ink);
+    background: var(--desk-surface);
+    color: var(--desk-ink);
+    font: 12px/1.6 var(--desk-font-mono);
     translate: 0;
-    transition: translate 160ms var(--ease);
+    transition: translate 160ms var(--desk-ease);
   }
 
   @starting-style {
@@ -24,33 +24,33 @@
 
   .terminal__output {
     overflow: auto;
-    padding: 10px var(--gap) 4px;
+    padding: 10px var(--desk-gap) 4px;
     white-space: pre-wrap;
   }
 
   .terminal__entry--muted,
   .terminal__entry--item {
-    color: var(--color-ink-muted);
+    color: var(--desk-ink-muted);
   }
 
   .terminal__entry--ok {
-    color: var(--color-success);
+    color: var(--desk-success);
   }
 
   .terminal__entry--error {
-    color: var(--color-danger);
+    color: var(--desk-danger);
   }
 
   .terminal__line {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px var(--gap);
-    border-top: 1px solid var(--color-line);
+    padding: 6px var(--desk-gap);
+    border-top: 1px solid var(--desk-line);
   }
 
   .terminal__prompt {
-    color: var(--color-success);
+    color: var(--desk-success);
     white-space: nowrap;
   }
 
@@ -58,7 +58,7 @@
     flex: 1;
     min-width: 0;
     outline: none;
-    caret-color: var(--color-success);
+    caret-color: var(--desk-success);
   }
 
   .terminal__suggestions {
@@ -66,8 +66,8 @@
     flex-wrap: wrap;
     gap: 4px 16px;
     min-height: 26px;
-    padding: 0 var(--gap) 6px;
-    color: var(--color-ink-muted);
+    padding: 0 var(--desk-gap) 6px;
+    color: var(--desk-ink-muted);
   }
 
   .terminal__suggestion {
@@ -76,7 +76,7 @@
   }
 
   .terminal__suggestion[aria-selected] {
-    color: var(--color-ink);
+    color: var(--desk-ink);
   }
 
   .terminal__group {

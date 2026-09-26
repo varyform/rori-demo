@@ -1,14 +1,14 @@
-@layer components {
+@layer desk.components {
   .menubar {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 12px;
-    padding: 0 var(--gap);
+    padding: 0 var(--desk-gap);
   }
 
   .menubar__brand {
-    font: 600 12px var(--font-mono);
+    font: 600 12px var(--desk-font-mono);
   }
 
   .menubar__search {
@@ -18,15 +18,15 @@
     height: 22px;
     min-width: 18rem;
     padding: 0 4px 0 10px;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-sm);
-    color: var(--color-ink-muted);
+    border: 1px solid var(--desk-line);
+    border-radius: var(--desk-radius-sm);
+    color: var(--desk-ink-muted);
     cursor: pointer;
   }
 
   .menubar__search:hover {
-    border-color: var(--color-ink-muted);
-    color: var(--color-ink);
+    border-color: var(--desk-ink-muted);
+    color: var(--desk-ink);
   }
 
   .menubar__search kbd {
@@ -34,8 +34,8 @@
   }
 
   .menubar__clock {
-    font: 12px var(--font-mono);
-    color: var(--color-ink-muted);
+    font: 12px var(--desk-font-mono);
+    color: var(--desk-ink-muted);
   }
 
   .workspaces {
@@ -47,18 +47,18 @@
     height: 18px;
     padding: 0 7px;
     border-radius: 4px;
-    font: 11px var(--font-mono);
-    color: var(--color-ink-muted);
+    font: 11px var(--desk-font-mono);
+    color: var(--desk-ink-muted);
     white-space: nowrap;
     cursor: pointer;
   }
 
   .workspace-button:hover {
-    background: var(--color-hover);
+    background: var(--desk-hover);
   }
 
   .workspace-button[aria-current] {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--desk-primary);
+    color: var(--desk-on-primary);
   }
 }
