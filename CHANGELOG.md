@@ -6,6 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Developers:** `mise.toml` pins the toolchain (Ruby, Rust, Tauri CLI), and `bin/setup` installs it with mise, then gems, the native app's crates and the database, so a fresh clone is one command away from running.
 - **Developers:** the rori gem has its own repository, [varyform/rori](https://github.com/varyform/rori) (`gem "rori", github: "varyform/rori", branch: "main"`), keeping its history since the rename; `bundle config set --local local.rori ../rori` works on a local checkout.
 - **Users:** notifications in the corner of the desk, next to the menu bar: results of commands that run on the server, and news from background work (they fade out after a few seconds, hovering holds them; errors stay until dismissed). The demo's ⌘K / terminal → Run › **Reindex search** asks first, takes 5 seconds in the background and notifies when it's done.
 - **Developers:** `Rori.command :name, confirm: true do … end` registers a server-side command, listed under Run in ⌘K and the terminal and labelled by `rori.commands.custom.<name>`; a String the block returns becomes the notification's text. `confirm: true` asks first (↵ twice in ⌘K, `y` in the terminal). `Rori.notify(title, body, kind:)` sends a notification to every open desk (Action Cable, `Rori.notifications_stream`), e.g. from a job.

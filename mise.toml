@@ -1,0 +1,5 @@
+# The demo's toolchain; bin/setup runs `mise install`.
+[tools]
+ruby = "4.0.7"   # keep in sync with .ruby-version (GitHub CI) and the Dockerfile
+rust = "stable"  # builds the native macOS app in src-tauri
+tauri-cli = "2"  # `cargo tauri dev`, as a prebuilt binary

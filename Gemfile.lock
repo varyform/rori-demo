@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/varyform/rori.git
-  revision: 33bdce2516867b0147271d9d38dcb9ef336644a9
+  revision: 8e6268659432e8a9ca57f059a3e102dc1cd90439
   branch: main
   specs:
     rori (0.1.0)

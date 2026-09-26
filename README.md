@@ -10,8 +10,13 @@ See `CHANGELOG.md` for what it does.
 ## Setup
 
 ```sh
-bin/setup                 # gems, database, seeds
+bin/setup                 # toolchain, gems, crates, database, seeds; then bin/dev
 ```
+
+The toolchain (Ruby, Rust and the Tauri CLI for the native app) is pinned in
+`mise.toml`; with [mise](https://mise.jdx.dev) installed, `bin/setup` installs
+it and runs everything through it. Without mise, provide those tools yourself.
+System tests also need Chrome.
 
 ## Running
 
