@@ -1,9 +1,25 @@
+require "rails"
+require "turbo-rails"
+require "stimulus-rails"
+require "importmap-rails"
+require "propshaft"
+require "haml"
+
+require "desk/version"
+require "desk/engine"
+
 # The desk: a niri-style window manager for Rails pages (tiled turbo-frame
-# windows, ⌘K palette, Ghostty themes). Everything desk-specific lives under
-# this namespace — app/*/desk, app/javascript/desk, app/assets/stylesheets/desk,
-# config/routes/desk.rb, config/locales/desk.en.yml — so it can be lifted into
-# an engine later. Apps configure it in config/initializers/desk.rb.
+# windows, ⌘K palette and terminal, Ghostty themes). A Rails engine; see the
+# README for wiring it into a host app. Configure in an initializer:
+#
+#   Desk.configure do |desk|
+#     desk.records = %w[ User Project ]
+#     desk.hover_keys = true
+#   end
 module Desk
+  # Shown in the menubar and the <title> of the bare desk.
+  mattr_accessor :app_name, default: "Desk"
+
   # Model class names whose most recent records are listed in ⌘K.
   mattr_accessor :records, default: []
   mattr_accessor :record_limit, default: 25
@@ -12,14 +28,21 @@ module Desk
   # every palette open (so they can list fresh data).
   mattr_accessor :commands, default: []
 
-  mattr_accessor :themes_directory, default: Rails.root.join("vendor/themes/ghostty")
-  mattr_accessor :themes_stylesheet, default: Rails.root.join("app/assets/stylesheets/desk/themes.css")
+  # Ghostty themes compiled by `bin/rails desk:themes:build`; both default to
+  # the ones bundled with the gem (paths resolve lazily, after boot).
+  mattr_writer :themes_directory, :themes_stylesheet
   mattr_accessor :theme_cookie, default: "theme"
 
   # Optional background photos (off by default): a random one per page load.
   mattr_accessor :wallpapers, default: false
-  mattr_accessor :wallpapers_file, default: Rails.root.join("vendor/wallpapers/unsplash.yml")
+  mattr_writer :wallpapers_file
   mattr_accessor :wallpaper_cookie, default: "wallpaper"
+
+  def self.themes_directory = @@themes_directory || Engine.root.join("vendor/themes/ghostty")
+
+  def self.themes_stylesheet = @@themes_stylesheet || Engine.root.join("app/assets/stylesheets/desk/themes.css")
+
+  def self.wallpapers_file = @@wallpapers_file || Engine.root.join("vendor/wallpapers/unsplash.yml")
 
   # The terminal (⌘K as a command line) opens with this bare key outside text
   # fields — KeyboardEvent#code, like the keymap — and with `toggle_terminal`.

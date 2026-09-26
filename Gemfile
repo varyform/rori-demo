@@ -67,3 +67,5 @@ end
 
 gem "haml-rails", "~> 3.1"
 gem "simple_form", "~> 5.4"
+
+gem "desk", path: "gems/desk"

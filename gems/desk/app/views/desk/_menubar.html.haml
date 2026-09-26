@@ -1,5 +1,5 @@
 %header.menubar
-  %span.menubar__brand= t("app_name")
+  %span.menubar__brand= Desk.app_name
   %nav.workspaces{ "aria-label": t(".workspaces"), data: { desk_target: "workspaces" } }
   %button.menubar__search{ type: "button", data: { action: "desk-palette#open" } }
     = t(".search")

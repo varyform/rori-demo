@@ -1,12 +1,13 @@
 -# The desk shell: full page loads render the requested page as the first
--# window. Apps add to <head> with `content_for :head`.
+-# window. Apps add app-wide <head> tags (icons…) by overriding the
+-# layouts/desk/_head partial, and per page with `content_for :head`.
 !!!
 %html{ lang: I18n.locale, data: { theme: current_theme&.slug } }
   %head
-    %title= windowed? ? window_title : t("app_name")
+    %title= windowed? ? window_title : Desk.app_name
     %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }
     %meta{ name: "apple-mobile-web-app-capable", content: "yes" }
-    %meta{ name: "application-name", content: t("app_name") }
+    %meta{ name: "application-name", content: Desk.app_name }
     %meta{ name: "mobile-web-app-capable", content: "yes" }
     -# Turbo's hover-prefetch cache is keyed by URL alone and hands its response
     -# to the next fetch of that URL, whatever frame asks. Window frames have
@@ -15,11 +16,10 @@
     %meta{ name: "turbo-prefetch", content: "false" }
     = csrf_meta_tags
     = csp_meta_tag
+    = render "layouts/desk/head"
     = yield :head
-    %link{ rel: "icon", href: "/icon.png", type: "image/png" }
-    %link{ rel: "icon", href: "/icon.svg", type: "image/svg+xml" }
-    %link{ rel: "apple-touch-icon", href: "/icon.png" }
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = desk_stylesheet_link_tags "data-turbo-track": "reload"
     = javascript_importmap_tags
 
   %body{ class: desk_wallpaper_classes,
