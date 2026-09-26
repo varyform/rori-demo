@@ -491,7 +491,10 @@ export default class extends Controller {
       if (win.open && !win.matches(":modal")) win.close()
       this.#moveTo(win, this.floatingTarget)
       win.style.width = `${MODAL_WIDTHS[size] || MODAL_WIDTHS.sm}px`
-      if (!win.open) win.showModal()
+      if (!win.open) {
+        win.returnFocus = document.activeElement // see #remove
+        win.showModal()
+      }
       return
     }
 
@@ -536,11 +539,15 @@ export default class extends Controller {
     const neighbour = col && (win.nextElementSibling || win.previousElementSibling ||
       this.#remembered(col.nextElementSibling) || this.#remembered(col.previousElementSibling))
     if (col && this.#src(win)) this.#rememberClosed(win, col)
+    // Removing a modal (unlike dialog.close()) doesn't hand focus back to what
+    // opened it — e.g. the terminal prompt a `new user` came from.
+    const returnFocus = win.matches(":modal") ? win.returnFocus : null
 
     win.remove()
     if (col && !col.querySelector(".win")) col.remove()
-    if (win !== this.focused && this.focused?.isConnected) return this.layout()
-    this.focus(neighbour || this.#focusIn(this.current) || this.current.querySelector(".win"))
+    if (win !== this.focused && this.focused?.isConnected) this.layout()
+    else this.focus(neighbour || this.#focusIn(this.current) || this.current.querySelector(".win"))
+    if (returnFocus?.isConnected && returnFocus.checkVisibility()) returnFocus.focus({ preventScroll: true })
   }
 
   #rememberClosed(win, col) {
