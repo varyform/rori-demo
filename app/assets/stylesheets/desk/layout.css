@@ -41,7 +41,7 @@
     gap: var(--gap);
     width: max-content;
     height: 100%;
-    padding: 0 var(--gap) var(--gap);
+    padding: var(--gap);
     transition: transform var(--motion) var(--ease);
   }
 

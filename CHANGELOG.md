@@ -33,6 +33,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** windows no longer butt against the menubar: the strip has the same gap above as around its other edges.
 - **Users:** after a reload you now always land on the window and workspace you left, instead of occasionally on another restored window (with the address bar following it there).
 - **Users:** in the macOS app, Esc no longer takes the window out of full screen — also when it's closing a modal; it still closes dialogs, leaves fields and exits the overview.
 - **Users:** after running a ⌘K command, the next bare key or shortcut (`W`, `⌥W`, `` ` ``…) no longer occasionally does nothing: focus left behind in the closed palette's search box was treated as typing.

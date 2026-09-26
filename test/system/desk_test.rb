@@ -258,7 +258,7 @@ class DeskTest < ApplicationSystemTestCase
     visit root_path
     run_command "dashboard"
     assert_workspace "overview"
-    assert_equal [ 12, 0, 12, 12 ], window_insets(window_titled("Dashboard"))
+    assert_equal [ 12, 12, 12, 12 ], window_insets(window_titled("Dashboard"))
 
     run_command "projects"
     assert_workspace "projects"

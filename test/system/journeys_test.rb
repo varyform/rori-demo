@@ -78,7 +78,7 @@ class JourneysTest < ApplicationSystemTestCase
     assert_workspace "projects"
     run_command "dashboard"
     assert_workspace "overview"
-    assert_equal [ 12, 0, 12, 12 ], window_insets(window_titled("Dashboard"))
+    assert_equal [ 12, 12, 12, 12 ], window_insets(window_titled("Dashboard"))
 
     press "1"
     assert_workspace "1"
