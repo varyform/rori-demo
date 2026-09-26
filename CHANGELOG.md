@@ -33,6 +33,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Desk::Command` a `source:` and answer the `desk-palette:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** a sideways swipe over the bare desk (the gutters between windows) scrolls the strip again, instead of doing nothing.
 - **Users:** a two-finger sideways swipe no longer navigates the browser back (or forward) out of the desk; sideways swipes only scroll the strip or the content under the pointer.
 - **Users:** windows no longer butt against the menubar: the strip has the same gap above as around its other edges.
 - **Users:** after a reload you now always land on the window and workspace you left, instead of occasionally on another restored window (with the address bar following it there).

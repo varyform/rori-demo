@@ -935,9 +935,13 @@ export default class extends Controller {
     return this.#remembered(best)
   }
 
+  // Content under the pointer that scrolls sideways itself (a wide table) keeps
+  // the swipe. Only real scrollers count: clipped boxes like .workspace are
+  // wider inside than out but don't scroll, and treating them as scrollers
+  // made swipes over the bare desk do nothing.
   #scrollsSideways(target) {
-    for (let el = target; el && !el.matches(".win"); el = el.parentElement) {
-      if (el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX !== "visible") return true
+    for (let el = target; el && el !== this.viewportTarget; el = el.parentElement) {
+      if (el.scrollWidth > el.clientWidth && ["auto", "scroll"].includes(getComputedStyle(el).overflowX)) return true
     }
     return false
   }
