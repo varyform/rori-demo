@@ -30,6 +30,24 @@ Native macOS app (⌘ as the shortcut modifier), with `bin/dev` running:
 cd src-tauri && cargo tauri dev
 ```
 
+## Deploying the public demo
+
+Kamal, one server, SQLite on a volume, jobs inside Puma, TLS from Let's
+Encrypt. The image goes through Kamal's local registry, so no registry
+account is needed; the server needs Docker-compatible SSH access and a DNS
+record for the hostname.
+
+```sh
+export DEMO_SERVER=203.0.113.7 DEMO_HOST=rori.example.com
+bin/kamal setup           # first time
+bin/kamal deploy          # after that
+```
+
+Visitors can create, edit and delete anything; `DemoResetJob` puts the seeds
+back every night at 04:00 UTC (`config/recurring.yml`). Notifications from
+server-side commands reach every open desk, so all visitors see each other's
+"Search reindexed".
+
 ## Data
 
 ```sh
