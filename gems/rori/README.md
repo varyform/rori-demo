@@ -78,8 +78,69 @@ See `lib/rori.rb` for everything: `app_name`, `records`, `commands`, `keymap`,
 `modifier` / `native_modifier` / `native_user_agent`, `hover_keys`,
 `terminal_key`, `wallpapers`, theme and wallpaper files and cookies.
 
-After adding a Ghostty theme file to `Rori.themes_directory`, run
-`bin/rails rori:themes:build`.
+### Your own themes and wallpapers
+
+```ruby
+Rori.configure do |rori|
+  rori.themes_folder = "config/themes"   # Ghostty theme files (relative to Rails.root)
+  rori.wallpapers = true
+  rori.wallpapers_folder = "wallpapers"  # app/assets/images/wallpapers/*.{jpg,png,webp,avif}
+end
+```
+
+- **Themes:** any Ghostty theme file (e.g. from
+  [iTerm2-Color-Schemes/ghostty](https://github.com/mbadolato/iTerm2-Color-Schemes/tree/master/ghostty))
+  dropped into the folder shows up in UI › Theme next to the bundled ones; a
+  file with a bundled theme's name replaces it. No build step — their CSS is
+  rendered into the page.
+- **Wallpapers:** the folder is a path inside the app's asset load path, so
+  images are fingerprinted and served by Propshaft. When set, its images
+  replace the bundled Unsplash photos.
+- UI › Wallpaper › **Next wallpaper** swaps the photo in place; **Pin
+  wallpaper** keeps the current one across launches (toggle).
+
+The bundled themes are compiled into the gem's `themes.css`; after changing
+`Rori.themes_directory`, run `bin/rails rori:themes:build`.
+
+## Customising the look
+
+The desk's chrome reads only its own `--rori-*` tokens, and each one defaults
+to your token of the same meaning. So there are three levels, from broad to
+precise:
+
+1. **Your design tokens** — set them as usual; the desk follows:
+   ```css
+   :root { --radius: 4px; --radius-sm: 2px; --gap: 8px; --font-sans: "Inter", sans-serif; }
+   ```
+   Supported: `--color-canvas|surface|ink|ink-muted|line|primary|on-primary|success|danger|hover|backdrop`,
+   `--gap`, `--radius`, `--radius-sm`, `--ease`, `--motion`, `--font-sans`, `--font-mono`.
+2. **Desk-only tokens** — change the desk without touching your pages:
+   ```css
+   @layer overrides {        /* any layer AFTER `rori`, or unlayered */
+     :root { --rori-radius: 0; --rori-gap: 16px; }
+   }
+   ```
+3. **Components** — every chrome element has a `rori-` class
+   (`.rori-win`, `.rori-win__bar`, `.rori-menubar`, `.rori-statusbar`,
+   `.rori-palette`, `.rori-terminal`, `.rori-col`…):
+   ```css
+   @layer overrides {
+     .rori-win { border-radius: 0; box-shadow: none; }
+     .rori-win__bar { height: 26px; }
+   }
+   ```
+
+**The one rule: overrides must come after the `rori` layer.** Cascade layers
+beat specificity, so a rule in a layer *before* `rori` loses even with a more
+specific selector — and so does a `--rori-*` token set there, since
+`rori.tokens` defines them on `:root` too. Put overrides in a later layer
+(`components`, `utilities`, a dedicated `overrides`) or leave them unlayered.
+Overriding your own tokens (level 1) works from any layer, because the desk
+only reads them.
+
+Themes set the `--color-*` tokens, so a theme picked in UI › Theme wins over
+level-1 colours; use level 2 (`--rori-ink`, `--rori-surface`…) for colours a
+theme mustn't change.
 
 ## Tests
 

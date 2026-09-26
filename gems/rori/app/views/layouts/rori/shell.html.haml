@@ -20,6 +20,7 @@
     = yield :head
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = rori_stylesheet_link_tags "data-turbo-track": "reload"
+    = rori_local_themes_style_tag
     = javascript_importmap_tags
 
   %body{ class: rori_wallpaper_classes,
@@ -28,6 +29,10 @@
     rori_theme_cookie_value: Rori.theme_cookie,
     rori_wallpaper_cookie_value: Rori.wallpaper_cookie,
     rori_wallpaper_mode_value: rori_wallpaper_mode,
+    rori_wallpaper_pin_cookie_value: Rori.wallpaper_pin_cookie,
+    rori_wallpaper_pool_value: (Rori::Wallpaper.all.to_json if rori_wallpaper),
+    rori_wallpaper_current_value: rori_wallpaper&.id,
+    rori_wallpaper_pinned_value: rori_wallpaper_pinned?.to_s,
     rori_terminal_root_value: rori_commands_path,
     rori_terminal_key_value: Rori.terminal_key,
     rori_terminal_prompt_value: t("rori.terminal.prompt"),

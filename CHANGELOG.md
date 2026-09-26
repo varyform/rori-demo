@@ -6,6 +6,10 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
+- **Users:** UI › Wallpaper › **Next wallpaper** swaps the photo in place, and **Pin wallpaper** keeps the current one across launches instead of a random one each time.
+- **Developers:** `Rori.wallpapers_folder` (a folder in the app's asset path, e.g. `"wallpapers"`) uses the app's own images instead of the bundled Unsplash photos.
+- **Developers:** `Rori.themes_folder` adds the app's own Ghostty theme files to UI › Theme (same name replaces a bundled theme), with no build step.
+- **Developers:** the gem README explains how to restyle the desk: via your own tokens, desk-only `--rori-*` tokens, or `rori-` component classes — overrides go in a layer after `rori` or unlayered.
 - **Developers:** the gem is named **rori** (`desk` is taken on rubygems.org): module `Rori`, `gems/rori`, `rori-*` CSS classes, Stimulus identifiers and events, `--rori-*` tokens, the `rori` cascade layer, `rori.*` locale keys, `draw :rori` (command lists under `/rori/commands`) and `bin/rails rori:themes:build`. Window-layout, ⌘K frecency and terminal history storage start fresh once. "Desk" remains the name of the window-manager metaphor in the UI and of this demo app (`Rori.app_name = "Desk"`).
 - **Developers:** the desk's chrome uses `rori-`-prefixed class names (`.rori-win`, `.rori-col`, `.rori-workspace`…), so generic host classes like `.col` or `.workspace` can't collide with it.
 - **Developers:** the desk's CSS is self-contained: one `rori` cascade layer (with `reset`, `tokens`, `base`, `layout`, `components`, `themes` sub-layers) hosts place with a single name, and `--rori-*` tokens that fall back from the host's tokens to built-in defaults, plus a reset scoped to its chrome. A host with no CSS gets a working desk.
@@ -38,6 +42,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Developers:** nested palette lists can come from the browser: give a `Rori::Command` a `source:` and answer the `rori-command:source` event with `detail.items`.
 
 ### Fixed
+- **Users:** commands run from the terminal (and ⌘K path results) do their action again — the rename to rori had left the terminal reading the old `data-desk-action` attribute.
 - **Users:** closing a modal (Esc, ×, Cancel) puts focus back where it was — e.g. the terminal prompt after `new user` — instead of dropping it on the page.
 - **Users:** a sideways swipe over the bare desk (the gutters between windows) scrolls the strip again, instead of doing nothing.
 - **Users:** a two-finger sideways swipe no longer navigates the browser back (or forward) out of the desk; sideways swipes only scroll the strip or the content under the pointer.

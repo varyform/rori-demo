@@ -12,7 +12,7 @@ export function parseList(html) {
     label: item.querySelector(".rori-palette__label").firstChild.textContent.trim(),
     group: item.querySelector(".rori-palette__group").lastChild.textContent.trim(),
     url: item.dataset.url,
-    action: item.dataset.deskAction,
+    action: item.dataset.roriAction,
     param: item.dataset.param,
     children: item.dataset.children,
     source: item.dataset.source,

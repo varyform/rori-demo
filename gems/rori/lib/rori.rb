@@ -33,10 +33,22 @@ module Rori
   mattr_writer :themes_directory, :themes_stylesheet
   mattr_accessor :theme_cookie, default: "theme"
 
-  # Optional background photos (off by default): a random one per page load.
+  # The app's own Ghostty theme files (a directory, relative to Rails.root or
+  # absolute), listed alongside the bundled ones; same name replaces a bundled
+  # theme. No build step: their CSS is rendered into the shell.
+  mattr_accessor :themes_folder
+
+  # Optional background photos (off by default): a random one per page load,
+  # unless one is pinned (UI › Wallpaper › Pin).
   mattr_accessor :wallpapers, default: false
   mattr_writer :wallpapers_file
   mattr_accessor :wallpaper_cookie, default: "wallpaper"
+  mattr_accessor :wallpaper_pin_cookie, default: "wallpaper_pin"
+
+  # The app's own wallpapers: a folder in its asset path (e.g. "wallpapers" for
+  # app/assets/images/wallpapers). When set, its images replace the bundled
+  # Unsplash photos.
+  mattr_accessor :wallpapers_folder
 
   def self.themes_directory = @@themes_directory || Engine.root.join("vendor/themes/ghostty")
 

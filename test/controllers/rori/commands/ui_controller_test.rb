@@ -23,5 +23,36 @@ class Rori::Commands::UiControllerTest < ActionDispatch::IntegrationTest
     assert_select "li[data-rori-action=wallpaper]", count: 3
     assert_select "li[data-param=cover][data-current]", text: /Cover bars/
     assert_select "li[data-param=safe]:not([data-current])"
+    assert_select "li[data-rori-action=wallpaper_next]", text: /Next wallpaper/
+    assert_select "li[data-rori-action=wallpaper_pin]:not([data-current])", text: /Pin wallpaper/
+  end
+
+  test "a pinned wallpaper is marked, and the desk renders it instead of a random one" do
+    Rori.wallpapers = true
+    pinned = Rori::Wallpaper.all.last
+    cookies[Rori.wallpaper_pin_cookie] = pinned.id
+
+    get rori_commands_wallpapers_path
+    assert_select "li[data-rori-action=wallpaper_pin][data-current]"
+
+    get root_path
+    assert_select "body[data-rori-wallpaper-current-value=?][data-rori-wallpaper-pinned-value=true]", pinned.id
+    assert_select "body[style*=?]", pinned.url(1920)
+    pool = JSON.parse(css_select("body").first["data-rori-wallpaper-pool-value"])
+    assert_equal Rori::Wallpaper.all.map(&:id), pool.map { it["id"] }
+  end
+
+  test "local themes are rendered inline, so the picker can preview them" do
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, "Paper"), "background = #f4f1ea\nforeground = #2b2b2b\npalette = 1=#b3261e\npalette = 2=#2e7d32\npalette = 3=#b26a00\npalette = 4=#1f5fa8\n")
+      Rori.themes_folder = dir
+
+      get root_path
+      assert_select "head style", text: /:root\[data-theme="paper"\]/
+      get rori_commands_themes_path
+      assert_select "li[data-param=paper]", text: /Paper/
+    end
+  ensure
+    Rori.themes_folder = nil
   end
 end

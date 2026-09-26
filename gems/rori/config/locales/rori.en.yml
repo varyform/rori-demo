@@ -24,6 +24,8 @@ en:
         safe: Safe
         cover: Cover bars
         "off": "Off"
+        next: Next wallpaper
+        pin: Pin wallpaper
       workspaces:
         move: Move column to workspace…
         group: Workspace

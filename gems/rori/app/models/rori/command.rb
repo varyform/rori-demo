@@ -53,11 +53,16 @@ class Rori::Command < Data.define(:label, :group, :url, :action, :param, :childr
       Rori.wallpapers ? [ theme, wallpaper ] : [ theme ]
     end
 
-    def wallpapers(current:)
-      Rori::Wallpaper::MODES.map do |mode|
-        new(label: I18n.t(mode, scope: "rori.commands.wallpapers"), group: I18n.t("rori.commands.ui.wallpaper"),
-          action: "wallpaper", param: mode, current: mode == current)
+    # The modes, then Next (swap the photo now) and Pin (keep it across launches).
+    def wallpapers(current:, pinned: false)
+      group = I18n.t("rori.commands.ui.wallpaper")
+      modes = Rori::Wallpaper::MODES.map do |mode|
+        new(label: I18n.t(mode, scope: "rori.commands.wallpapers"), group:, action: "wallpaper", param: mode, current: mode == current)
       end
+      modes + [
+        new(label: I18n.t("rori.commands.wallpapers.next"), group:, action: "wallpaper_next"),
+        new(label: I18n.t("rori.commands.wallpapers.pin"), group:, action: "wallpaper_pin", current: pinned)
+      ]
     end
 
     # `param: ""` is the built-in theme (no data-theme attribute).

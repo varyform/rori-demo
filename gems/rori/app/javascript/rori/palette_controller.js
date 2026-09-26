@@ -216,7 +216,7 @@ export default class extends Controller {
     const list = document.createElement("ul")
     list.className = "rori-palette__list"
     list.setAttribute("role", "listbox")
-    list.dataset.deskPaletteTarget = "list"
+    list.dataset.roriPaletteTarget = "list"
     list.append(...detail.items.map((attributes) => this.#buildItem(attributes)))
 
     this.navigating = false
@@ -228,7 +228,7 @@ export default class extends Controller {
 
   #buildItem({ label, group, action, param, url, children, source, trail, current, shortcut }) {
     const item = this.itemTemplateTarget.content.firstElementChild.cloneNode(true)
-    const data = { deskAction: action, param: param ?? "", url, children, source, trail, shortcut, search: `${label} ${group}` }
+    const data = { roriAction: action, param: param ?? "", url, children, source, trail, shortcut, search: `${label} ${group}` }
     for (const [key, value] of Object.entries(data)) if (value !== undefined) item.dataset[key] = value
     if (current) item.dataset.current = ""
     item.querySelector(".rori-palette__label").textContent = label + (children || source ? " ›" : "")
@@ -263,12 +263,12 @@ export default class extends Controller {
   }
 
   #detail(item, extra = {}) {
-    const { url, deskAction: action, param } = item.dataset
+    const { url, roriAction: action, param } = item.dataset
     return { url, action, param, ...extra }
   }
 
   #id(item) {
-    const { url, deskAction: action, param, children, source } = item.dataset
+    const { url, roriAction: action, param, children, source } = item.dataset
     return this.#idOf({ url, action, param, children, source })
   }
 
