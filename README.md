@@ -2,8 +2,8 @@
 
 A niri-style window manager for Rails pages: every page opens as a window in
 scrolling column strips, driven from ⌘K, a drop-down terminal (`` ` ``) and
-the keyboard. The desk itself is the `desk` engine in `gems/desk` (see its
-README); this app is its demo host, configured in `config/initializers/desk.rb`.
+the keyboard. The desk itself is the `rori` engine in `gems/rori` (see its
+README); this app is its demo host, configured in `config/initializers/rori.rb`.
 See `CHANGELOG.md` for what it does.
 
 ## Setup
@@ -47,5 +47,5 @@ bin/ci                    # style, security audits, tests, seeds
 bin/rails test:system     # browser tests (headless Chrome), not part of bin/ci
 ```
 
-Themes are compiled from `gems/desk/vendor/themes/ghostty`: after adding one,
-run `bin/rails desk:themes:build`.
+Themes are compiled from `gems/rori/vendor/themes/ghostty`: after adding one,
+run `bin/rails rori:themes:build`.

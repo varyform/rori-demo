@@ -2,7 +2,7 @@ require "application_system_test_case"
 require "rake"
 
 # Five end-to-end journeys that each prove one claim about the desk, across
-# features rather than one feature at a time (desk_test.rb covers those).
+# features rather than one feature at a time (rori_test.rb covers those).
 class JourneysTest < ApplicationSystemTestCase
   # 1. Keyboard only: from a blank desk to a created record and back to it,
   #    never touching the mouse, with focus always where the next key needs it.
@@ -12,15 +12,15 @@ class JourneysTest < ApplicationSystemTestCase
 
     type_into_focus :space
     type_into_focus "users"
-    assert_selector ".palette__item[aria-selected=true]", text: "Users"
+    assert_selector ".rori-palette__item[aria-selected=true]", text: "Users"
     type_into_focus :enter
     window_titled "Users"
 
     type_into_focus [ :meta, "k" ]
     type_into_focus "new user"
-    assert_selector ".palette__item[aria-selected=true]", text: "New user"
+    assert_selector ".rori-palette__item[aria-selected=true]", text: "New user"
     type_into_focus :enter
-    assert_selector "dialog.win:modal #user_name:focus"
+    assert_selector "dialog.rori-win:modal #user_name:focus"
     type_into_focus "Grace Hopper"
     type_into_focus :tab
     type_into_focus "grace@example.com"
@@ -28,7 +28,7 @@ class JourneysTest < ApplicationSystemTestCase
 
     # The modal became the user's window, taking over the Users one (same key).
     window_titled "Grace Hopper"
-    assert_selector ".col dialog.win", count: 1
+    assert_selector ".rori-col dialog.rori-win", count: 1
     type_into_focus "w"
     assert_text "Nothing open"
     type_into_focus [ :alt, :shift, "t" ]
@@ -53,8 +53,8 @@ class JourneysTest < ApplicationSystemTestCase
       execute_script("Turbo.renderStreamMessage('<turbo-stream action=\"refresh\"></turbo-stream>')")
       within(window_titled("Users")) { assert_text "Linus" }
 
-      find("dialog.win .win__title", exact_text: "New service").hover
-      assert_selector "dialog.win.is-armed"
+      find("dialog.rori-win .rori-win__title", exact_text: "New service").hover
+      assert_selector "dialog.rori-win.is-armed"
       dismiss_confirm(/unsaved changes/) { type_into_focus "w" }
       form = window_titled("New service")
 
@@ -86,14 +86,14 @@ class JourneysTest < ApplicationSystemTestCase
     press :left
     assert_focused "Users"
     assert_equal 12, window_insets(window_titled("Users"))[0], "the focused column is fully on screen"
-    assert_selector ".minimap__col", count: 2
+    assert_selector ".rori-minimap__col", count: 2
 
     refresh
     assert_workspace "1"
-    assert_selector ".workspace-button", count: 3
+    assert_selector ".rori-workspace-button", count: 3
     window_titled "Users"
     window_titled "Oleh"
-    find(".workspace-button", text: "projects").click
+    find(".rori-workspace-button", text: "projects").click
     window_titled "Projects"
   end
 
@@ -116,17 +116,17 @@ class JourneysTest < ApplicationSystemTestCase
 
     type_into_focus [ :meta, "k" ]
     type_into_focus "uthed"
-    assert_selector ".palette__item[aria-selected=true]", text: "UI › Theme › Default"
+    assert_selector ".rori-palette__item[aria-selected=true]", text: "UI › Theme › Default"
     type_into_focus :enter
     # Selecting already previewed Default; a closed palette means the pick ran.
-    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "dialog.rori-palette[open]"
     assert_no_selector "html[data-theme]", visible: :all
 
     type_into_focus "w"
     assert_text "Nothing open"
     type_into_focus :space
     type_into_focus "reopen"
-    assert_selector ".palette__item[aria-selected=true]", text: "Reopen closed window"
+    assert_selector ".rori-palette__item[aria-selected=true]", text: "Reopen closed window"
     type_into_focus :enter
     window_titled "Projects"
   end
@@ -136,28 +136,28 @@ class JourneysTest < ApplicationSystemTestCase
   test "at volume and zoomed in, it still fits, reveals and finds" do
     Rails.application.load_tasks unless Rake::Task.task_defined?("db:seed:scale")
     with_env(USERS: 50, PROJECTS: 1_500, SERVICES: 50) { capture_io { Rake::Task["db:seed:scale"].invoke } }
-    # ⌘K lists the Desk.record_limit most recently updated records per model.
+    # ⌘K lists the Rori.record_limit most recently updated records per model.
     needle = Project.order(updated_at: :desc).first
 
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 1120, height: 720, deviceScaleFactor: 1.25, mobile: false)
     visit projects_path
     projects = window_titled("Projects")
-    assert_selector "dialog.win tbody tr", minimum: 1_500
+    assert_selector "dialog.rori-win tbody tr", minimum: 1_500
 
     run_command needle.name, new_window: true
     window_titled needle.name
-    assert_equal evaluate_script("innerWidth"), evaluate_script("document.querySelector('.viewport').clientWidth")
+    assert_equal evaluate_script("innerWidth"), evaluate_script("document.querySelector('.rori-viewport').clientWidth")
     assert_equal 12, window_insets(window_titled(needle.name))[2]
 
-    projects.find(".win__title").click
-    body, table = boxes(projects.find(".win__body"), projects.find("table.table"))
+    projects.find(".rori-win__title").click
+    body, table = boxes(projects.find(".rori-win__body"), projects.find("table.table"))
     assert_in_delta body["left"], table["left"], 1
     assert_in_delta body["right"], table["right"], 1
 
     started = Time.current
     type_into_focus [ :meta, "k" ]
     type_into_focus needle.name.split.first(2).join(" ")
-    assert_selector ".palette__item", text: needle.name
+    assert_selector ".rori-palette__item", text: needle.name
     assert_operator Time.current - started, :<, 3, "⌘K finds a record among thousands within seconds"
   ensure
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")

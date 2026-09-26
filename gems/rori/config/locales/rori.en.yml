@@ -1,0 +1,72 @@
+# The desk's own copy. App-specific palette labels (desk.commands.routes)
+# stay in the app's locale files.
+en:
+  rori:
+    commands:
+      groups:
+        open: Open
+        rori: Desk
+        ui: UI
+      actions:
+        overview: Toggle overview
+        reopen_window: Reopen closed window
+        new_workspace: New workspace
+        cycle_width: Cycle column width
+        full_width: Toggle full-width column
+        center_column: Center column
+        close_window: Close window
+        toggle_terminal: Toggle terminal
+      ui:
+        label: UI
+        theme: Theme
+        wallpaper: Wallpaper
+      wallpapers:
+        safe: Safe
+        cover: Cover bars
+        "off": "Off"
+      workspaces:
+        move: Move column to workspace…
+        group: Workspace
+        new: New workspace
+      themes:
+        pick: Pick theme…
+        default: Default
+        auto: Follows system
+        dark: Dark
+        light: Light
+    menubar:
+      workspaces: Workspaces
+      search: Search or run a command…
+    statusbar:
+      columns: Columns
+      wallpaper: Photo · Unsplash
+      # %{mod} is Rori.modifier's symbol (⌥, ⌘ or ⌃).
+      hint_html: "<kbd>⌘K</kbd> commands · <kbd>%{mod}←→↑↓</kbd> focus · <kbd>%{mod}1–9</kbd> workspace · <kbd>%{mod}⇧</kbd> + arrows / 1–9 move · <kbd>%{mod}[</kbd> <kbd>%{mod}]</kbd> stack / unstack · <kbd>%{mod}R</kbd> width · <kbd>%{mod}F</kbd> full · <kbd>%{mod}O</kbd> overview · <kbd>%{mod}W</kbd> close · <kbd>%{mod}⇧T</kbd> reopen · <kbd>`</kbd> terminal · <kbd>esc</kbd> leave field"
+    wallpaper:
+      title: Nothing open
+      hint_html: "Press <kbd>⌘K</kbd>, <kbd>space</kbd> or <kbd>↵</kbd> to open a page or run a command."
+    terminal:
+      label: Terminal
+      prompt: "desk ›"
+      # Passed to rori-terminal as one JSON value; %{…} are filled in there.
+      messages:
+        welcome: "Same commands as ⌘K, matched as whole paths: ui wallpaper cover, or just uthen (UI › Theme › Nord) · Tab completes · ↑↓ history · help · clear · esc or ` closes."
+        help: "Top level (anything nested is reachable by typing its path, even abbreviated):"
+        list: "%{path} ›"
+        empty: "  (nothing here)"
+        opened: "→ %{path}"
+        ran: "✓ %{path}"
+        no_match: "No match for “%{query}”."
+    palette:
+      label: Command palette
+      placeholder: Type a command or search…
+      empty: Nothing matches.
+      hint_html: "<kbd>↵</kbd> open · <kbd>⇧↵</kbd> in a new window · <kbd>⌫</kbd> back · <kbd>esc</kbd> close"
+    window:
+      back: Back
+      detach: Open in a new tab
+      close: Close
+      armed: keys → here
+      typing: "<input>"
+      discard: This window has unsaved changes. Close it anyway?
+      load_error: This page couldn't be shown in a window. Open it in a new tab (↗) to see what went wrong.

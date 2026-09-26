@@ -1,0 +1,64 @@
+@layer rori.components {
+  .rori-statusbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 var(--rori-gap);
+  }
+
+  .rori-statusbar__hint {
+    min-width: 0;
+    margin-left: auto;
+    overflow: hidden;
+    color: var(--rori-ink-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .rori-statusbar__credit {
+    flex: none;
+    color: var(--rori-ink-muted);
+    text-decoration: none;
+  }
+
+  body:not(.has-wallpaper) .rori-statusbar__credit {
+    display: none;
+  }
+
+  .rori-statusbar__credit:hover {
+    color: var(--rori-ink);
+    text-decoration: underline;
+  }
+
+  .rori-minimap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rori-minimap__col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 22px;
+    padding: 2px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: width var(--rori-motion) var(--rori-ease);
+  }
+
+  .rori-minimap__col.is-visible {
+    border-color: var(--rori-line);
+  }
+
+  .rori-minimap__col span {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--rori-line);
+  }
+
+  .rori-minimap__col span.is-focused {
+    background: var(--rori-ink);
+  }
+}

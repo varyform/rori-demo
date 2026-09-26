@@ -1,0 +1,174 @@
+@layer rori.components {
+
+  /* Author styles beat the UA's dialog rules, so restate the closed state. */
+  .rori-win {
+    --rori-bar-height: 30px;
+    position: relative;
+    isolation: isolate;
+    flex: 1;
+    min-height: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--rori-surface);
+    color: var(--rori-ink);
+    border: 1px solid var(--rori-line);
+    border-radius: var(--rori-radius);
+    overflow: hidden;
+    outline: none;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+
+  .rori-win:not([open]) {
+    display: none;
+  }
+
+  .rori-win.is-focused {
+    border-color: var(--rori-ink);
+    box-shadow: 0 0 0 1px var(--rori-ink);
+  }
+
+  .rori-win:modal {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    flex: none;
+    height: fit-content;
+    max-height: min(85vh, 48rem);
+    border-color: var(--rori-ink);
+    pointer-events: auto;
+  }
+
+  .rori-win::backdrop {
+    background: var(--rori-backdrop);
+  }
+
+  .rori-win__bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+    height: var(--rori-bar-height);
+    padding: 0 4px;
+    border-bottom: 1px solid var(--rori-line);
+    font: 11px var(--rori-font-mono);
+    color: var(--rori-ink-muted);
+    user-select: none;
+  }
+
+  .rori-win.is-focused .rori-win__bar,
+  .rori-win:modal .rori-win__bar {
+    color: var(--rori-ink);
+  }
+
+  .rori-win__title {
+    flex: 1;
+    padding: 0 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rori-win__btn {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .rori-win__btn:hover:not(:disabled) {
+    background: var(--rori-hover);
+  }
+
+  .rori-win__btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* Pages lay out against the window, not the viewport (see forms.css). */
+  /* contain: scrolling a wide table to its edge stops there instead of
+     chaining on to the page (where a sideways overscroll means "back"). */
+  .rori-win__body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    container-type: inline-size;
+  }
+
+  /* Inactive windows are dimmed by an overlay rather than opacity, so a single
+     field can rise above it (opacity on a parent can't be undone by a child). */
+  .rori-win::after {
+    content: "";
+    position: absolute;
+    inset: var(--rori-bar-height) 0 0;
+    z-index: 1;
+    background: color-mix(in oklch, var(--rori-surface) 45%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms;
+  }
+
+  .rori-win:not(.is-focused, :modal)::after {
+    opacity: 1;
+  }
+
+  .is-overview .rori-win::after {
+    opacity: 0;
+  }
+
+  /* Hover keys (Rori.hover_keys) will act on this window: say so plainly. */
+  .rori-win.is-armed {
+    outline: 2px dashed var(--rori-ink);
+    outline-offset: 2px;
+  }
+
+  .rori-win.is-armed::after {
+    opacity: 0.4;
+  }
+
+  .rori-win__armed {
+    display: none;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--rori-primary);
+    color: var(--rori-on-primary);
+    white-space: nowrap;
+  }
+
+  .rori-win.is-armed .rori-win__armed {
+    display: block;
+  }
+
+  /* The field under the pointer in an inactive window lights up: one click
+     activates the window and focuses that field. */
+  .rori-win:not(.is-focused, :modal) :is(.simple_form .input, input, select, textarea):hover {
+    position: relative;
+    z-index: 2;
+  }
+
+  .rori-win:not(.is-focused, :modal) :is(.simple_form .input:hover :is(input, select, textarea), input:hover, select:hover, textarea:hover):not([type="hidden"], [type="checkbox"]) {
+    outline: 2px solid var(--rori-ink);
+    outline-offset: 1px;
+  }
+
+  /* --container-padding: edge-to-edge content (tables.css) bleeds by this much. */
+  .rori-win__body>turbo-frame {
+    --container-padding: 16px;
+    display: grid;
+    gap: 16px;
+    padding: 14px var(--container-padding) 16px;
+  }
+
+  .rori-win__error {
+    color: var(--rori-danger);
+  }
+}

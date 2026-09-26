@@ -1,0 +1,15 @@
+-# locals: (frame_id: nil, src: nil, body: nil)
+-# Rendered once server-side for the page being loaded, and once inside a
+-# <template> the desk clones for every window it opens.
+%dialog.rori-win{ open: body.present?, tabindex: -1, data: { rori_target: "window",
+  action: "pointerdown->rori#focusWindow focusin->rori#focusWindow input->rori#markDirty change->rori#markDirty cancel->rori#cancel" } }
+  %header.rori-win__bar{ data: { action: "dblclick->rori#toggleFullWidth" } }
+    %button.rori-win__btn{ type: "button", title: t(".back"), disabled: true, data: { action: "rori#back", window_part: "back" } } ←
+    %span.rori-win__title{ data: { window_part: "title" } }
+    %span.rori-win__armed= t(".armed")
+    %button.rori-win__btn{ type: "button", title: t(".detach"), data: { action: "rori#detach" } } ↗
+    %button.rori-win__btn{ type: "button", title: t(".close"), data: { action: "rori#close" } } ×
+  .rori-win__body
+    = turbo_frame_tag frame_id, src: src, complete: src.present?, refresh: "morph",
+      data: { action: "turbo:frame-load->rori#frameLoaded turbo:frame-missing->rori#frameMissing" } do
+      = body

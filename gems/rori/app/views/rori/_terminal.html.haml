@@ -1,0 +1,9 @@
+-# Drop-down command line (rori-terminal, on <body>). data-rori-keys=off keeps
+-# desk shortcuts and hover keys out while you type here.
+%section.rori-terminal{ hidden: true, "aria-label": t(".label"), data: { rori_keys: "off", rori_terminal_target: "panel" } }
+  .rori-terminal__output{ "aria-live": "polite", data: { rori_terminal_target: "output" } }
+  %label.rori-terminal__line
+    %span.rori-terminal__prompt= t(".prompt")
+    %input.rori-terminal__input{ type: "text", autocomplete: "off", spellcheck: "false", "aria-label": t(".label"),
+      data: { "1p-ignore": true, rori_terminal_target: "input", action: "input->rori-terminal#suggest keydown->rori-terminal#navigate" } }
+  %ul.rori-terminal__suggestions{ data: { rori_terminal_target: "suggestions" } }

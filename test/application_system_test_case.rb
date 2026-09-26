@@ -15,12 +15,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   private
     def run_command(query, new_window: false)
       find("body").send_keys [ :meta, "k" ]
-      within "dialog.palette" do
-        find(".palette__input").set(query)
-        assert_selector ".palette__item[aria-selected=true]"
-        find(".palette__input").send_keys(new_window ? [ :shift, :enter ] : :enter)
+      within "dialog.rori-palette" do
+        find(".rori-palette__input").set(query)
+        assert_selector ".rori-palette__item[aria-selected=true]"
+        find(".rori-palette__input").send_keys(new_window ? [ :shift, :enter ] : :enter)
       end
-      assert_no_selector "dialog.palette[open]"
+      assert_no_selector "dialog.rori-palette[open]"
     end
 
     def press(*keys)
@@ -28,10 +28,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     def terminal_run(line)
-      input = find(".terminal__input")
+      input = find(".rori-terminal__input")
       input.set(line)
       input.send_keys :enter
-      assert_selector ".terminal__entry--echo", text: line
+      assert_selector ".rori-terminal__entry--echo", text: line
     end
 
     def boxes(*elements)
@@ -41,11 +41,11 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     # The page reads the timeout on load, so this wraps the visit.
     def with_hover_timeout(seconds)
-      previous = Desk.hover_timeout
-      Desk.hover_timeout = seconds
+      previous = Rori.hover_timeout
+      Rori.hover_timeout = seconds
       yield
     ensure
-      Desk.hover_timeout = previous
+      Rori.hover_timeout = previous
     end
 
     def focused_field_id = evaluate_script("document.activeElement.id")
@@ -61,15 +61,15 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
 
     def window_titled(title)
-      find("dialog.win[open]", text: title) { it.find(".win__title").text == title }
+      find("dialog.rori-win[open]", text: title) { it.find(".rori-win__title").text == title }
     end
 
     def assert_focused(title)
-      assert_selector "dialog.win.is-focused .win__title", exact_text: title
+      assert_selector "dialog.rori-win.is-focused .rori-win__title", exact_text: title
     end
 
     def assert_workspace(name)
-      assert_selector ".workspace-button[aria-current]", text: name
+      assert_selector ".rori-workspace-button[aria-current]", text: name
     end
 
     # Window edges measured from the viewport edges, once animations settle: [left, top, right, bottom].
@@ -77,7 +77,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       sleep 0.4
       evaluate_script(<<~JS, window)
         ((win) => {
-          const w = win.getBoundingClientRect(), v = document.querySelector(".viewport").getBoundingClientRect()
+          const w = win.getBoundingClientRect(), v = document.querySelector(".rori-viewport").getBoundingClientRect()
           return [w.left - v.left, w.top - v.top, v.right - w.right, v.bottom - w.bottom].map(Math.round)
         })(arguments[0])
       JS

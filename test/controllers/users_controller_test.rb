@@ -5,7 +5,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     get users_path
 
     assert_response :success
-    assert_select "main.viewport .floating > dialog.win[open] turbo-frame#win_main[src=?][complete]", users_path
+    assert_select "main.rori-viewport .rori-floating > dialog.rori-win[open] turbo-frame#win_main[src=?][complete]", users_path
     assert_equal "users", window_meta(frame: "win_main")["key"]
   end
 
@@ -13,7 +13,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     get_in_window users_path
 
     assert_response :success
-    assert_select "main.viewport", count: 0
+    assert_select "main.rori-viewport", count: 0
     assert_equal({ "size" => "lg", "mode" => "tile", "key" => "users", "title" => "Users" }, window_meta)
   end
 

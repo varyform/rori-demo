@@ -1,0 +1,17 @@
+-# locals: (command:)
+- shortcut = rori_shortcut(command.action)
+%li.rori-palette__item{ role: "option",
+  data: { rori_palette_target: "item", url: command.url, rori_action: command.action, param: command.param,
+    children: command.children, source: command.source, shortcut: shortcut,
+    current: command.current || nil, search: "#{command.label} #{command.group}",
+    action: "click->rori-palette#pick mousemove->rori-palette#hover" } }
+  %span.rori-palette__label
+    = command.label
+    - if command.children || command.source
+      %span.rori-palette__more ›
+  - if shortcut
+    %kbd.rori-palette__shortcut= shortcut
+  %span.rori-palette__group
+    - if command.current
+      %span.rori-palette__check ✓
+    = command.group

@@ -1,0 +1,7 @@
+%header.rori-menubar
+  %span.rori-menubar__brand= Rori.app_name
+  %nav.rori-workspaces{ "aria-label": t(".workspaces"), data: { rori_target: "workspaces" } }
+  %button.rori-menubar__search{ type: "button", data: { action: "rori-palette#open" } }
+    = t(".search")
+    %kbd ⌘K
+  %time.rori-menubar__clock{ data: { controller: "rori-clock" } }

@@ -1,0 +1,80 @@
+-# The desk shell: full page loads render the requested page as the first
+-# window. Apps add app-wide <head> tags (icons…) by overriding the
+-# layouts/rori/_head partial, and per page with `content_for :head`.
+!!!
+%html{ lang: I18n.locale, data: { theme: current_theme&.slug } }
+  %head
+    %title= windowed? ? window_title : Rori.app_name
+    %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }
+    %meta{ name: "apple-mobile-web-app-capable", content: "yes" }
+    %meta{ name: "application-name", content: Rori.app_name }
+    %meta{ name: "mobile-web-app-capable", content: "yes" }
+    -# Turbo's hover-prefetch cache is keyed by URL alone and hands its response
+    -# to the next fetch of that URL, whatever frame asks. Window frames have
+    -# generated ids, so a page prefetched for `_top` or another window arrives
+    -# without the requesting frame and the window shows "missing frame".
+    %meta{ name: "turbo-prefetch", content: "false" }
+    = csrf_meta_tags
+    = csp_meta_tag
+    = render "layouts/rori/head"
+    = yield :head
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = rori_stylesheet_link_tags "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  %body{ class: rori_wallpaper_classes,
+    style: ("--rori-wallpaper: #{rori_wallpaper.css_image}" if rori_wallpaper),
+    data: { controller: "rori rori-palette rori-theme rori-wallpaper rori-terminal",
+    rori_theme_cookie_value: Rori.theme_cookie,
+    rori_wallpaper_cookie_value: Rori.wallpaper_cookie,
+    rori_wallpaper_mode_value: rori_wallpaper_mode,
+    rori_terminal_root_value: rori_commands_path,
+    rori_terminal_key_value: Rori.terminal_key,
+    rori_terminal_prompt_value: t("rori.terminal.prompt"),
+    rori_terminal_messages_value: t("rori.terminal.messages").to_json,
+    rori_palette_root_value: rori_commands_path,
+    rori_root_url_value: root_path,
+    rori_load_error_value: t("rori.window.load_error"),
+    rori_workspace_group_value: t("rori.commands.workspaces.group"),
+    rori_new_workspace_label_value: t("rori.commands.workspaces.new"),
+    rori_keymap_value: Rori.resolved_keymap(rori_modifier).to_json,
+    rori_native_value: rori_native?.to_s,
+    rori_hover_keymap_value: Rori.resolved_hover_keymap.to_json,
+    rori_hover_timeout_value: (Rori.hover_timeout * 1000).round,
+    rori_discard_prompt_value: t("rori.window.discard"),
+    action: ["keydown@window->rori#keydown",
+      "keydown@window->rori-palette#keydown",
+      "resize@window->rori#layout",
+      "pagehide@window->rori#save",
+      "message->rori#streamMessage:capture",
+      "turbo:before-stream-render@document->rori#streamRender",
+      "turbo:before-visit@document->rori#interceptVisit",
+      "keydown@window->rori-terminal#keydown",
+      "rori-command:run->rori#command",
+      "rori-command:source->rori#commandSource",
+      "rori-command:run->rori-theme#run",
+      "rori-command:preview->rori-theme#preview",
+      "rori-command:closed->rori-theme#revert",
+      "rori-command:run->rori-wallpaper#run",
+      "rori-command:preview->rori-wallpaper#preview",
+      "rori-command:closed->rori-wallpaper#revert",
+      "rori:toggle-terminal->rori-terminal#toggle",
+      "rori:open-palette->rori-palette#open"].join(" ") } }
+    = render "rori/menubar"
+    %main.rori-viewport{ data: { rori_target: "viewport", action: "wheel->rori#wheel:!passive pointermove->rori#hover pointerleave->rori#unhover" } }
+      = render "rori/wallpaper"
+      .rori-stack{ data: { rori_target: "stack" } }
+      -# Windows wait here until their page says where they go; modals stay here.
+      .rori-floating{ data: { rori_target: "floating" } }
+        - if windowed?
+          = render "rori/window", frame_id: "win_main", src: (request.fullpath if request.get?), body: safe_join([yield, window_meta_tag])
+        - else
+          = yield
+      -# Tags the window whose field has focus (rori/typing_badge.css, anchor positioning).
+      %span.rori-typing-badge.rori-typing-badge--side{ "aria-hidden": "true" }= t("rori.window.typing")
+      %span.rori-typing-badge.rori-typing-badge--inside{ "aria-hidden": "true" }= t("rori.window.typing")
+    = render "rori/statusbar"
+    = render "rori/terminal"
+    = render "rori/palette"
+    %template{ data: { rori_target: "template" } }
+      = render "rori/window"

@@ -1,0 +1,64 @@
+@layer rori.components {
+  .rori-menubar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 0 var(--rori-gap);
+  }
+
+  .rori-menubar__brand {
+    font: 600 12px var(--rori-font-mono);
+  }
+
+  .rori-menubar__search {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 22px;
+    min-width: 18rem;
+    padding: 0 4px 0 10px;
+    border: 1px solid var(--rori-line);
+    border-radius: var(--rori-radius-sm);
+    color: var(--rori-ink-muted);
+    cursor: pointer;
+  }
+
+  .rori-menubar__search:hover {
+    border-color: var(--rori-ink-muted);
+    color: var(--rori-ink);
+  }
+
+  .rori-menubar__search kbd {
+    margin-left: auto;
+  }
+
+  .rori-menubar__clock {
+    font: 12px var(--rori-font-mono);
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-workspaces {
+    display: flex;
+    gap: 4px;
+  }
+
+  .rori-workspace-button {
+    height: 18px;
+    padding: 0 7px;
+    border-radius: 4px;
+    font: 11px var(--rori-font-mono);
+    color: var(--rori-ink-muted);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .rori-workspace-button:hover {
+    background: var(--rori-hover);
+  }
+
+  .rori-workspace-button[aria-current] {
+    background: var(--rori-primary);
+    color: var(--rori-on-primary);
+  }
+}

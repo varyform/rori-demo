@@ -1,0 +1,56 @@
+/* A green "<input>" tag on the window whose field has focus — keys type there
+   instead of reaching the desk (same field list as FIELDS in rori_controller.js).
+   Pure CSS: the window becomes the anchor through :has(:focus); the badges sit
+   in the untransformed viewport, so the window's overflow doesn't clip them and
+   anchor positioning follows the strip's transforms. */
+@layer rori.components {
+  .rori-col:not([data-w="1"])>.rori-win:has(:is(input, textarea, select, [contenteditable]):focus) {
+    anchor-name: --rori-typing;
+  }
+
+  /* Full-width columns have no room beside them: tag the inside corner instead. */
+  .rori-col[data-w="1"]>.rori-win:has(:is(input, textarea, select, [contenteditable]):focus) {
+    anchor-name: --rori-typing-inside;
+  }
+
+  .rori-typing-badge {
+    position: absolute;
+    z-index: 2;
+    display: none;
+    border-radius: 4px;
+    background: var(--rori-success);
+    color: var(--rori-surface);
+    font: 600 10px/1 var(--rori-font-mono);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Hangs off the window's left edge into the gutter, below the title bar;
+     flips to the right edge when the window touches the viewport's left. */
+  .rori-typing-badge--side {
+    position-anchor: --rori-typing;
+    position-area: left span-bottom;
+    position-try-fallbacks: flip-inline;
+    margin-top: 40px;
+    padding: 6px 3px;
+    writing-mode: vertical-rl;
+  }
+
+  .rori-typing-badge--inside {
+    position-anchor: --rori-typing-inside;
+    position-area: center;
+    align-self: end;
+    justify-self: start;
+    margin: 0 0 10px 10px;
+    padding: 3px 6px;
+  }
+
+  .rori-viewport:has(.rori-col:not([data-w="1"]) > .rori-win :is(input, textarea, select, [contenteditable]):focus) .rori-typing-badge--side,
+  .rori-viewport:has(.rori-col[data-w="1"] > .rori-win :is(input, textarea, select, [contenteditable]):focus) .rori-typing-badge--inside {
+    display: block;
+  }
+
+  .is-overview .rori-typing-badge {
+    display: none;
+  }
+}

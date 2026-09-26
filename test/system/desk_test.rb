@@ -6,14 +6,14 @@ class DeskTest < ApplicationSystemTestCase
     assert_text "Nothing open"
 
     run_command "new user"
-    within "dialog.win:modal" do
+    within "dialog.rori-win:modal" do
       fill_in "Name", with: "Grace"
       fill_in "Email", with: "grace@example.com"
       click_on "Create User"
     end
 
-    assert_no_selector "dialog.win:modal"
-    assert_selector ".col dialog.win", text: "Grace"
+    assert_no_selector "dialog.rori-win:modal"
+    assert_selector ".rori-col dialog.rori-win", text: "Grace"
     assert_current_path user_path(User.find_by!(email: "grace@example.com"))
   end
 
@@ -25,61 +25,61 @@ class DeskTest < ApplicationSystemTestCase
       click_on "New user"
     end
 
-    assert_selector "dialog.win:modal", text: "Name"
+    assert_selector "dialog.rori-win:modal", text: "Name"
     assert_no_text "couldn't be shown"
   end
 
   test "an optional wallpaper sits behind the strips, tinted toward the theme" do
-    Desk.wallpapers = true
+    Rori.wallpapers = true
     visit root_path
 
-    background = evaluate_script("getComputedStyle(document.querySelector('.viewport')).backgroundImage")
+    background = evaluate_script("getComputedStyle(document.querySelector('.rori-viewport')).backgroundImage")
     assert_match %r{image-set\(url\("https://images\.unsplash\.com/photo-}, background
-    assert_not_equal "none", evaluate_script("getComputedStyle(document.querySelector('.viewport'), '::before').backgroundColor")
+    assert_not_equal "none", evaluate_script("getComputedStyle(document.querySelector('.rori-viewport'), '::before').backgroundColor")
     assert_text "Nothing open"
   ensure
-    Desk.wallpapers = false
+    Rori.wallpapers = false
   end
 
   test "` opens the terminal; words walk the ⌘K tree and runs go through the same commands" do
-    Desk.wallpapers = true
+    Rori.wallpapers = true
     visit root_path
 
     type_into_focus "`"
-    assert_selector ".terminal"
+    assert_selector ".rori-terminal"
     assert_equal "terminal__input", evaluate_script("document.activeElement.className")
 
     terminal_run "ui wallpaper cover"
-    assert_selector ".terminal__entry--ok", text: "✓ UI › Wallpaper › Cover bars"
+    assert_selector ".rori-terminal__entry--ok", text: "✓ UI › Wallpaper › Cover bars"
     assert_selector "body.wallpaper-cover", visible: :all
 
     terminal_run "new user"
-    assert_selector "dialog.win:modal", text: "Name"
+    assert_selector "dialog.rori-win:modal", text: "Name"
 
     refresh
     assert_selector "body.wallpaper-cover", visible: :all
   ensure
-    Desk.wallpapers = false
+    Rori.wallpapers = false
   end
 
   test "terminal: Tab completes a level at a time, nested items list their children, ↑ recalls" do
     visit root_path
     type_into_focus "`"
-    input = find(".terminal__input")
+    input = find(".rori-terminal__input")
 
     input.send_keys "u"
-    assert_selector ".terminal__suggestion[aria-selected]", text: "ui ›"
+    assert_selector ".rori-terminal__suggestion[aria-selected]", text: "ui ›"
     input.send_keys :tab
     assert_equal "ui ", input.value
     input.send_keys "th"
-    assert_selector ".terminal__suggestion[aria-selected]", text: "theme ›"
+    assert_selector ".rori-terminal__suggestion[aria-selected]", text: "theme ›"
     input.send_keys :tab, :enter
 
-    assert_selector ".terminal__entry", text: "UI › Theme ›"
-    assert_selector ".terminal__entry--item", text: "nord"
+    assert_selector ".rori-terminal__entry", text: "UI › Theme ›"
+    assert_selector ".rori-terminal__entry--item", text: "nord"
 
     terminal_run "nothing-like-this"
-    assert_selector ".terminal__entry--error", text: "No match for “nothing-like-this”."
+    assert_selector ".rori-terminal__entry--error", text: "No match for “nothing-like-this”."
 
     input.send_keys :up
     assert_equal "nothing-like-this", input.value
@@ -90,31 +90,31 @@ class DeskTest < ApplicationSystemTestCase
   test "fuzzy matching spans nesting: uthen is UI › Theme › Nord, in ⌘K and the terminal" do
     visit root_path
     find("body").send_keys [ :meta, "k" ]
-    within "dialog.palette" do
-      find(".palette__input").set("uthen")
-      assert_selector ".palette__item[aria-selected=true]", text: "UI › Theme › Nord"
-      find(".palette__input").send_keys :enter
+    within "dialog.rori-palette" do
+      find(".rori-palette__input").set("uthen")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "UI › Theme › Nord"
+      find(".rori-palette__input").send_keys :enter
     end
     # Selecting already previews Nord; a closed palette means the pick itself ran.
-    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "dialog.rori-palette[open]"
     assert_selector "html[data-theme=nord]", visible: :all
 
     type_into_focus "`"
     terminal_run "uthed"
-    assert_selector ".terminal__entry--ok", text: "✓ UI › Theme › Default"
+    assert_selector ".rori-terminal__entry--ok", text: "✓ UI › Theme › Default"
     assert_no_selector "html[data-theme]", visible: :all
   end
 
   test "a top-level ranking still prefers shallow matches, and nested picks drill in" do
     visit root_path
     find("body").send_keys [ :meta, "k" ]
-    within "dialog.palette" do
-      find(".palette__input").set("ui th")
-      assert_selector ".palette__item[aria-selected=true]", text: "UI › Theme ›"
-      find(".palette__input").send_keys :enter
+    within "dialog.rori-palette" do
+      find(".rori-palette__input").set("ui th")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "UI › Theme ›"
+      find(".rori-palette__input").send_keys :enter
 
-      assert_selector ".palette__crumbs", text: "UI › Theme ›"
-      assert_selector ".palette__item[aria-selected=true][data-current]", text: "Default"
+      assert_selector ".rori-palette__crumbs", text: "UI › Theme ›"
+      assert_selector ".rori-palette__item[aria-selected=true][data-current]", text: "Default"
     end
   end
 
@@ -125,17 +125,17 @@ class DeskTest < ApplicationSystemTestCase
     assert_selector "#service_name:focus"
     type_into_focus "`"
     assert_equal "`", find("#service_name").value
-    assert_no_selector ".terminal"
+    assert_no_selector ".rori-terminal"
 
     type_into_focus :escape
     type_into_focus "`"
-    assert_selector ".terminal"
+    assert_selector ".rori-terminal"
     type_into_focus "`"
-    assert_no_selector ".terminal"
+    assert_no_selector ".rori-terminal"
 
     type_into_focus "`"
-    find(".terminal__input").send_keys :escape
-    assert_no_selector ".terminal"
+    find(".rori-terminal__input").send_keys :escape
+    assert_no_selector ".rori-terminal"
   end
 
   test "on an empty desk Space or Enter opens ⌘K; with a window open they don't" do
@@ -143,26 +143,26 @@ class DeskTest < ApplicationSystemTestCase
     assert_text "Nothing open"
 
     type_into_focus :space
-    assert_selector "dialog.palette[open]"
-    find(".palette__input").send_keys :escape
-    assert_no_selector "dialog.palette[open]"
+    assert_selector "dialog.rori-palette[open]"
+    find(".rori-palette__input").send_keys :escape
+    assert_no_selector "dialog.rori-palette[open]"
 
 
     type_into_focus :enter
-    assert_selector "dialog.palette[open]"
-    find(".palette__input").set("users")
-    assert_selector ".palette__item[aria-selected=true]", text: "Users"
-    find(".palette__input").send_keys :enter
+    assert_selector "dialog.rori-palette[open]"
+    find(".rori-palette__input").set("users")
+    assert_selector ".rori-palette__item[aria-selected=true]", text: "Users"
+    find(".rori-palette__input").send_keys :enter
     window_titled "Users"
 
     type_into_focus :space
-    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "dialog.rori-palette[open]"
   end
 
   test "invalid modal submissions keep the modal up with field errors" do
     visit root_path
     run_command "new user"
-    within "dialog.win:modal" do
+    within "dialog.rori-win:modal" do
       fill_in "Email", with: users(:oleh).email
       click_on "Create User"
       assert_selector ".user_name .error"
@@ -177,7 +177,7 @@ class DeskTest < ApplicationSystemTestCase
 
     run_command "oleh"
     window_titled "Oleh"
-    assert_selector ".col", count: 1
+    assert_selector ".rori-col", count: 1
 
     click_on "Back"
     window_titled "Users"
@@ -205,11 +205,11 @@ class DeskTest < ApplicationSystemTestCase
     run_command "oleh", new_window: true
     oleh = window_titled("Oleh")
 
-    assert_equal evaluate_script("innerWidth"), evaluate_script("document.querySelector('.viewport').clientWidth")
+    assert_equal evaluate_script("innerWidth"), evaluate_script("document.querySelector('.rori-viewport').clientWidth")
     assert_equal 12, window_insets(oleh)[2]
 
-    users = find("dialog.win .win__title", exact_text: "Users").ancestor("dialog.win")
-    users.find(".win__title").click
+    users = find("dialog.rori-win .rori-win__title", exact_text: "Users").ancestor("dialog.rori-win")
+    users.find(".rori-win__title").click
     assert_equal 12, window_insets(users)[0]
   ensure
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
@@ -218,7 +218,7 @@ class DeskTest < ApplicationSystemTestCase
   test "tables run edge to edge: row rules touch the window's borders, text stays aligned" do
     visit users_path
     window = window_titled("Users")
-    body, table, first_cell, meta = boxes(window.find(".win__body"), window.find("table.table"),
+    body, table, first_cell, meta = boxes(window.find(".rori-win__body"), window.find("table.table"),
       window.find("tbody td:first-child", match: :first), window.find(".toolbar__meta"))
 
     assert_in_delta body["left"], table["left"], 1
@@ -235,7 +235,7 @@ class DeskTest < ApplicationSystemTestCase
     window = window_titled("Users")
 
     assert_equal %w[ none none ], evaluate_script("[document.documentElement, document.body].map((el) => getComputedStyle(el).overscrollBehaviorX)")
-    assert_equal "contain", evaluate_script("getComputedStyle(arguments[0]).overscrollBehaviorX", window.find(".win__body"))
+    assert_equal "contain", evaluate_script("getComputedStyle(arguments[0]).overscrollBehaviorX", window.find(".rori-win__body"))
   end
 
   test "column widths cycle and go full width" do
@@ -254,14 +254,14 @@ class DeskTest < ApplicationSystemTestCase
     visit users_path
     run_command "oleh", new_window: true
     window_titled "Oleh"
-    assert_selector ".col", count: 2
+    assert_selector ".rori-col", count: 2
 
     press "["
-    assert_selector ".col", count: 1
-    assert_selector ".col > dialog.win", count: 2
+    assert_selector ".rori-col", count: 1
+    assert_selector ".rori-col > dialog.rori-win", count: 2
 
     press "]"
-    assert_selector ".col", count: 2
+    assert_selector ".rori-col", count: 2
   end
 
   test "pages choose their workspace and mode; workspaces stack vertically" do
@@ -287,25 +287,25 @@ class DeskTest < ApplicationSystemTestCase
     press :shift, "2"
     assert_workspace "2"
     assert_focused "Oleh"
-    assert_selector ".workspace[data-name='2'] .col", count: 1, visible: :all
+    assert_selector ".rori-workspace[data-name='2'] .rori-col", count: 1, visible: :all
 
     find("body").send_keys [ :meta, "k" ]
-    within "dialog.palette" do
-      find(".palette__input").set("move")
-      assert_selector ".palette__item[aria-selected=true]", text: "Move column to workspace"
-      find(".palette__input").send_keys :enter
+    within "dialog.rori-palette" do
+      find(".rori-palette__input").set("move")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "Move column to workspace"
+      find(".rori-palette__input").send_keys :enter
 
-      assert_selector ".palette__crumbs", text: "Move column to workspace… ›"
-      assert_selector ".palette__item", count: 2
-      find(".palette__input").set("1")
-      assert_selector ".palette__item[aria-selected=true]", text: "1"
-      find(".palette__input").send_keys :enter
+      assert_selector ".rori-palette__crumbs", text: "Move column to workspace… ›"
+      assert_selector ".rori-palette__item", count: 2
+      find(".rori-palette__input").set("1")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "1"
+      find(".rori-palette__input").send_keys :enter
     end
 
     assert_workspace "1"
     assert_focused "Oleh"
-    assert_selector ".workspace-button", count: 1
-    assert_selector ".col", count: 2
+    assert_selector ".rori-workspace-button", count: 1
+    assert_selector ".rori-col", count: 2
   end
 
   test "a field hovered in an inactive window lights up; one click activates the window and focuses it" do
@@ -341,29 +341,29 @@ class DeskTest < ApplicationSystemTestCase
   end
 
   test "the keymap modifier is configurable" do
-    Desk.modifier = "Control"
+    Rori.modifier = "Control"
     visit users_path
     run_command "oleh", new_window: true
     assert_focused "Oleh"
-    assert_selector ".statusbar__hint kbd", text: "⌃←→↑↓"
+    assert_selector ".rori-statusbar__hint kbd", text: "⌃←→↑↓"
 
     type_into_focus [ :alt, :left ]
     assert_focused "Oleh"
     type_into_focus [ :control, :left ]
     assert_focused "Users"
   ensure
-    Desk.modifier = "Alt"
+    Rori.modifier = "Alt"
   end
 
   test "hover keys: w over an inactive window closes it while a field elsewhere keeps focus; reopen brings it back" do
     with_hover_timeout(3) do
       editing_with_users_beside
 
-      find("dialog.win .win__title", exact_text: "Users").hover
-      assert_selector "dialog.win.is-armed .win__armed"
+      find("dialog.rori-win .rori-win__title", exact_text: "Users").hover
+      assert_selector "dialog.rori-win.is-armed .rori-win__armed"
       type_into_focus "w"
 
-      assert_no_selector "dialog.win .win__title", exact_text: "Users"
+      assert_no_selector "dialog.rori-win .rori-win__title", exact_text: "Users"
       assert_equal [ "service_name", "api-gateway" ], evaluate_script("[document.activeElement.id, document.activeElement.value]")
 
       type_into_focus :escape
@@ -376,9 +376,9 @@ class DeskTest < ApplicationSystemTestCase
     with_hover_timeout(0.3) do
       editing_with_users_beside
 
-      find("dialog.win .win__title", exact_text: "Users").hover
-      assert_selector "dialog.win.is-armed"
-      assert_no_selector "dialog.win.is-armed", wait: 2
+      find("dialog.rori-win .rori-win__title", exact_text: "Users").hover
+      assert_selector "dialog.rori-win.is-armed"
+      assert_no_selector "dialog.rori-win.is-armed", wait: 2
       type_into_focus "w"
 
       assert_equal "api-gatewayw", find("#service_name").value
@@ -390,10 +390,10 @@ class DeskTest < ApplicationSystemTestCase
     with_hover_timeout(3) do
       editing_with_users_beside
 
-      find("dialog.win .win__title", exact_text: "Users").hover
-      assert_selector "dialog.win.is-armed"
+      find("dialog.rori-win .rori-win__title", exact_text: "Users").hover
+      assert_selector "dialog.rori-win.is-armed"
       type_into_focus "x"
-      assert_no_selector "dialog.win.is-armed"
+      assert_no_selector "dialog.rori-win.is-armed"
       type_into_focus "w"
 
       assert_equal "api-gatewayxw", find("#service_name").value
@@ -409,9 +409,9 @@ class DeskTest < ApplicationSystemTestCase
       run_command "oleh", new_window: true
       window_titled "Oleh"
       run_command "new project"
-      assert_selector "dialog.win:modal"
+      assert_selector "dialog.rori-win:modal"
 
-      find("dialog.win .win__title", exact_text: "Users").hover
+      find("dialog.rori-win .rori-win__title", exact_text: "Users").hover
       type_into_focus "w"
 
       assert_equal "w", find("#project_name").value
@@ -424,13 +424,13 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "Projects"
 
     type_into_focus "w"
-    assert_no_selector "dialog.win[open]"
+    assert_no_selector "dialog.rori-win[open]"
 
     type_into_focus "u"
     window_titled "Projects"
 
     run_command "new project"
-    assert_selector "dialog.win:modal #project_name:focus"
+    assert_selector "dialog.rori-win:modal #project_name:focus"
     type_into_focus "w"
     assert_equal "w", find("#project_name").value
     window_titled "Projects"
@@ -442,21 +442,21 @@ class DeskTest < ApplicationSystemTestCase
     form = window_titled("New service")
     assert_equal "service_name", evaluate_script("document.activeElement.id")
 
-    side = find(".typing-badge--side", text: "<input>")
-    assert_no_selector ".typing-badge--inside"
+    side = find(".rori-typing-badge--side", text: "<input>")
+    assert_no_selector ".rori-typing-badge--inside"
     window_box, badge_box = boxes(form, side)
     assert_in_delta window_box["left"], badge_box["right"], 1, "hangs off the left edge"
     assert_operator badge_box["top"], :>, window_box["top"]
 
     type_into_focus :escape
-    assert_no_selector ".typing-badge"
+    assert_no_selector ".rori-typing-badge"
 
     find("#service_name").click
     type_into_focus :escape
     type_into_focus [ :alt, "f" ]
     find("#service_name").click
-    inside = find(".typing-badge--inside", text: "<input>")
-    assert_no_selector ".typing-badge--side"
+    inside = find(".rori-typing-badge--inside", text: "<input>")
+    assert_no_selector ".rori-typing-badge--side"
     window_box, badge_box = boxes(form, inside)
     assert_operator badge_box["left"], :>, window_box["left"]
     assert_operator badge_box["bottom"], :<, window_box["bottom"]
@@ -467,7 +467,7 @@ class DeskTest < ApplicationSystemTestCase
     form = window_titled("New service")
     find("#service_name").click
 
-    window_box, badge_box = boxes(form, find(".typing-badge--side"))
+    window_box, badge_box = boxes(form, find(".rori-typing-badge--side"))
     assert_in_delta window_box["right"], badge_box["left"], 1
   end
 
@@ -479,7 +479,7 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "New service"
 
     accept_confirm(/unsaved changes/) { click_button "Close" }
-    assert_no_selector "dialog.win[open]"
+    assert_no_selector "dialog.rori-win[open]"
   end
 
   test "programmatic focus on a window's dialog (as dialog.show() does) doesn't switch focus or workspace" do
@@ -489,7 +489,7 @@ class DeskTest < ApplicationSystemTestCase
     assert_workspace "projects"
 
     # What a restored window's show() does, possibly after the restore finished.
-    execute_script("document.querySelector('.workspace[data-name=\"1\"] dialog.win').focus()")
+    execute_script("document.querySelector('.rori-workspace[data-name=\"1\"] dialog.rori-win').focus()")
     assert_workspace "projects"
     assert_focused "Projects"
     assert_current_path projects_path
@@ -500,7 +500,7 @@ class DeskTest < ApplicationSystemTestCase
     run_command "oleh", new_window: true
     assert_focused "Oleh"
 
-    execute_script("document.querySelector('dialog.win:not(.is-focused) a').focus()")
+    execute_script("document.querySelector('dialog.rori-win:not(.is-focused) a').focus()")
     assert_focused "Users"
   end
 
@@ -542,7 +542,7 @@ class DeskTest < ApplicationSystemTestCase
     window_titled "Projects"
     assert_workspace "projects"
 
-    find(".workspace-button", text: "1").click
+    find(".rori-workspace-button", text: "1").click
     window_titled "Users"
   end
 
@@ -557,45 +557,45 @@ class DeskTest < ApplicationSystemTestCase
     User.create!(name: "Linus", email: "linus@example.com")
     Turbo::StreamsChannel.broadcast_refresh_to(:users)
 
-    find(".workspace-button", text: "1").click
+    find(".rori-workspace-button", text: "1").click
     within(window_titled("Users")) { assert_text "Linus" }
-    find(".workspace-button", text: "projects").click
+    find(".rori-workspace-button", text: "projects").click
     window_titled "Desk UI"
   end
 
   test "nested theme picker previews on the way, reverts on close and persists a pick" do
     visit root_path
     find("body").send_keys [ :meta, "k" ]
-    within "dialog.palette" do
-      find(".palette__input").set("theme")
-      assert_selector ".palette__item[aria-selected=true]", text: "Pick theme"
-      find(".palette__input").send_keys :enter
+    within "dialog.rori-palette" do
+      find(".rori-palette__input").set("theme")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "Pick theme"
+      find(".rori-palette__input").send_keys :enter
 
-      assert_selector ".palette__crumbs", text: "Pick theme… ›"
-      assert_selector ".palette__item[aria-selected=true][data-current]", text: "Default"
-      find(".palette__input").send_keys :down
+      assert_selector ".rori-palette__crumbs", text: "Pick theme… ›"
+      assert_selector ".rori-palette__item[aria-selected=true][data-current]", text: "Default"
+      find(".rori-palette__input").send_keys :down
     end
     assert_selector "html[data-theme=catppuccin-latte]", visible: :all
 
-    within("dialog.palette") { find(".palette__input").send_keys :escape }
-    assert_selector "dialog.palette .palette__item", text: "Pick theme"
-    assert_no_selector "dialog.palette .palette__crumbs"
-    within("dialog.palette") { find(".palette__input").send_keys :escape }
-    assert_no_selector "dialog.palette[open]"
+    within("dialog.rori-palette") { find(".rori-palette__input").send_keys :escape }
+    assert_selector "dialog.rori-palette .rori-palette__item", text: "Pick theme"
+    assert_no_selector "dialog.rori-palette .rori-palette__crumbs"
+    within("dialog.rori-palette") { find(".rori-palette__input").send_keys :escape }
+    assert_no_selector "dialog.rori-palette[open]"
     assert_no_selector "html[data-theme]", visible: :all
 
     find("body").send_keys [ :meta, "k" ]
-    within "dialog.palette" do
-      find(".palette__input").set("theme")
-      assert_selector ".palette__item[aria-selected=true]", text: "Pick theme"
-      find(".palette__input").send_keys :enter
-      assert_selector ".palette__crumbs"
-      find(".palette__input").set("nord")
-      assert_selector ".palette__item[aria-selected=true]", text: "Nord"
-      find(".palette__input").send_keys :enter
+    within "dialog.rori-palette" do
+      find(".rori-palette__input").set("theme")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "Pick theme"
+      find(".rori-palette__input").send_keys :enter
+      assert_selector ".rori-palette__crumbs"
+      find(".rori-palette__input").set("nord")
+      assert_selector ".rori-palette__item[aria-selected=true]", text: "Nord"
+      find(".rori-palette__input").send_keys :enter
     end
     # The selection already previews Nord; the closed palette means the pick itself ran and was saved.
-    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "dialog.rori-palette[open]"
     assert_selector "html[data-theme=nord]", visible: :all
 
     refresh
@@ -634,32 +634,32 @@ class DeskTest < ApplicationSystemTestCase
     assert_equal true, escape_default_prevented.call
 
     run_command "new user"
-    assert_selector "dialog.win:modal #user_name:focus"
+    assert_selector "dialog.rori-win:modal #user_name:focus"
     assert_equal true, escape_default_prevented.call, "claimed with a modal open too"
-    assert_no_selector "dialog.win:modal"
+    assert_no_selector "dialog.rori-win:modal"
     window_titled "Users"
 
     run_command "new user"
     fill_in "Name", with: "draft"
     dismiss_confirm(/unsaved changes/) { type_into_focus :escape }
-    assert_selector "dialog.win:modal"
+    assert_selector "dialog.rori-win:modal"
     accept_confirm(/unsaved changes/) { type_into_focus :escape }
-    assert_no_selector "dialog.win:modal"
+    assert_no_selector "dialog.rori-win:modal"
 
     find("body").send_keys [ :meta, "k" ]
-    assert_selector "dialog.palette[open]"
+    assert_selector "dialog.rori-palette[open]"
     assert_equal true, escape_default_prevented.call
-    assert_no_selector "dialog.palette[open]"
+    assert_no_selector "dialog.rori-palette[open]"
   ensure
     page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: "")
   end
 
   test "Esc closes a modal window" do
     visit new_project_path
-    assert_selector "dialog.win:modal"
+    assert_selector "dialog.rori-win:modal"
 
-    find("dialog.win:modal").send_keys :escape
-    assert_no_selector "dialog.win[open]"
+    find("dialog.rori-win:modal").send_keys :escape
+    assert_no_selector "dialog.rori-win[open]"
     assert_current_path root_path
   end
 end

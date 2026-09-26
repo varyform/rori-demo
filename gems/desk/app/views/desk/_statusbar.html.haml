@@ -1,5 +1,0 @@
-%footer.statusbar
-  %nav.minimap{ "aria-label": t(".columns"), data: { desk_target: "minimap" } }
-  %span.statusbar__hint= t(".hint_html", mod: Desk.modifier_symbol(desk_modifier))
-  - if desk_wallpaper
-    = link_to t(".wallpaper"), desk_wallpaper.url(3200), class: "statusbar__credit", target: "_blank", rel: "noopener"

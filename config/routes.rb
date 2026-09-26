@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  draw :desk
+  draw :rori
 
   resources :users
   resources :projects
@@ -14,5 +14,5 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  root "desk/desktops#show"
+  root "rori/desktops#show"
 end

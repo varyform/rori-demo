@@ -1,0 +1,114 @@
+@layer rori.layout {
+
+  /* minmax(0, 1fr): an implicit `auto` column would grow to the widest bar's
+     content (e.g. the unwrapped status hint) and push the viewport past the
+     window on narrow or zoomed screens, leaving focused columns cut off. */
+  /* A two-finger swipe that overscrolls the page is history navigation in
+     Chrome and Safari ("back" on a leftward swipe). Sideways swipes belong to
+     the strip, and the desk manages windows itself, so the page never lets
+     overscroll through — nor pull-to-refresh or rubber-banding. */
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
+  body {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 32px 1fr 36px;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  /* Workspaces stack vertically; each is an endless horizontal strip of columns.
+     rori_controller.js sets column widths and the strip/stack transforms. */
+  /* clip, not hidden: dialog.show() focuses the window and would scroll a
+     hidden-overflow box behind the transforms' back. */
+  .rori-viewport {
+    position: relative;
+    overflow: clip;
+  }
+
+  .rori-stack {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    transition: transform var(--rori-motion) var(--rori-ease);
+  }
+
+  .rori-workspace {
+    height: 100%;
+    overflow: clip;
+  }
+
+  .is-overview .rori-workspace {
+    overflow: visible;
+  }
+
+  .rori-strip {
+    display: flex;
+    gap: var(--rori-gap);
+    width: max-content;
+    height: 100%;
+    padding: var(--rori-gap);
+    transition: transform var(--rori-motion) var(--rori-ease);
+  }
+
+  .rori-col {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--rori-gap);
+    min-width: 0;
+    transition: width var(--rori-motion) var(--rori-ease);
+  }
+
+  /* Loading windows wait here unseen; modals live here in the top layer. */
+  .rori-floating {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .rori-floating>.rori-win:not(:modal) {
+    display: none;
+  }
+
+  .is-booting :is(.rori-stack, .rori-strip, .rori-col),
+  .is-scrolling .rori-strip {
+    transition: none;
+  }
+
+  .is-overview .rori-workspace {
+    outline: 1px dashed var(--rori-line);
+    outline-offset: -1px;
+  }
+
+  .is-overview .rori-win {
+    cursor: pointer;
+  }
+
+  .is-overview .rori-win__body {
+    pointer-events: none;
+  }
+
+  .rori-wallpaper {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    text-align: center;
+    color: var(--rori-ink-muted);
+    pointer-events: none;
+  }
+
+  .rori-viewport:not(.is-empty) .rori-wallpaper {
+    display: none;
+  }
+
+  .rori-wallpaper__title {
+    font-weight: 600;
+    color: var(--rori-ink);
+  }
+}

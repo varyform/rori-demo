@@ -1,0 +1,106 @@
+@layer rori.components {
+  .rori-palette {
+    width: min(36rem, calc(100vw - 2rem));
+    margin: 12vh auto auto;
+    padding: 0;
+    border: 1px solid var(--rori-ink);
+    border-radius: var(--rori-radius);
+    background: var(--rori-surface);
+    color: var(--rori-ink);
+  }
+
+  .rori-palette::backdrop {
+    background: var(--rori-backdrop);
+  }
+
+  .rori-palette__field {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--rori-line);
+  }
+
+  .rori-palette__crumbs {
+    padding-left: 16px;
+    font: 12px var(--rori-font-mono);
+    color: var(--rori-ink-muted);
+    white-space: nowrap;
+  }
+
+  .rori-palette__input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .rori-palette__crumbs:not([hidden])+.rori-palette__input {
+    padding-left: 8px;
+  }
+
+  .rori-palette__input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .rori-palette__results {
+    display: block;
+    max-height: 22rem;
+    overflow: auto;
+  }
+
+  .rori-palette__list {
+    padding: 4px;
+  }
+
+  .rori-palette__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 12px;
+    border-radius: var(--rori-radius-sm);
+    cursor: pointer;
+  }
+
+  .rori-palette__item[aria-selected="true"] {
+    background: var(--rori-primary);
+    color: var(--rori-on-primary);
+  }
+
+  .rori-palette__label {
+    flex: 1;
+  }
+
+  .rori-palette__group {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  /* The command's keyboard shortcut, before its group. currentColor keeps it
+     legible on the inverted selected row too. */
+  .rori-palette__shortcut {
+    align-self: center;
+    padding: 0 5px;
+    border: 1px solid color-mix(in oklch, currentColor 30%, transparent);
+    border-radius: 4px;
+    color: inherit;
+    opacity: 0.75;
+    white-space: nowrap;
+  }
+
+  .rori-palette__more,
+  .rori-palette__check {
+    margin: 0 4px;
+  }
+
+  .rori-palette__empty {
+    padding: 16px;
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-palette__hint {
+    padding: 8px 12px;
+    border-top: 1px solid var(--rori-line);
+    color: var(--rori-ink-muted);
+    font-size: 12px;
+  }
+}

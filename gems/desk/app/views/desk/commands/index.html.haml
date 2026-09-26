@@ -1,5 +1,0 @@
--# Shared by every palette list (root and nested). The explicit partial path
--# keeps namespaced controllers (Desk::Commands::…) from prefixing it.
-= turbo_frame_tag "commands" do
-  %ul.palette__list{ role: "listbox", data: { desk_palette_target: "list" } }
-    = render partial: "desk/commands/command", collection: @commands, as: :command

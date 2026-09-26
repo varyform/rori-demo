@@ -1,9 +1,0 @@
--# Drop-down command line (desk-terminal, on <body>). data-desk-keys=off keeps
--# desk shortcuts and hover keys out while you type here.
-%section.terminal{ hidden: true, "aria-label": t(".label"), data: { desk_keys: "off", desk_terminal_target: "panel" } }
-  .terminal__output{ "aria-live": "polite", data: { desk_terminal_target: "output" } }
-  %label.terminal__line
-    %span.terminal__prompt= t(".prompt")
-    %input.terminal__input{ type: "text", autocomplete: "off", spellcheck: "false", "aria-label": t(".label"),
-      data: { "1p-ignore": true, desk_terminal_target: "input", action: "input->desk-terminal#suggest keydown->desk-terminal#navigate" } }
-  %ul.terminal__suggestions{ data: { desk_terminal_target: "suggestions" } }

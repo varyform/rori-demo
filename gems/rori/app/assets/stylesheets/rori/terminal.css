@@ -1,0 +1,85 @@
+/* Quake-style drop-down under the menubar (rori-terminal). Fixed, so it stays
+   out of the body grid; slides in via @starting-style. */
+@layer rori.components {
+  .rori-terminal {
+    position: fixed;
+    inset: 32px 0 auto;
+    z-index: 20;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    height: min(44vh, 28rem);
+    border-bottom: 1px solid var(--rori-ink);
+    background: var(--rori-surface);
+    color: var(--rori-ink);
+    font: 12px/1.6 var(--rori-font-mono);
+    translate: 0;
+    transition: translate 160ms var(--rori-ease);
+  }
+
+  @starting-style {
+    .rori-terminal {
+      translate: 0 -100%;
+    }
+  }
+
+  .rori-terminal__output {
+    overflow: auto;
+    padding: 10px var(--rori-gap) 4px;
+    white-space: pre-wrap;
+  }
+
+  .rori-terminal__entry--muted,
+  .rori-terminal__entry--item {
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-terminal__entry--ok {
+    color: var(--rori-success);
+  }
+
+  .rori-terminal__entry--error {
+    color: var(--rori-danger);
+  }
+
+  .rori-terminal__line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px var(--rori-gap);
+    border-top: 1px solid var(--rori-line);
+  }
+
+  .rori-terminal__prompt {
+    color: var(--rori-success);
+    white-space: nowrap;
+  }
+
+  .rori-terminal__input {
+    flex: 1;
+    min-width: 0;
+    outline: none;
+    caret-color: var(--rori-success);
+  }
+
+  .rori-terminal__suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    min-height: 26px;
+    padding: 0 var(--rori-gap) 6px;
+    color: var(--rori-ink-muted);
+  }
+
+  .rori-terminal__suggestion {
+    display: flex;
+    gap: 6px;
+  }
+
+  .rori-terminal__suggestion[aria-selected] {
+    color: var(--rori-ink);
+  }
+
+  .rori-terminal__group {
+    opacity: 0.6;
+  }
+}

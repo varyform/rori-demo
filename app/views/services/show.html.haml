@@ -3,7 +3,7 @@
 .toolbar
   %dl.props
     %dt= Service.human_attribute_name(:user)
-    %dd= desk_link_to @service.user.name, @service.user
+    %dd= rori_link_to @service.user.name, @service.user
     %dt= Service.human_attribute_name(:repository)
     %dd= @service.repository.present? ? link_to(@service.repository, @service.repository, target: "_blank", rel: "noopener") : "—"
     %dt= Service.human_attribute_name(:branch)

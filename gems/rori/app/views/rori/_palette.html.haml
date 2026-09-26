@@ -1,0 +1,13 @@
+%dialog.rori-palette{ "aria-label": t(".label"), data: { rori_palette_target: "dialog", action: "click->rori-palette#backdrop close->rori-palette#closed" } }
+  .rori-palette__field
+    %span.rori-palette__crumbs{ hidden: true, data: { rori_palette_target: "crumbs" } }
+    %input.rori-palette__input{ type: "search", placeholder: t(".placeholder"), autocomplete: "off", spellcheck: "false",
+      data: { "1p-ignore": true, rori_palette_target: "input", action: "input->rori-palette#filter keydown->rori-palette#navigate" } }
+  -# No src until the palette opens: it loads the root list (rori-palette's rootValue) on every open.
+  = turbo_frame_tag "commands", class: "rori-palette__results",
+    data: { rori_palette_target: "frame", action: "turbo:frame-load->rori-palette#loaded" }
+  %p.rori-palette__empty{ hidden: true, data: { rori_palette_target: "empty" } }= t(".empty")
+  %footer.rori-palette__hint= t(".hint_html")
+  -# Prototype for items of browser-provided lists (Rori::Command `source:`).
+  %template{ data: { rori_palette_target: "itemTemplate" } }
+    = render "rori/commands/command", command: Rori::Command.new(label: "", group: "")

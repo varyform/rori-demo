@@ -3,5 +3,5 @@ import { application } from "controllers/application"
 import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 eagerLoadControllersFrom("controllers", application)
 
-import { registerDesk } from "desk"
-registerDesk(application)
+import { registerRori } from "rori"
+registerRori(application)

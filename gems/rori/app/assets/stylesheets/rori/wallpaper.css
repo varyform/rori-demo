@@ -1,0 +1,32 @@
+/* Optional photo (Rori.wallpapers; UI › Wallpaper picks the mode). Windows are
+   opaque, so it shows through the gutters and on an empty desk. `safe` keeps it
+   inside the desk; `wallpaper-cover` runs it behind the menu and status bars. */
+@layer rori.layout {
+
+  body.has-wallpaper:not(.wallpaper-cover) .rori-viewport,
+  body.has-wallpaper.wallpaper-cover {
+    background: var(--rori-wallpaper) center / cover no-repeat;
+  }
+
+  /* Tinted toward the theme's canvas so light and dark themes both stay calm
+     and the empty-desk hint stays readable. */
+  body.has-wallpaper .rori-viewport::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--rori-canvas) 35%, transparent);
+    pointer-events: none;
+  }
+
+  body.has-wallpaper.wallpaper-cover :is(.rori-menubar, .rori-statusbar) {
+    background: color-mix(in oklch, var(--rori-canvas) 72%, transparent);
+  }
+
+  body.has-wallpaper .rori-wallpaper {
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    padding: 14px 20px;
+    border-radius: var(--rori-radius);
+    background: color-mix(in oklch, var(--rori-surface) 88%, transparent);
+  }
+}

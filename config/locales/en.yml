@@ -90,7 +90,7 @@ en:
             environment:
               assignments: "has lines that aren't KEY=value: %{lines}"
 
-  desk:
+  rori:
     commands:
       # ⌘K entries. A parameterless GET route shows up once it has a label here.
       routes:

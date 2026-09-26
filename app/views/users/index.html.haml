@@ -2,7 +2,7 @@
 = turbo_stream_from :users
 .toolbar
   %p.toolbar__meta= t(".count", count: @users.size)
-  = desk_link_to t(".new"), new_user_path, class: "btn btn--primary"
+  = rori_link_to t(".new"), new_user_path, class: "btn btn--primary"
 - if @users.any?
   %table.table
     %thead

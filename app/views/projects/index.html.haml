@@ -2,7 +2,7 @@
 = turbo_stream_from :projects
 .toolbar
   %p.toolbar__meta= t(".count", count: @projects.size)
-  = desk_link_to t(".new"), new_project_path, class: "btn btn--primary"
+  = rori_link_to t(".new"), new_project_path, class: "btn btn--primary"
 - if @projects.any?
   %table.table
     %thead

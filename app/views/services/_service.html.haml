@@ -5,5 +5,5 @@
     %code= service.region
   %td= service.human_size
   %td.table__num= service.replicas
-  %td= desk_link_to service.user.name, service.user
+  %td= rori_link_to service.user.name, service.user
   %td= l(service.updated_at, format: :short)

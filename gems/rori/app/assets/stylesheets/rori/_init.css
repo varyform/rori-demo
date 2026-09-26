@@ -1,0 +1,78 @@
+/* The desk's CSS lives in one `desk` layer with its own sub-layers, so it never
+   mixes into the host's layers. Hosts position it with one name, e.g.
+     @layer reset, base, rori, layout, components, utilities;
+   Unmentioned, it lands after the host's layers (it loads later). Keep it
+   after the host's token layer: desk.themes overrides the host's colours. */
+@layer rori {
+  @layer reset, tokens, base, layout, components, themes;
+}
+
+/* Rori tokens: the host's semantic tokens when it has them, standalone
+   defaults otherwise. Components use only --rori-*. Computed on :root, so
+   themes (which set the host names on :root) flow through. */
+@layer rori.tokens {
+  :root {
+    --rori-gap: var(--gap, 12px);
+    --rori-radius: var(--radius, 10px);
+    --rori-radius-sm: var(--radius-sm, 6px);
+    --rori-ease: var(--ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+    --rori-motion: var(--motion, 320ms);
+    --rori-font-sans: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
+    --rori-font-mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+
+    --rori-canvas: var(--color-canvas, light-dark(oklch(0.95 0 0), oklch(0.14 0 0)));
+    --rori-surface: var(--color-surface, light-dark(oklch(0.995 0 0), oklch(0.195 0 0)));
+    --rori-ink: var(--color-ink, light-dark(oklch(0.2 0 0), oklch(0.94 0 0)));
+    --rori-ink-muted: var(--color-ink-muted, color-mix(in oklch, var(--rori-ink) 60%, var(--rori-surface)));
+    --rori-line: var(--color-line, color-mix(in oklch, var(--rori-ink) 14%, var(--rori-surface)));
+    --rori-primary: var(--color-primary, var(--rori-ink));
+    --rori-on-primary: var(--color-on-primary, var(--rori-surface));
+    --rori-success: var(--color-success, light-dark(oklch(0.55 0.12 150), oklch(0.74 0.1 150)));
+    --rori-danger: var(--color-danger, light-dark(oklch(0.55 0.16 27), oklch(0.7 0.13 25)));
+    --rori-hover: var(--color-hover, color-mix(in oklch, var(--rori-ink) 6%, transparent));
+    --rori-backdrop: var(--color-backdrop, color-mix(in oklch, oklch(0 0 0) 45%, transparent));
+  }
+}
+
+/* Just enough reset for the desk's own chrome, whatever the host resets.
+   :where() keeps it at zero specificity; window content is left to the host. */
+@layer rori.reset {
+  :where(.rori-menubar, .rori-statusbar, .rori-viewport, .rori-palette, .rori-terminal) :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
+  :where(.rori-menubar, .rori-statusbar, .rori-palette, .rori-terminal, .rori-win__bar, .rori-wallpaper) :where(button, input, ul, p, dl, dd, label) {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    list-style: none;
+  }
+
+  :where(.rori-menubar, .rori-statusbar, .rori-viewport, .rori-palette, .rori-terminal) [hidden] {
+    display: none !important;
+  }
+}
+
+/* The shell owns the page: its type and colours come from the tokens (so from
+   the host's, when set). */
+@layer rori.base {
+  html {
+    background: var(--rori-canvas);
+    color: var(--rori-ink);
+    font: 13px/1.45 var(--rori-font-sans);
+  }
+
+  body {
+    margin: 0;
+  }
+
+  :where(.rori-menubar, .rori-statusbar, .rori-palette, .rori-terminal, .rori-wallpaper) kbd {
+    padding: 0 4px;
+    border: 1px solid var(--rori-line);
+    font: 12px var(--rori-font-mono);
+  }
+}

@@ -1,0 +1,5 @@
+-# Shared by every palette list (root and nested). The explicit partial path
+-# keeps namespaced controllers (Rori::Commands::…) from prefixing it.
+= turbo_frame_tag "commands" do
+  %ul.rori-palette__list{ role: "listbox", data: { rori_palette_target: "list" } }
+    = render partial: "rori/commands/command", collection: @commands, as: :command
