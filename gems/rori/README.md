@@ -78,6 +78,30 @@ See `lib/rori.rb` for everything: `app_name`, `records`, `commands`, `keymap`,
 `modifier` / `native_modifier` / `native_user_agent`, `hover_keys`,
 `terminal_key`, `wallpapers`, theme and wallpaper files and cookies.
 
+### Records in ⌘K
+
+```ruby
+Rori.configure do |rori|
+  rori.records = %w[ User Project ]
+  rori.record_limit = 25   # the default
+end
+```
+
+Each time ⌘K opens (and when the terminal loads its commands), the desk lists
+the `record_limit` most recently updated records of every model named here,
+so typing “ada” jumps straight to that user. An entry is labelled with
+`record.to_s`, grouped by `Model.model_name.human`, and opens
+`polymorphic_path(record)` in a window. Each model therefore needs:
+
+- an `updated_at` column (the list is ordered by it);
+- a show route, e.g. `resources :users` (`polymorphic_path` raises without one);
+- a meaningful `to_s`, or the label reads `#<User:0x…>`.
+
+It's a shortcut to recent work, not a search: older records don't appear, and
+each model costs one query per open. Leaving a model out only drops its
+records from ⌘K; its pages still open from links, and its index can still be
+listed through a route label (`rori.commands.routes.<controller>.index`).
+
 ### Server-side commands and notifications
 
 ```ruby
