@@ -1,5 +1,7 @@
-PATH
-  remote: gems/rori
+GIT
+  remote: https://github.com/varyform/rori.git
+  revision: 33bdce2516867b0147271d9d38dcb9ef336644a9
+  branch: main
   specs:
     rori (0.1.0)
       haml (>= 6.0)

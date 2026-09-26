@@ -68,4 +68,4 @@ end
 gem "haml-rails", "~> 3.1"
 gem "simple_form", "~> 5.4"
 
-gem "rori", path: "gems/rori"
+gem "rori", github: "varyform/rori", branch: "main"

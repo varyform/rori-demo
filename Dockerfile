@@ -37,8 +37,6 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY vendor/* ./vendor/
-# Path gems (gems/rori) must exist before bundle install.
-COPY gems ./gems
 COPY Gemfile Gemfile.lock ./
 
 RUN bundle install && \
