@@ -3,6 +3,15 @@
   /* minmax(0, 1fr): an implicit `auto` column would grow to the widest bar's
      content (e.g. the unwrapped status hint) and push the viewport past the
      window on narrow or zoomed screens, leaving focused columns cut off. */
+  /* A two-finger swipe that overscrolls the page is history navigation in
+     Chrome and Safari ("back" on a leftward swipe). Sideways swipes belong to
+     the strip, and the desk manages windows itself, so the page never lets
+     overscroll through — nor pull-to-refresh or rubber-banding. */
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   body {
     height: 100vh;
     display: grid;

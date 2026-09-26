@@ -94,10 +94,13 @@
   }
 
   /* Pages lay out against the window, not the viewport (see forms.css). */
+  /* contain: scrolling a wide table to its edge stops there instead of
+     chaining on to the page (where a sideways overscroll means "back"). */
   .win__body {
     flex: 1;
     min-height: 0;
     overflow: auto;
+    overscroll-behavior: contain;
     container-type: inline-size;
   }
 

@@ -228,6 +228,16 @@ class DeskTest < ApplicationSystemTestCase
     assert_operator first_cell["left"], :<, text_left
   end
 
+  # A real trackpad swipe can't be synthesized headless; this pins the CSS that
+  # keeps overscroll (and so swipe-back navigation) from reaching the page.
+  test "overscroll never reaches the page, so a two-finger swipe can't navigate back" do
+    visit users_path
+    window = window_titled("Users")
+
+    assert_equal %w[ none none ], evaluate_script("[document.documentElement, document.body].map((el) => getComputedStyle(el).overscrollBehaviorX)")
+    assert_equal "contain", evaluate_script("getComputedStyle(arguments[0]).overscrollBehaviorX", window.find(".win__body"))
+  end
+
   test "column widths cycle and go full width" do
     visit users_path
     users = window_titled("Users")
