@@ -1,5 +1,7 @@
 require "test_helper"
 
+# The engine's own suite covers running commands in general; this checks the
+# demo's reindex_search wiring (initializer, locale, job).
 class Rori::Commands::RunsControllerTest < ActionDispatch::IntegrationTest
   include ActiveJob::TestHelper
   include ActionCable::TestHelper
@@ -17,41 +19,9 @@ class Rori::Commands::RunsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "a failing command answers with a sticky error notification" do
-    with_runnable(:explode, -> { raise "boom" }) do
-      post rori_commands_runs_path, params: { name: "explode" }, as: :turbo_stream
-    end
-
-    assert_response :unprocessable_entity
-    assert_select ".rori-notification--error.rori-notification--sticky[role=alert] .rori-notification__body", "boom"
-  end
-
-  test "a command without a message reports Done" do
-    with_runnable(:quiet, -> { 42 }) do
-      post rori_commands_runs_path, params: { name: "quiet" }, as: :turbo_stream
-    end
-
-    assert_select ".rori-notification__body", "Done"
-  end
-
-  test "unknown commands are not found" do
-    post rori_commands_runs_path, params: { name: "nope" }, as: :turbo_stream
-
-    assert_response :not_found
-  end
-
   test "the job notifies every open desk when it's done" do
     assert_broadcasts Rori.notifications_stream, 1 do
       ReindexSearchJob.perform_now(0)
     end
   end
-
-  private
-    def with_runnable(name, block)
-      I18n.backend.store_translations(:en, rori: { commands: { custom: { name => name.to_s.humanize } } })
-      Rori.command(name, &block)
-      yield
-    ensure
-      Rori.runnables.delete(name.to_s)
-    end
 end
