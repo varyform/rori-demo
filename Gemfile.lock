@@ -427,6 +427,7 @@ DEPENDENCIES
   rails (~> 8.1.4)
   rori (~> 0.1)
   rubocop-rails-omakase
+  ruby-vips
   selenium-webdriver
   simple_form (~> 5.4)
   solid_cable
