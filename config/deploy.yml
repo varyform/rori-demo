@@ -1,7 +1,11 @@
 # The public demo: one server, SQLite on a volume, jobs in Puma, data reset
-# nightly (DemoResetJob, config/recurring.yml). Set the server and hostname
-# in the environment, then `bin/kamal setup` once and `bin/kamal deploy`:
-#   DEMO_SERVER=203.0.113.7 DEMO_HOST=rori.example.com bin/kamal deploy
+# nightly (DemoResetJob, config/recurring.yml). Server, hostname and job mode
+# come from .env.deploy (copy .env.deploy.example); variables already set in
+# the shell win. Then `bin/kamal setup` once and `bin/kamal deploy`.
+# Kamal doesn't read .env files itself, hence the explicit load; dotenv comes
+# with Kamal. Not .env.development: SOLID_QUEUE_IN_PUMA would reach bin/dev,
+# which has no queue database.
+<% require "dotenv"; Dotenv.load(".env.deploy") %>
 
 # Name of your application. Used to uniquely configure containers.
 service: rori-demo
@@ -50,7 +54,7 @@ env:
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
-    SOLID_QUEUE_IN_PUMA: true
+    SOLID_QUEUE_IN_PUMA: <%= ENV.fetch("SOLID_QUEUE_IN_PUMA", "true") %>
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
