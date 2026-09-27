@@ -19,7 +19,7 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
+        run: bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error
 
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
@@ -92,6 +92,12 @@ jobs:
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test
+
+      # Same as bin/ci's "Tests: Seeds": db/seeds.rb still loads into a fresh schema.
+      - name: Load the seeds
+        env:
+          RAILS_ENV: test
+        run: bin/rails db:seed:replant
 
   # Off on GitHub: three timing-sensitive tests fail on the runners' headless
   # Chrome while passing locally. Run them with `bin/rails test:system`.
