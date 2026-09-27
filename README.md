@@ -47,7 +47,9 @@ bin/kamal deploy          # after that
 files); variables set in the shell take precedence.
 
 Visitors can create, edit and delete anything; `DemoResetJob` empties the
-app's tables and puts the seeds back every night at 04:00 UTC
+app's tables and puts the seeds back, with the `db:seed:scale` volume on top
+(200 users, 2,000 projects, 300 services; the same world every time), every
+night at 04:00 UTC
 (`config/recurring.yml`). `bin/kamal replant` does it right away
 (`bin/rails demo:replant` locally — it wipes your development data too). Notifications from
 server-side commands reach every open desk, so all visitors see each other's
