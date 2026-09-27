@@ -1,0 +1,21 @@
+{
+  // Fixture files that use ERB are not valid YAML until Rails renders them.
+  "file_types": {
+    "YAML+ERB": [
+      "**/*.yml"
+    ]
+  },
+  "lsp": {
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          // SchemaStore matches fixture names like submissions.yml against
+          // unrelated tools' schemas; Rails fixtures have no schema.
+          "schemaStore": {
+            "enable": false
+          }
+        }
+      }
+    }
+  }
+}
