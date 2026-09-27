@@ -6,7 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
-- **Developers:** the public demo deploys with Kamal (one server, TLS, SQLite on a volume), configured in a gitignored `.env.deploy` (`DEMO_SERVER`, `DEMO_HOST`, `SOLID_QUEUE_IN_PUMA`; copy `.env.deploy.example`) that `config/deploy.yml` loads, and `DemoResetJob` restores the seeds every night.
+- **Developers:** the public demo deploys with Kamal (one server, TLS, SQLite on a volume), configured in a gitignored `.env.deploy` (`DEMO_SERVER`, `DEMO_HOST`, `SOLID_QUEUE_IN_PUMA`; copy `.env.deploy.example`) that `config/deploy.yml` loads. Every night `DemoResetJob` empties the app's tables and re-seeds them; `bin/kamal replant` (`bin/rails demo:replant`) does it on demand.
 - **Developers:** `script/readme_media.rb` renders the gem README's screenshots and animated tour from a scripted browser session (`bin/rails test script/readme_media.rb`; not part of CI).
 - **Developers:** `mise.toml` pins the toolchain (Ruby, Rust, Tauri CLI), and `bin/setup` installs it with mise, then gems, the native app's crates and the database, so a fresh clone is one command away from running.
 - **Developers:** the rori gem has its own repository, [varyform/rori](https://github.com/varyform/rori), keeping its history since the rename, and is published on rubygems.org: the demo uses `gem "rori", "~> 0.1"` (0.1.0); `path: "../rori"` works on a local checkout.

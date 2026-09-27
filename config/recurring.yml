@@ -10,7 +10,8 @@
 #     schedule: at 5am every day
 
 production:
-  reset_demo:
+  # Empty the app's tables and re-seed (bin/kamal replant does it now).
+  replant_demo:
     class: DemoResetJob
     schedule: every day at 4am UTC
 

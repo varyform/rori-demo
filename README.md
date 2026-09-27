@@ -46,8 +46,10 @@ bin/kamal deploy          # after that
 `config/deploy.yml` loads `.env.deploy` itself (Kamal doesn't read `.env`
 files); variables set in the shell take precedence.
 
-Visitors can create, edit and delete anything; `DemoResetJob` puts the seeds
-back every night at 04:00 UTC (`config/recurring.yml`). Notifications from
+Visitors can create, edit and delete anything; `DemoResetJob` empties the
+app's tables and puts the seeds back every night at 04:00 UTC
+(`config/recurring.yml`). `bin/kamal replant` does it right away
+(`bin/rails demo:replant` locally — it wipes your development data too). Notifications from
 server-side commands reach every open desk, so all visitors see each other's
 "Search reindexed".
 

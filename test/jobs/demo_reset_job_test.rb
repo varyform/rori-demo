@@ -11,5 +11,13 @@ class DemoResetJobTest < ActiveJob::TestCase
     assert_equal %w[ ada@example.com oleh@example.com ], User.order(:email).pluck(:email)
     assert_equal [ "Analytical Engine", "Blog", "Desk UI", "Dotfiles" ], Project.order(:name).pluck(:name)
     assert_equal 3, Service.find_by!(name: "api-gateway").replicas
+    assert_equal 3, Service.count
+  end
+
+  test "leaves Rails' own bookkeeping alone" do
+    DemoResetJob.perform_now
+
+    assert ActiveRecord::Base.connection_pool.schema_migration.versions.any?
+    assert_equal "test", ActiveRecord::Base.connection_pool.internal_metadata[:environment]
   end
 end
