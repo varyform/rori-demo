@@ -8,7 +8,7 @@
 # Used by `bin/rails db:seed:scale` (development) and the public demo's
 # replant (DemoResetJob).
 class ScaleSeed
-  COUNTS = { users: 200, projects: 2_000, services: 300 }.freeze
+  COUNTS = { users: 50, projects: 200, services: 100 }.freeze
   SEED = 20_260_925
 
   FIRST_NAMES = %w[Ada Grace Linus Margaret Ken Barbara Dennis Frances Alan Radia Guido Yukihiro Anders Brendan Sophie Tim].freeze

@@ -1,6 +1,6 @@
 # The public demo's replant: every table in the app's database is emptied,
-# the seeds go back in and the scale data (ScaleSeed: 200 users, 2,000
-# projects, 300 services, the same world every time) on top — whatever
+# the seeds go back in and the scale data (ScaleSeed::COUNTS, the same world
+# every time) on top — whatever
 # visitors created, edited or deleted. Nightly from config/recurring.yml; by
 # hand with `bin/kamal replant` (bin/rails demo:replant).
 #

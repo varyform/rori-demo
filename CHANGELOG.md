@@ -6,7 +6,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 ## Unreleased
 
 ### Added
-- **Developers:** the public demo deploys with Kamal (one server, TLS, SQLite on a volume), configured in a gitignored `.env.deploy` (`DEMO_SERVER`, `DEMO_HOST`, `SOLID_QUEUE_IN_PUMA`; copy `.env.deploy.example`) that `config/deploy.yml` loads. Every night `DemoResetJob` empties the app's tables and re-seeds them, scale data included (`ScaleSeed`, shared with `db:seed:scale`: 200 users, 2,000 projects, 300 services); `bin/kamal replant` (`bin/rails demo:replant`) does it on demand.
+- **Developers:** the public demo deploys with Kamal (one server, TLS, SQLite on a volume), configured in a gitignored `.env.deploy` (`DEMO_SERVER`, `DEMO_HOST`, `SOLID_QUEUE_IN_PUMA`; copy `.env.deploy.example`) that `config/deploy.yml` loads. Every night `DemoResetJob` empties the app's tables and re-seeds them, scale data included (`ScaleSeed`, shared with `db:seed:scale`: 50 users, 200 projects, 100 services); `bin/kamal replant` (`bin/rails demo:replant`) does it on demand.
 - **Developers:** `script/readme_media.rb` renders the gem README's screenshots and animated tour from a scripted browser session (`bin/rails test script/readme_media.rb`; not part of CI).
 - **Developers:** `mise.toml` pins the toolchain (Ruby, Rust, Tauri CLI), and `bin/setup` installs it with mise, then gems, the native app's crates and the database, so a fresh clone is one command away from running.
 - **Developers:** the rori gem has its own repository, [varyform/rori](https://github.com/varyform/rori), keeping its history since the rename, and is published on rubygems.org: the demo uses `gem "rori", "~> 0.1"` (0.1.0); `path: "../rori"` works on a local checkout.
@@ -26,7 +26,7 @@ Notable changes to the desk, newest first. Each entry names who it's for:
 - **Users:** ⌘K shows the keyboard shortcut next to each command that has one (⌥W, ⌥⇧T, ⌥`…; ⌘ in the macOS app).
 - **Users:** the macOS app toggles full screen with fn/Globe+F or ⌃⌘F (View → Toggle Full Screen).
 - **Users:** on an empty desk, Space or Enter opens ⌘K.
-- **Developers:** `bin/rails db:seed:scale` bulk-adds users, projects and services (`USERS=200 PROJECTS=2000 SERVICES=300` by default, `SEED=` for a different repeatable world) to check lists, ⌘K search and refreshes at volume. Development only; each run adds on top.
+- **Developers:** `bin/rails db:seed:scale` bulk-adds users, projects and services (`USERS=50 PROJECTS=200 SERVICES=100` by default, `SEED=` for a different repeatable world) to check lists, ⌘K search and refreshes at volume. Development only; each run adds on top.
 - **Users:** fuzzy matching spans nested lists in ⌘K and the terminal: `uthen` finds UI › Theme › Nord, `uwc` UI › Wallpaper › Cover menu bar. Matches are ranked by word and segment starts, runs and gaps (best alignment, not first letters found), shallow paths first when equally good.
 - **Users:** a drop-down terminal on `` ` `` (outside text fields; `Rori.terminal_key`, or `⌥``/`⌘`` and ⌘K "Toggle terminal"). It runs every ⌘K command with the same matching: words walk the nested lists (`ui wallpaper cover`, `new user`, `oleh`), Tab completes one level at a time, ↑↓ recall history, `help` lists the top level, `clear` wipes the scrollback.
 - **Users:** ⌘K / terminal → UI › Theme and UI › Wallpaper › Safe (inside the desk) | Cover menu bar (behind the menu bar too) | Off, remembered across launches.

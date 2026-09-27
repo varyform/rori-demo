@@ -1,8 +1,8 @@
 # Scale data on top of (or instead of) db:seed (see ScaleSeed), then prints
 # the totals.
 #
-#   bin/rails db:seed:scale                        # 200 users, 2k projects, 300 services
-#   USERS=50 PROJECTS=500 SERVICES=100 bin/rails db:seed:scale
+#   bin/rails db:seed:scale                        # 50 users, 200 projects, 100 services
+#   USERS=200 PROJECTS=2000 SERVICES=300 bin/rails db:seed:scale
 #   SEED=42 bin/rails db:seed:scale                # a different, still repeatable world
 #
 # Development (and its test) only; the public demo gets its scale data from

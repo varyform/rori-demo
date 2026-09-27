@@ -48,10 +48,10 @@ files); variables set in the shell take precedence.
 
 Visitors can create, edit and delete anything; `DemoResetJob` empties the
 app's tables and puts the seeds back, with the `db:seed:scale` volume on top
-(200 users, 2,000 projects, 300 services; the same world every time), every
-night at 04:00 UTC
-(`config/recurring.yml`). `bin/kamal replant` does it right away
-(`bin/rails demo:replant` locally — it wipes your development data too). Notifications from
+(50 users, 200 projects, 100 services, sized for a small server; the same
+world every time), every night at 04:00 UTC (`config/recurring.yml`).
+`bin/kamal replant` does it right away (`bin/rails demo:replant` locally —
+it wipes your development data too). Notifications from
 server-side commands reach every open desk, so all visitors see each other's
 "Search reindexed".
 
@@ -59,7 +59,7 @@ server-side commands reach every open desk, so all visitors see each other's
 
 ```sh
 bin/rails db:seed         # a few users, projects and services
-bin/rails db:seed:scale   # + 200 users, 2,000 projects, 300 services
+bin/rails db:seed:scale   # + 50 users, 200 projects, 100 services
 ```
 
 `db:seed:scale` bulk-inserts data for checking lists, ⌘K search and live
@@ -67,7 +67,7 @@ refreshes at volume. Development only; each run adds on top. Sizes and the
 random seed are configurable:
 
 ```sh
-USERS=50 PROJECTS=500 SERVICES=100 bin/rails db:seed:scale
+USERS=200 PROJECTS=2000 SERVICES=300 bin/rails db:seed:scale   # real volume
 SEED=42 bin/rails db:seed:scale          # a different, still repeatable data set
 ```
 
