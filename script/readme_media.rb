@@ -1,16 +1,20 @@
 require "application_system_test_case"
 
-# Renders the gem README's media into ../rori/docs: still screenshots and an
-# animated tour. Not a test and not part of CI — a scripted browser session
-# that happens to use the system-test harness (server, headless Chrome, a
-# throwaway database). Needs network for the Unsplash wallpaper, and cwebp,
-# img2webp and ImageMagick (brew install webp imagemagick).
+# Renders the gem README's media into ../rori/docs — still screenshots and an
+# animated tour, all 1920×1080 — plus the tour as MP4 in ../media (for
+# uploads to Reddit, social sites; GitHub READMEs can't play repo videos).
+# Not a test and not part of CI — a scripted browser session that happens to
+# use the system-test harness (server, headless Chrome, a throwaway database).
+# Needs network for the Unsplash wallpaper, and cwebp, img2webp and ffmpeg
+# (brew install webp ffmpeg).
 #
 #   bin/rails test script/readme_media.rb                   # everything
 #   bin/rails test script/readme_media.rb -n test_animation  # just the tour
 #   KEEP_FRAMES=1 …                                          # keep tmp/readme_frames
 class ReadmeMedia < ApplicationSystemTestCase
   DOCS = Rails.root.join("../rori/docs")
+  MEDIA = Rails.root.join("../media")
+  VIEWPORT = { width: 1920, height: 1080 }
   WALLPAPER = "1464822759023-fed622ff2c3b"
   CAST = {
     "Grace Hopper" => [ [ "COBOL compiler", "done" ], [ "Nanoseconds talk", "active" ] ],
@@ -28,8 +32,7 @@ class ReadmeMedia < ApplicationSystemTestCase
     "Tim Berners-Lee" => [ [ "World Wide Web", "done" ], [ "Solid", "idea" ] ]
   }
 
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 1440, 1043 ] do |options| # a 1440×900 viewport
-    options.add_argument("--force-device-scale-factor=2")
+  driven_by :selenium, using: :headless_chrome, screen_size: [ VIEWPORT[:width], VIEWPORT[:height] + 200 ] do |options|
     options.add_argument("--hide-scrollbars")
   end
 
@@ -45,6 +48,8 @@ class ReadmeMedia < ApplicationSystemTestCase
     Rori.wallpapers = true
     FileUtils.mkdir_p(DOCS.join("screenshots"))
 
+    # Exactly Full HD at 1×, whatever the headless window's chrome takes.
+    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", **VIEWPORT, deviceScaleFactor: 1, mobile: false)
     visit "/up"
     { wallpaper_pin: WALLPAPER, theme: "catppuccin-mocha", wallpaper: "cover" }.each do |name, value|
       page.driver.browser.manage.add_cookie(name: name.to_s, value:)
@@ -239,14 +244,25 @@ class ReadmeMedia < ApplicationSystemTestCase
       @frames << [ path, duration ]
     end
 
-    # Half size (the README shows it at ~900px), lossy, looping.
+    # The same frames twice: a looping lossy WebP for the README, and an MP4
+    # (H.264, plays everywhere) with each frame held for its duration.
     def render_animation(name)
-      @frames.each { |path, _| system("magick", path.to_s, "-resize", "50%", path.to_s, exception: true) }
       args = @frames.flat_map { |path, duration| [ "-d", duration.to_s, path.to_s ] }
-      out = DOCS.join("#{name}.webp")
-      system("img2webp", "-loop", "0", "-lossy", "-q", "80", "-m", "6", *args, "-o", out.to_s, exception: true)
+      webp = DOCS.join("#{name}.webp")
+      system("img2webp", "-loop", "0", "-lossy", "-q", "80", "-m", "6", *args, "-o", webp.to_s, exception: true, out: File::NULL)
+      puts "#{webp.basename}: #{@frames.size} frames, #{File.size(webp) / 1024} KB"
+
+      FileUtils.mkdir_p(MEDIA)
+      mp4 = MEDIA.join("#{name}.mp4")
+      list = Rails.root.join("tmp/readme_frames/frames.txt")
+      # The concat demuxer ignores the last entry's duration, so it's repeated.
+      list.write(@frames.map { |path, duration| "file '#{path}'\nduration #{duration / 1000.0}\n" }.join + "file '#{@frames.last[0]}'\n")
+      system("ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", list.to_s,
+        "-vf", "fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-movflags", "+faststart",
+        mp4.to_s, exception: true)
+      puts "#{mp4.basename}: #{File.size(mp4) / 1024} KB"
+
       FileUtils.rm_rf(Rails.root.join("tmp/readme_frames")) unless ENV["KEEP_FRAMES"]
-      puts "#{name}.webp: #{@frames.size} frames, #{File.size(out) / 1024} KB"
     end
 
     def webp(png, out)

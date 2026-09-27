@@ -7,6 +7,8 @@ engine gem (see its README); this app is its demo host, configured in
 `config/initializers/rori.rb`.
 See `CHANGELOG.md` for what it does.
 
+Live at **https://rori.varyform.info** (resets every night).
+
 ## Setup
 
 ```sh
