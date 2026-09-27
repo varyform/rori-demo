@@ -9,7 +9,7 @@ require "application_system_test_case"
 # (brew install webp ffmpeg).
 #
 #   bin/rails test script/readme_media.rb                   # everything
-#   bin/rails test script/readme_media.rb -n test_animation  # just the tour
+#   bin/rails test script/readme_media.rb -i test_animation  # just the tour
 #   KEEP_FRAMES=1 …                                          # keep tmp/readme_frames
 class ReadmeMedia < ApplicationSystemTestCase
   DOCS = Rails.root.join("../rori/docs")
@@ -142,7 +142,7 @@ class ReadmeMedia < ApplicationSystemTestCase
 
     type_into_focus "`"
     frames_while_moving(2)
-    "ui theme rose dawn".each_char { |char| find(".rori-terminal__input").send_keys(char); frame 70 }
+    "ui theme gruvbox".each_char { |char| find(".rori-terminal__input").send_keys(char); frame 70 }
     frame 600
     find(".rori-terminal__input").send_keys :enter
     frame 1200
